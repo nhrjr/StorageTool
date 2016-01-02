@@ -20,11 +20,13 @@ namespace StorageTool
         private Queue<TaskMode> MoveQueue;
         private Log log;
         private MovePane moveStack;
+        private IProgress<State> state;
 
-        public MoveFolders( Log logvalue, MovePane stack)
+        public MoveFolders( Log logvalue, MovePane stack, IProgress<State> msg) 
         {
             log = logvalue;
             moveStack = stack;
+            state = msg;
             GamesToStorage = new Queue<Profile>();
             StorageToGames = new Queue<Profile>();
             LinkToGames = new Queue<Profile>();
@@ -119,7 +121,9 @@ namespace StorageTool
                 moveStack[moveStack.Index].Status = "Finished";
                 moveStack.Index++;
                 MoveQueue.Dequeue();
+                
             }
+            state.Report(State.FINISHED_QUEUE);
         }
 
 

@@ -41,8 +41,8 @@
         <!--<TextBox x:Name="inputLeft" Text="{Binding profileInput.LeftInput,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Margin="10,35,39,0" Height="20" VerticalAlignment="Top"/>
         <TextBox x:Name="inputRight" Text="{Binding profileInput.RightInput,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Margin="10,35,35,0" Grid.Column="1" Height="20" VerticalAlignment="Top"/>-->
 
-        <TextBlock x:Name="inputLeft" Text="{Binding profileInput.LeftInput,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Margin="10,10,39,0" Height="20" VerticalAlignment="Top" Background="#FF9B9B9B" Grid.Column="1"/>
-        <TextBlock x:Name="inputRight" Text="{Binding profileInput.RightInput,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Margin="10,35,39,0" Grid.Column="1" Height="20" VerticalAlignment="Top" Background="#FF9B9B9B"/>
+        <TextBlock x:Name="inputLeft" Text="{Binding ProfileInput.LeftInput}"  Margin="10,10,39,0" Height="20" VerticalAlignment="Top" Background="#FF9B9B9B" Grid.Column="1"/>
+        <TextBlock x:Name="inputRight" Text="{Binding ProfileInput.RightInput}" Margin="10,35,39,0" Grid.Column="1" Height="20" VerticalAlignment="Top" Background="#FF9B9B9B"/>
 
         <ListView x:Name="listView" ItemsSource="{Binding Loc.FoldersLeft}" SelectedItem="{Binding Loc.SelectedFolderLeft}" GridViewColumnHeader.Click="sortLocations_Click" Margin="10,30,10,33" Grid.Row="1">
             <ListView.View>
@@ -66,7 +66,7 @@
             </ListView.View>
         </ListView>
 
-        <ListView x:Name="dirListRight" ItemsSource="{Binding Loc.FoldersRight}" DisplayMemberPath="DirInfo.Name" GridViewColumnHeader.Click="sortLocations_Click" SelectedItem="{Binding Loc.SelectedFolderRight}" Margin="10,30,10,33" Grid.Column="1" Grid.Row="1">
+        <ListView x:Name="dirListRight" ItemsSource="{Binding Loc.FoldersRight}" GridViewColumnHeader.Click="sortLocations_Click" SelectedItem="{Binding Loc.SelectedFolderRight}" Margin="10,30,10,33" Grid.Column="1" Grid.Row="1">
             <ListView.View>
                 <GridView>
                     <GridViewColumn  DisplayMemberBinding="{Binding DirInfo.Name}" Width="250">
@@ -88,7 +88,7 @@
             </ListView.View>
         </ListView>
 
-        <ListView x:Name="relinkList" ItemsSource="{Binding Loc.FoldersUnlinked}" DisplayMemberPath="DirInfo.Name" GridViewColumnHeader.Click="sortLocations_Click" SelectedItem="{Binding Loc.SelectedFolderReLink}" Grid.Column="1" Margin="10,20,10,25" Grid.Row="2">
+        <ListView x:Name="relinkList" ItemsSource="{Binding Loc.FoldersUnlinked}" GridViewColumnHeader.Click="sortLocations_Click" SelectedItem="{Binding Loc.SelectedFolderReLink}" Grid.Column="1" Margin="10,20,10,25" Grid.Row="2">
             <ListView.View>
                 <GridView>
                     <GridViewColumn  DisplayMemberBinding="{Binding DirInfo.Name}" Width="250">
@@ -115,10 +115,10 @@
         <Button x:Name="relinkButton" Click="relinkButton_Click" Content="Link" Grid.Column="1" Margin="10,0,0,0" Grid.Row="2" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="75"/>
 
         <ListBox x:Name="logList" ItemsSource="{Binding Log.LogList}" Margin="10" Grid.Row="2"/>
-        <ComboBox x:Name="profileBox" ItemsSource="{Binding Profiles}" DisplayMemberPath="ProfileName" SelectionChanged="profileBox_SelectionChanged" SelectedItem="{Binding Profiles.ActiveProfile}" SelectedIndex="{Binding Profiles.ActiveProfileIndex.ProfileIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,35,0,0" VerticalAlignment="Top" Width="176" Height="22"/>
+        <ComboBox x:Name="profileBox" ItemsSource="{Binding Profiles}" DisplayMemberPath="ProfileName" SelectionChanged="profileBox_SelectionChanged" SelectedIndex="{Binding Profiles.ActiveProfileIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,35,0,0" VerticalAlignment="Top" Width="176" Height="22"/>
         <Button x:Name="addProfile" Click="addProfile_Click" Content="Add profile" Margin="436,61,10,0" VerticalAlignment="Top" RenderTransformOrigin="1.311,0.826" Height="20" Grid.Column="1" Grid.RowSpan="2"/>
         <Button x:Name="removeProfile" Click="removeProfile_Click" Content="Remove selected profile" HorizontalAlignment="Left" Margin="191,35,0,0" VerticalAlignment="Top" Width="137" Height="22"/>
-        <TextBox x:Name="profileName" Text="{Binding profileInput.ProfileName,Mode=OneWayToSource,UpdateSourceTrigger=PropertyChanged}" Margin="198,60,99,0" TextWrapping="Wrap" RenderTransformOrigin="0.459,-0.163" Grid.Column="1" Height="20" VerticalAlignment="Top"/>
+        <TextBox x:Name="profileName" Text="{Binding ProfileInput.ProfileName,UpdateSourceTrigger=PropertyChanged}" Margin="198,60,99,0" TextWrapping="Wrap" RenderTransformOrigin="0.459,-0.163" Grid.Column="1" Height="20" VerticalAlignment="Top"/>
         <TextBlock x:Name="gameFolderName" Margin="10,10,0,0" TextWrapping="Wrap" Text="{Binding Loc.LocationLeftFullName}" VerticalAlignment="Top" Height="20" Grid.Row="1" HorizontalAlignment="Left" Width="405"/>
         <TextBlock x:Name="storageFolderName" Grid.Column="1" Margin="10,10,0,0" TextWrapping="Wrap" Text="{Binding Loc.LocationRightFullName}" VerticalAlignment="Top" Height="20" Grid.Row="1" HorizontalAlignment="Left" Width="405"/>
         <TextBlock x:Name="selectedGame" Margin="90,0,0,8" Grid.Row="1" TextWrapping="Wrap" Text="{Binding Loc.SelectedFolderLeft.DirInfo.Name}" Height="18" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="296"/>

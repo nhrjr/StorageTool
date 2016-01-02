@@ -22,6 +22,7 @@ namespace StorageTool
         }
 
 
+
         public void SetFolders(Profile input)
         {
             LinkedFolders.Clear();

@@ -22,6 +22,7 @@ using Monitor.Core.Utilities;
 
 namespace StorageTool
 {
+    public enum State { FINISHED_QUEUE };
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -32,17 +33,23 @@ namespace StorageTool
         private GridViewColumnHeader listViewSortCol = null;
         private SortAdorner listViewSortAdorner = null;        
 
+
         public Log Log { get; set; } = new Log();
         public FolderPane Loc { get; set; } = new FolderPane();
         public MovePane MoveStack { get; set; } = new MovePane();
         public Profiles Profiles { get; set; } = new Profiles();
         public ProfileInput ProfileInput{ get; set; } = new ProfileInput();
+        
 
         public MainWindow()
         {
             InitializeComponent();
+            var msg = new Progress<State>(fu =>
+            {
+                if (fu == State.FINISHED_QUEUE) { Loc.RefreshFolders(Profiles[Profiles.ActiveProfileIndex]); }//Loc.SetActiveProfile(Profiles[Profiles.ActiveProfileIndex]); }
+            });
 
-            MoveFolders = new MoveFolders(Log, MoveStack);
+            MoveFolders = new MoveFolders(Log, MoveStack, msg);
 
             Profiles = new Profiles(Properties.Settings.Default.Config.Profiles);         
             //Profiles.Add(new Profile("Steam", @"C:\Games\Steam\SteamApps\common", @"D:\Games\Steam"));
@@ -55,7 +62,10 @@ namespace StorageTool
 
         private void profileBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            Loc.SetActiveProfile(Profiles.ActiveProfile);
+            if (Profiles.ActiveProfileIndex >= 0 && Profiles.ActiveProfileIndex <= Profiles.Count)
+                Loc.SetActiveProfile(Profiles[Profiles.ActiveProfileIndex]);
+            else
+                Loc.SetActiveProfile(null);
         }
 
         private void pickFolderLeft_Click(object sender, RoutedEventArgs e)
@@ -78,19 +88,20 @@ namespace StorageTool
         private void addProfile_Click(object sender, RoutedEventArgs e)
         {
             Profiles.Add(ProfileInput.GetProfile());
+            ProfileInput.Clear();
             Properties.Settings.Default.Config.Profiles = Profiles.GetProfileBase();
         }
 
         private void removeProfile_Click(object sender, RoutedEventArgs e)
         {
-            string name = Profiles.ActiveProfile.ProfileName;
+            string name = Profiles[Profiles.ActiveProfileIndex].ProfileName;
             string message = "Are you sure you want to delete \"" + name + "\" profile?";
             MessageBoxButton btnMessageBox = MessageBoxButton.YesNo;
             MessageBoxResult rsltMessageBox = MessageBox.Show(message, "Delete Profile", btnMessageBox);
             switch (rsltMessageBox)
             {
                 case MessageBoxResult.Yes :
-                    Profiles.Remove(Profiles.ActiveProfile);
+                    Profiles.RemoveProfile();
                     profileBox.SelectedItem = null;
                     break;
             }
@@ -101,20 +112,31 @@ namespace StorageTool
         private void moveToRight_Click(object sender, RoutedEventArgs e)
         {
             Log.LogMessage = "Moving " + Loc.SelectedFolderLeft.DirInfo.Name + " to Storage.";
-            this.MoveFolders.addToMoveQueue(TaskMode.STORE, new Profile(Loc.SelectedFolderLeft.DirInfo, Profiles.ActiveProfile.StorageFolder));
-            
+            LocationsDirInfo tmp1 = Loc.SelectedFolderLeft;
+            DirectoryInfo tmp2 = Profiles[Profiles.ActiveProfileIndex].StorageFolder;
+            this.MoveFolders.addToMoveQueue(TaskMode.STORE, new Profile(tmp1.DirInfo, tmp2));
+            Loc.SelectedFolderLeft = null;
+            Loc.FoldersLeft.Remove(tmp1);
         }
 
         private void moveToLeft_Click(object sender, RoutedEventArgs e)
         {
             Log.LogMessage = "Moving " + Loc.SelectedFolderRight.DirInfo.Name + " to Game folder.";
-            this.MoveFolders.addToMoveQueue(TaskMode.RESTORE, new Profile(Profiles.ActiveProfile.GameFolder, Loc.SelectedFolderRight.DirInfo));
+            DirectoryInfo tmp1 = Profiles[Profiles.ActiveProfileIndex].GameFolder;
+            LocationsDirInfo tmp2 = Loc.SelectedFolderRight;
+            this.MoveFolders.addToMoveQueue(TaskMode.RESTORE, new Profile(tmp1,tmp2.DirInfo ));
+            Loc.SelectedFolderRight = null;
+            Loc.FoldersRight.Remove(tmp2);
         }
 
         private void relinkButton_Click(object sender, RoutedEventArgs e)
         {
             Log.LogMessage = "Linking " + Loc.SelectedFolderReLink.DirInfo.Name + " to Game folder.";
-            this.MoveFolders.addToMoveQueue(TaskMode.RELINK, new Profile(Profiles.ActiveProfile.GameFolder, Loc.SelectedFolderReLink.DirInfo));
+            DirectoryInfo tmp1 = Profiles[Profiles.ActiveProfileIndex].GameFolder;
+            LocationsDirInfo tmp2 = Loc.SelectedFolderReLink;
+            this.MoveFolders.addToMoveQueue(TaskMode.RELINK, new Profile( tmp1, tmp2.DirInfo ));
+            Loc.SelectedFolderReLink = null;
+            Loc.FoldersUnlinked.Remove(tmp2);
         }
 
         private void sortLocations_Click(object sender, RoutedEventArgs e)

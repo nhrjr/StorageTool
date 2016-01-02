@@ -106,7 +106,14 @@ namespace StorageTool
             }
             return var;
         }
-        public Profile ActiveProfile { get; set; } = null;
+        //public Profile ActiveProfile { get; set; } = null;
+        public int ActiveProfileIndex { get; set; }
+        public void RemoveProfile()
+        {
+            int index = ActiveProfileIndex;
+            ActiveProfileIndex = 0;
+            this.RemoveAt(index);
+        }
     }
 
 

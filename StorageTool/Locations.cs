@@ -36,13 +36,95 @@ namespace StorageTool
         public LocationsDirInfo(string path) {
             DirInfo = new DirectoryInfo(path);
             DirSize = 0;
-            Task.Run(() => ScanFolderAsync(DirInfo).ContinueWith(task => DirSize = task.Result).ConfigureAwait(false));
+            //try
+            //{
+            //    if(DirSize == 0)
+            //    Task.Run(() => ScanFolderAsync(DirInfo).ContinueWith(task => DirSize = task.Result).ConfigureAwait(false));
+            //}
+            //catch (UnauthorizedAccessException e)
+            //{
+                
+            //}
         }
         public LocationsDirInfo(DirectoryInfo dir)
         {
             DirInfo = dir;
             DirSize = 0;
-            Task.Run(() => ScanFolderAsync(DirInfo).ContinueWith(task => DirSize = task.Result).ConfigureAwait(false));
+            //try
+            //{
+            //    if(DirSize == 0)
+            //    Task.Run(() => ScanFolderAsync(DirInfo).ContinueWith(task => DirSize = task.Result).ConfigureAwait(false));
+            //}
+            //catch (UnauthorizedAccessException e)
+            //{
+
+            //}
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public void OnPropertyChanged(string propName)
+        {
+            if (this.PropertyChanged != null)
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
+        }
+
+
+    }
+
+    public class FolderPane : INotifyPropertyChanged {
+
+        private ObservableCollection<LocationsDirInfo> foldersLeft = new ObservableCollection<LocationsDirInfo>();
+        private ObservableCollection<LocationsDirInfo> foldersRight = new ObservableCollection<LocationsDirInfo>();
+        private ObservableCollection<LocationsDirInfo> foldersUnlinked = new ObservableCollection<LocationsDirInfo>();
+
+        private LocationsDirInfo selectedFolderLeft = null;
+        private LocationsDirInfo selectedFolderRight = null;
+        private LocationsDirInfo selectedFolderReLink = null;
+
+        private string locationLeftFullName = null;
+        private string locationRightFullName = null;
+
+        private AnalyzeFolders setFolders = new AnalyzeFolders();
+        //private AnalyzeFolders refreshFolders = new AnalyzeFolders();
+
+        public void SetActiveProfile(Profile ActiveProfile)
+        {
+            if (ActiveProfile != null)
+            {
+                setFolders.SetFolders(ActiveProfile);
+                this.LocationLeftFullName = ActiveProfile.GameFolder.FullName;
+                this.LocationRightFullName = ActiveProfile.StorageFolder.FullName;
+                this.FoldersLeft = new ObservableCollection<LocationsDirInfo>(setFolders.StorableFolders);
+                this.FoldersRight = new ObservableCollection<LocationsDirInfo>(setFolders.LinkedFolders);
+                this.FoldersUnlinked = new ObservableCollection<LocationsDirInfo>(setFolders.UnlinkedFolders);
+                RefreshSizes();
+            }
+            else
+            {
+                this.LocationLeftFullName = null;
+                this.LocationRightFullName = null;
+                this.FoldersLeft.Clear();
+                this.FoldersRight.Clear();
+                this.FoldersUnlinked.Clear();
+            }
+        }
+
+        public void RefreshSizes()
+        {
+            foreach(LocationsDirInfo dir in FoldersLeft)
+            {
+                if(dir.DirSize == 0) Task.Factory.StartNew(() => ScanFolderAsync(dir.DirInfo).ContinueWith(task => dir.DirSize = task.Result).ConfigureAwait(false), TaskCreationOptions.LongRunning);
+            }
+            foreach (LocationsDirInfo dir in FoldersRight)
+            {
+                if (dir.DirSize == 0) Task.Factory.StartNew(() => ScanFolderAsync(dir.DirInfo).ContinueWith(task => dir.DirSize = task.Result).ConfigureAwait(false), TaskCreationOptions.LongRunning);
+            }
+            foreach (LocationsDirInfo dir in FoldersUnlinked)
+            {
+                if (dir.DirSize == 0) Task.Factory.StartNew(() => ScanFolderAsync(dir.DirInfo).ContinueWith(task => dir.DirSize = task.Result).ConfigureAwait(false), TaskCreationOptions.LongRunning);
+            }
+
         }
 
         private async Task<long> ScanFolderAsync(DirectoryInfo dir)
@@ -55,45 +137,21 @@ namespace StorageTool
             size = AnalyzeFolders.DirSizeSync(dir.DirInfo);
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
 
-        public void OnPropertyChanged(string propName)
+
+
+        public void RefreshFolders(Profile ActiveProfile)
         {
-            if (this.PropertyChanged != null)
-                this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
-        }
-    }
-    public class Locations : ObservableCollection<LocationsDirInfo>
-    {
-        public Locations() : base() { }
-        public Locations(List<LocationsDirInfo> list ) : base(list) { }
-    }
-
-    public class FolderPane : INotifyPropertyChanged {
-
-        private Locations foldersLeft = new Locations();
-        private Locations foldersRight = new Locations();
-        private Locations foldersUnlinked = new Locations();
-
-        private LocationsDirInfo selectedFolderLeft = null;
-        private LocationsDirInfo selectedFolderRight = null;
-        private LocationsDirInfo selectedFolderReLink = null;
-
-        private string locationLeftFullName = null;
-        private string locationRightFullName = null;
-
-        private AnalyzeFolders analyzeFolders = new AnalyzeFolders();
-
-        public void SetActiveProfile(Profile ActiveProfile)
-        {
-            if (ActiveProfile != null)
+            if(ActiveProfile != null)
             {
-                analyzeFolders.SetFolders(ActiveProfile);
-                this.LocationLeftFullName = ActiveProfile.GameFolder.FullName;
-                this.LocationRightFullName = ActiveProfile.StorageFolder.FullName;
-                this.FoldersLeft = new Locations(analyzeFolders.StorableFolders);
-                this.FoldersRight = new Locations(analyzeFolders.LinkedFolders);
-                this.FoldersUnlinked = new Locations(analyzeFolders.UnlinkedFolders);
+                setFolders.SetFolders(ActiveProfile);
+                var tmpList1 = setFolders.StorableFolders; //.Where(n => !FoldersLeft.Select(n1 => n1.DirInfo.FullName).Contains(n.DirInfo.FullName)).ToList();
+                var tmpList2 = setFolders.LinkedFolders; //.Where(n => !FoldersRight.Select(n1 => n1.DirInfo.FullName).Contains(n.DirInfo.FullName)).ToList();
+                var tmpList3 = setFolders.UnlinkedFolders; //.Where(n => !FoldersUnlinked.Select(n1 => n1.DirInfo.FullName).Contains(n.DirInfo.FullName)).ToList();
+                foreach(LocationsDirInfo g in tmpList1) if (!FoldersLeft.Any(f => f.DirInfo.FullName == g.DirInfo.FullName)) this.FoldersLeft.Add(g);
+                foreach(LocationsDirInfo g in tmpList2) if (!FoldersRight.Any(f => f.DirInfo.FullName == g.DirInfo.FullName)) this.FoldersRight.Add(g);
+                foreach(LocationsDirInfo g in tmpList3) if (!FoldersUnlinked.Any(f => f.DirInfo.FullName == g.DirInfo.FullName)) this.FoldersUnlinked.Add(g);
+                RefreshSizes();
             }
         }
 
@@ -153,7 +211,7 @@ namespace StorageTool
             }
         }
 
-        public Locations FoldersLeft
+        public ObservableCollection<LocationsDirInfo> FoldersLeft
         {
             get { return this.foldersLeft; }
             set
@@ -162,7 +220,7 @@ namespace StorageTool
                 this.OnPropertyChanged("FoldersLeft");
             }
         }
-        public Locations FoldersRight
+        public ObservableCollection<LocationsDirInfo> FoldersRight
         {
             get { return this.foldersRight; }
             set
@@ -171,7 +229,7 @@ namespace StorageTool
                 this.OnPropertyChanged("FoldersRight");
             }
         }
-        public Locations FoldersUnlinked
+        public ObservableCollection<LocationsDirInfo> FoldersUnlinked
         {
             get { return this.foldersUnlinked; }
             set
