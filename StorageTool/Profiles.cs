@@ -87,13 +87,7 @@ namespace StorageTool
     {
         public Profiles() : base () { }
         public Profiles(List<ProfileBase> input) : base(convertProfileBaseToProfile(input)) { }
-        //public event PropertyChangedEventHandler PropertyChanged;
 
-        //public void OnPropertyChanged(string propName)
-        //{
-        //    if (this.PropertyChanged != null)
-        //        this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
-        //}
         private static List<Profile> convertProfileBaseToProfile(List<ProfileBase> input)
         {
             List<Profile> var = new List<Profile>();
@@ -102,6 +96,7 @@ namespace StorageTool
             }
             return var;
         }
+
         public List<ProfileBase> GetProfileBase()
         {
             List<ProfileBase> var = new List<ProfileBase>();
@@ -111,9 +106,7 @@ namespace StorageTool
             }
             return var;
         }
-
-
-
+        public Profile ActiveProfile { get; set; } = null;
     }
 
 

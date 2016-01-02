@@ -145,11 +145,10 @@ namespace StorageTool
                 this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
         }
     }
-    public class MoveStack : ObservableCollection<MoveItem>
+    public class MovePane : ObservableCollection<MoveItem>
     {
-
         public int Index { get; set; }
-        public MoveStack() : base() { Index = 0; }
-        public MoveStack(List<MoveItem> list) : base(list) { Index = 0; }
+        public MovePane() : base() { Index = 0; }
+        public MovePane(List<MoveItem> list) : base(list) { Index = 0; }
     }
 }

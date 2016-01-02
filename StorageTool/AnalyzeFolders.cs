@@ -43,8 +43,6 @@ namespace StorageTool
 
                     if (isJunction)
                     {
-                        //DirectoryInfo targetOfJunction = new DirectoryInfo(JunctionPoint.GetTarget(@g.FullName));
-                        //if (sFolders.Contains(targetOfJunction))
                         this.LinkedFolders.Add(new LocationsDirInfo(JunctionPoint.GetTarget(@g.FullName)));
                     }
                     else
@@ -52,27 +50,25 @@ namespace StorageTool
                         this.StorableFolders.Add(new LocationsDirInfo(g));
                     }
                 }
-                catch(IOException ex)
+                catch (IOException ex)
                 {
-                    
+
                 }
             }
 
-            //List1.Where(n => !List2.select(n1 => n1.Id).Contains.(n.Id));
-            //UnlinkedFolders = sFolders.Where(n => !LinkedFolders.Select(n1 => n1.DirInfo.FullName).Contains(n.FullName)).ToList();
             List<DirectoryInfo> tmpList1 = sFolders.Where(n => LinkedFolders.Select(n1 => n1.DirInfo.FullName).Contains(n.FullName)).ToList();
             this.LinkedFolders.Clear();
             foreach (DirectoryInfo d in tmpList1)
             {
                 this.LinkedFolders.Add(new LocationsDirInfo(d));
             }
+
             List<DirectoryInfo> tmpList = sFolders.Where(n => !LinkedFolders.Select(n1 => n1.DirInfo.FullName).Contains(n.FullName)).ToList();
             foreach (DirectoryInfo d in tmpList)
             {
                 this.UnlinkedFolders.Add(new LocationsDirInfo(d));
             }
 
-            //MessageBox.Show(sFolders.Count().ToString() + " " + LinkedFolders.Count().ToString());
         }
 
         public static async Task<long> DirSizeAsync(DirectoryInfo dir)
@@ -86,7 +82,7 @@ namespace StorageTool
             DirectoryInfo[] dis = dir.GetDirectories();
             foreach(DirectoryInfo di in dis)
             {
-                Size += await DirSizeAsync(di);
+                Size += await DirSizeAsync(di).ConfigureAwait(false);
             }
             return Size;
 

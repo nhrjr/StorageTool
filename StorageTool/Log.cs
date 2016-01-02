@@ -43,9 +43,7 @@ namespace StorageTool
                 this.logList = value;
                 this.OnPropertyChanged("LogList");
             }
-        }
-        
-
+        } 
 
         public event PropertyChangedEventHandler PropertyChanged;
 

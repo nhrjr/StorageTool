@@ -17,10 +17,7 @@ namespace StorageTool
         private string sizeString;
         public string SizeString
         {
-            get
-            {
-                return sizeString;
-            }
+            get { return sizeString; }
             set
             {
                 sizeString = value;
@@ -28,10 +25,7 @@ namespace StorageTool
             }
         }
         public long DirSize {
-            get
-            {
-                return this.dirSize;
-            }
+            get { return this.dirSize; }
             set
             {
                 this.dirSize = value;
@@ -42,12 +36,23 @@ namespace StorageTool
         public LocationsDirInfo(string path) {
             DirInfo = new DirectoryInfo(path);
             DirSize = 0;
-
+            Task.Run(() => ScanFolderAsync(DirInfo).ContinueWith(task => DirSize = task.Result).ConfigureAwait(false));
         }
         public LocationsDirInfo(DirectoryInfo dir)
         {
             DirInfo = dir;
             DirSize = 0;
+            Task.Run(() => ScanFolderAsync(DirInfo).ContinueWith(task => DirSize = task.Result).ConfigureAwait(false));
+        }
+
+        private async Task<long> ScanFolderAsync(DirectoryInfo dir)
+        {
+            return await AnalyzeFolders.DirSizeAsync(dir).ConfigureAwait(false);
+        }
+
+        private void ScanFolderSync(LocationsDirInfo dir, long size)
+        {
+            size = AnalyzeFolders.DirSizeSync(dir.DirInfo);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -64,85 +69,33 @@ namespace StorageTool
         public Locations(List<LocationsDirInfo> list ) : base(list) { }
     }
 
-    public class ListOfLocations : INotifyPropertyChanged {
+    public class FolderPane : INotifyPropertyChanged {
 
-        private DirectoryInfo locationLeft;
-        private DirectoryInfo locationRight;
+        private Locations foldersLeft = new Locations();
+        private Locations foldersRight = new Locations();
+        private Locations foldersUnlinked = new Locations();
 
-        private Locations foldersLeft;
-        private Locations foldersRight;
-        private Locations foldersUnlinked;
+        private LocationsDirInfo selectedFolderLeft = null;
+        private LocationsDirInfo selectedFolderRight = null;
+        private LocationsDirInfo selectedFolderReLink = null;
 
-        private LocationsDirInfo selectedFolderLeft;
-        private LocationsDirInfo selectedFolderRight;
-        private LocationsDirInfo selectedFolderReLink;
+        private string locationLeftFullName = null;
+        private string locationRightFullName = null;
 
-        private string locationLeftFullName;
-        private string locationRightFullName;
+        private AnalyzeFolders analyzeFolders = new AnalyzeFolders();
 
-        private AnalyzeFolders analyzedFolders;
-
-        public ListOfLocations() {
-            foldersLeft = new Locations();
-            foldersRight = new Locations();
-            foldersUnlinked = new Locations();
-            analyzedFolders = new AnalyzeFolders();
-        }
-        public async Task InitAsync(IProgress<string> msg)
+        public void SetActiveProfile(Profile ActiveProfile)
         {
-            foreach (LocationsDirInfo dir in FoldersLeft)
-            {                
-                dir.DirSize = await AnalyzeFolders.DirSizeAsync(dir.DirInfo);
-                msg.Report("Scanned " + dir.DirInfo.FullName);
-            }
-            
-            foreach (LocationsDirInfo dir in FoldersRight)
-            {                
-                dir.DirSize = await AnalyzeFolders.DirSizeAsync(dir.DirInfo);
-                msg.Report("Scanned " + dir.DirInfo.FullName);
-            }
-            
-            foreach (LocationsDirInfo dir in FoldersUnlinked)
-            {                
-                dir.DirSize = await AnalyzeFolders.DirSizeAsync(dir.DirInfo);
-                msg.Report("Scanned " + dir.DirInfo.FullName);
-            }
-            
-
-        }
-
-        public void InitSync()
-        {
-            foreach (LocationsDirInfo dir in foldersLeft)
+            if (ActiveProfile != null)
             {
-                dir.DirSize = AnalyzeFolders.DirSizeSync(dir.DirInfo);
-            }
-            foreach (LocationsDirInfo dir in foldersRight)
-            {
-                dir.DirSize = AnalyzeFolders.DirSizeSync(dir.DirInfo);
-            }
-            foreach (LocationsDirInfo dir in foldersUnlinked)
-            {
-                dir.DirSize = AnalyzeFolders.DirSizeSync(dir.DirInfo);
+                analyzeFolders.SetFolders(ActiveProfile);
+                this.LocationLeftFullName = ActiveProfile.GameFolder.FullName;
+                this.LocationRightFullName = ActiveProfile.StorageFolder.FullName;
+                this.FoldersLeft = new Locations(analyzeFolders.StorableFolders);
+                this.FoldersRight = new Locations(analyzeFolders.LinkedFolders);
+                this.FoldersUnlinked = new Locations(analyzeFolders.UnlinkedFolders);
             }
         }
-
-        public void SetActiveFolder(Profile ActiveProfile,IProgress<string> msg)
-        {
-            AnalyzedFolders.SetFolders(ActiveProfile);            
-            this.LocationLeftFullName = ActiveProfile.GameFolder.FullName;
-            this.LocationRightFullName = ActiveProfile.StorageFolder.FullName;
-            this.FoldersLeft = new Locations(AnalyzedFolders.StorableFolders);
-            this.FoldersRight = new Locations(AnalyzedFolders.LinkedFolders);
-            this.FoldersUnlinked = new Locations(AnalyzedFolders.UnlinkedFolders);
-            Task.Run(() => this.InitAsync(msg)).ContinueWith(task => { msg.Report("Finished scanning folders.");
-                this.OnPropertyChanged("FoldersLeft");
-                this.OnPropertyChanged("FoldersRight");
-                this.OnPropertyChanged("FoldersUnlinked");
-            });
-        }
-
-        public AnalyzeFolders AnalyzedFolders { get { return analyzedFolders; } set { analyzedFolders = value; } }
 
         public string LocationLeftFullName
         {
@@ -154,7 +107,6 @@ namespace StorageTool
                     this.locationLeftFullName = value;
                     this.OnPropertyChanged("LocationLeftFullName");
                 }
-                
             }
         }
 
@@ -226,26 +178,6 @@ namespace StorageTool
             {
                 this.foldersUnlinked = value;
                 this.OnPropertyChanged("FoldersUnlinked");
-            }
-        }
-
-        public DirectoryInfo LocationLeft
-        {
-            get { return this.locationLeft; }
-            set
-            {
-                this.locationLeft = value;
-                this.OnPropertyChanged("LocationLeft");
-            }
-        }
-
-        public DirectoryInfo LocationRight
-        {
-            get { return this.locationRight; }
-            set
-            {
-                this.locationRight = value;
-                this.OnPropertyChanged("LocationRight");
             }
         }
 
