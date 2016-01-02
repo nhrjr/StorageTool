@@ -37,15 +37,24 @@ namespace StorageTool
 
             foreach(DirectoryInfo g in gFolders)
             {
-                if (JunctionPoint.Exists(@g.FullName))
+                try
                 {
-                    //DirectoryInfo targetOfJunction = new DirectoryInfo(JunctionPoint.GetTarget(@g.FullName));
-                    //if (sFolders.Contains(targetOfJunction))
-                    this.LinkedFolders.Add(new LocationsDirInfo(JunctionPoint.GetTarget(@g.FullName)));
+                    bool isJunction = JunctionPoint.Exists(@g.FullName);
+
+                    if (isJunction)
+                    {
+                        //DirectoryInfo targetOfJunction = new DirectoryInfo(JunctionPoint.GetTarget(@g.FullName));
+                        //if (sFolders.Contains(targetOfJunction))
+                        this.LinkedFolders.Add(new LocationsDirInfo(JunctionPoint.GetTarget(@g.FullName)));
+                    }
+                    else
+                    {
+                        this.StorableFolders.Add(new LocationsDirInfo(g));
+                    }
                 }
-                else
+                catch(IOException ex)
                 {
-                    this.StorableFolders.Add(new LocationsDirInfo(g));
+                    
                 }
             }
 

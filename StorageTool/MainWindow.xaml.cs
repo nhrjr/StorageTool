@@ -50,6 +50,9 @@ namespace StorageTool
         public MainWindow()
         {
             InitializeComponent();
+
+            //Properties.Settings.Default.Config.Name = "hallo2";
+            //Properties.Settings.Default.Save();            
                         
             Log = new Log();
             Loc = new ListOfLocations();
@@ -64,10 +67,14 @@ namespace StorageTool
             //moveStack.Add(new MoveItem() { Action = "Restoring Test2", Progress = 45 }); moveStack.Index++;
             //moveStack.Add(new MoveItem() { Action = "Linking Test3", Progress = 100 }); moveStack.Index++;
 
-            moveFolders = new MoveFolders(Log,moveStatus,moveStack);            
-            Profiles.Add(new Profile("Steam", @"C:\Games\Steam\SteamApps\common", @"D:\Games\Steam"));
-            Profiles.Add(new Profile("Origin", @"C:\Games\Origin\OriginApps", @"D:\Games\Origin"));
-            Profiles.Add(new Profile("TestFolders", @"C:\FolderGames", @"C:\FolderStorage"));
+            moveFolders = new MoveFolders(Log,moveStatus,moveStack);
+            Profiles = new Profiles(Properties.Settings.Default.Config.Profiles);         
+            //Profiles.Add(new Profile("Steam", @"C:\Games\Steam\SteamApps\common", @"D:\Games\Steam"));
+            //Profiles.Add(new Profile("Origin", @"C:\Games\Origin\OriginApps", @"D:\Games\Origin"));
+            //Profiles.Add(new Profile("TestFolders", @"C:\FolderGames", @"C:\FolderStorage"));
+            Properties.Settings.Default.Config.Profiles = Profiles.GetProfileBase();
+            MessageBox.Show(Properties.Settings.Default.Config.Name);
+            Properties.Settings.Default.Config.Name = "Saved Storage Tool";
             //InputProfile = null; // new Profile("", "C:\\", "C:\\");
             //ActiveProfile = Profiles[2];
 
@@ -130,6 +137,7 @@ namespace StorageTool
         private void addProfile_Click(object sender, RoutedEventArgs e)
         {
             Profiles.Add(profileInput.GetProfile());
+            Properties.Settings.Default.Config.Profiles = Profiles.GetProfileBase();
         }
 
         private void removeProfile_Click(object sender, RoutedEventArgs e)
@@ -145,8 +153,8 @@ namespace StorageTool
                     profileBox.SelectedItem = null;
                     break;
             }
-            
-         
+            Properties.Settings.Default.Config.Profiles = Profiles.GetProfileBase();
+
         }
 
 

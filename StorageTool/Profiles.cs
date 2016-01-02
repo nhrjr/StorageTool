@@ -75,9 +75,18 @@ namespace StorageTool
         }
     }
 
+    [Serializable]
+    public class ProfileBase
+    {
+        public string ProfileName { get; set; }
+        public string GameFolder { get; set; }
+        public string StorageFolder { get; set; }
+    }
+
     public class Profiles : ObservableCollection<Profile>
     {
         public Profiles() : base () { }
+        public Profiles(List<ProfileBase> input) : base(convertProfileBaseToProfile(input)) { }
         //public event PropertyChangedEventHandler PropertyChanged;
 
         //public void OnPropertyChanged(string propName)
@@ -85,6 +94,26 @@ namespace StorageTool
         //    if (this.PropertyChanged != null)
         //        this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
         //}
+        private static List<Profile> convertProfileBaseToProfile(List<ProfileBase> input)
+        {
+            List<Profile> var = new List<Profile>();
+            foreach( ProfileBase g in input){
+                var.Add(new Profile(g.ProfileName,g.GameFolder,g.StorageFolder));
+            }
+            return var;
+        }
+        public List<ProfileBase> GetProfileBase()
+        {
+            List<ProfileBase> var = new List<ProfileBase>();
+            foreach (Profile g in this)
+            {
+                var.Add(new ProfileBase() { ProfileName = g.ProfileName, GameFolder = g.GameFolder.FullName, StorageFolder = g.StorageFolder.FullName });
+            }
+            return var;
+        }
+
+
+
     }
 
 
