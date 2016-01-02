@@ -93,19 +93,19 @@ namespace StorageTool
             foreach (LocationsDirInfo dir in FoldersLeft)
             {                
                 dir.DirSize = await AnalyzeFolders.DirSizeAsync(dir.DirInfo);
-                msg.Report("After " + dir.DirInfo.FullName);
+                msg.Report("Scanned " + dir.DirInfo.FullName);
             }
             
             foreach (LocationsDirInfo dir in FoldersRight)
             {                
                 dir.DirSize = await AnalyzeFolders.DirSizeAsync(dir.DirInfo);
-                msg.Report("After " + dir.DirInfo.FullName);
+                msg.Report("Scanned " + dir.DirInfo.FullName);
             }
             
             foreach (LocationsDirInfo dir in FoldersUnlinked)
             {                
                 dir.DirSize = await AnalyzeFolders.DirSizeAsync(dir.DirInfo);
-                msg.Report("After " + dir.DirInfo.FullName);
+                msg.Report("Scanned " + dir.DirInfo.FullName);
             }
             
 
@@ -135,7 +135,7 @@ namespace StorageTool
             this.FoldersLeft = new Locations(AnalyzedFolders.StorableFolders);
             this.FoldersRight = new Locations(AnalyzedFolders.LinkedFolders);
             this.FoldersUnlinked = new Locations(AnalyzedFolders.UnlinkedFolders);
-            Task.Run(() => this.InitAsync(msg)).ContinueWith(task => { msg.Report("All Finished");
+            Task.Run(() => this.InitAsync(msg)).ContinueWith(task => { msg.Report("Finished scanning folders.");
                 this.OnPropertyChanged("FoldersLeft");
                 this.OnPropertyChanged("FoldersRight");
                 this.OnPropertyChanged("FoldersUnlinked");

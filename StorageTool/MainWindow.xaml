@@ -6,6 +6,24 @@
         xmlns:local="clr-namespace:StorageTool"
         mc:Ignorable="d"
         Title="StorageTool" Height="833" Width="1068" Background="#FFD8D8D8">
+    <Window.Resources>
+        <!--<Style TargetType="GridViewColumnHeader">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Stretch" />
+        </Style>-->
+        <!--<Style TargetType="DataGridColumnHeader">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Stretch" />
+        </Style>-->
+        <Style TargetType="ListViewItem">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Stretch" />
+        </Style>
+        <!--<Style TargetType="DataGridCell">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Stretch" />
+        </Style>-->
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="69*"/>
@@ -18,7 +36,7 @@
             <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
         <Button x:Name="pickFolderLeft" Click="pickFolderLeft_Click" Content="..." Margin="0,10,10,0" VerticalAlignment="Top" Height="20" HorizontalAlignment="Right" Width="24" Grid.Column="1"/>
-        <Button x:Name="pickFolderRight" Click="pickFolderRight_Click" Content="..." Grid.Column="1" Margin="0,35,10,0" HorizontalAlignment="Right" Width="24" Height="20" VerticalAlignment="Top"/>
+        <Button x:Name="pickFolderRight" Click="pickFolderRight_Click" Content="..." Margin="0,36,10,0" HorizontalAlignment="Right" Width="24" Height="20" VerticalAlignment="Top" Grid.Column="1"/>
 
         <!--<TextBox x:Name="inputLeft" Text="{Binding profileInput.LeftInput,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Margin="10,35,39,0" Height="20" VerticalAlignment="Top"/>
         <TextBox x:Name="inputRight" Text="{Binding profileInput.RightInput,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Margin="10,35,35,0" Grid.Column="1" Height="20" VerticalAlignment="Top"/>-->
@@ -34,7 +52,12 @@
                             <GridViewColumnHeader Tag="DirInfo.Name" >Name</GridViewColumnHeader>
                         </GridViewColumn.Header>
                     </GridViewColumn>
-                    <GridViewColumn  DisplayMemberBinding="{Binding SizeString}" Width="100">
+                    <GridViewColumn  Width="100">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock HorizontalAlignment="Right" Text="{Binding SizeString}" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
                         <GridViewColumn.Header>
                             <GridViewColumnHeader Tag="DirSize">Size</GridViewColumnHeader>
                         </GridViewColumn.Header>
@@ -51,7 +74,12 @@
                             <GridViewColumnHeader Tag="DirInfo.Name" >Name</GridViewColumnHeader>
                         </GridViewColumn.Header>
                     </GridViewColumn>
-                    <GridViewColumn  DisplayMemberBinding="{Binding SizeString}" Width="100">
+                    <GridViewColumn Width="100">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock HorizontalAlignment="Right" Text="{Binding SizeString}" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
                         <GridViewColumn.Header>
                             <GridViewColumnHeader Tag="DirSize">Size</GridViewColumnHeader>
                         </GridViewColumn.Header>
@@ -60,7 +88,7 @@
             </ListView.View>
         </ListView>
 
-        <ListView x:Name="relinkList" ItemsSource="{Binding Loc.FoldersUnlinked}" DisplayMemberPath="DirInfo.Name" GridViewColumnHeader.Click="sortLocations_Click" SelectedItem="{Binding Loc.SelectedFolderReLink}" Grid.Column="1" Margin="10,10,10,35" Grid.Row="2">
+        <ListView x:Name="relinkList" ItemsSource="{Binding Loc.FoldersUnlinked}" DisplayMemberPath="DirInfo.Name" GridViewColumnHeader.Click="sortLocations_Click" SelectedItem="{Binding Loc.SelectedFolderReLink}" Grid.Column="1" Margin="10,20,10,25" Grid.Row="2">
             <ListView.View>
                 <GridView>
                     <GridViewColumn  DisplayMemberBinding="{Binding DirInfo.Name}" Width="250">
@@ -68,7 +96,12 @@
                             <GridViewColumnHeader Tag="DirInfo.Name">Name</GridViewColumnHeader>
                         </GridViewColumn.Header>
                     </GridViewColumn>
-                    <GridViewColumn  DisplayMemberBinding="{Binding SizeString}" Width="100">
+                    <GridViewColumn Width="100">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock HorizontalAlignment="Right" Text="{Binding SizeString}" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
                         <GridViewColumn.Header>
                             <GridViewColumnHeader Tag="DirSize">Size</GridViewColumnHeader>
                         </GridViewColumn.Header>
@@ -79,15 +112,15 @@
 
         <Button x:Name="moveToRight" Click="moveToRight_Click" Content="Store" Margin="10,0,0,8" Grid.Row="1" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="75"/>
         <Button x:Name="moveToLeft" Click="moveToLeft_Click" Content="Restore" Grid.Column="1" Margin="10,0,0,8" Grid.Row="1" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="75"/>
-        <Button x:Name="relinkButton" Click="relinkButton_Click" Content="Link" Grid.Column="1" Margin="10,0,0,10" Grid.Row="2" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="75"/>
+        <Button x:Name="relinkButton" Click="relinkButton_Click" Content="Link" Grid.Column="1" Margin="10,0,0,0" Grid.Row="2" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="75"/>
 
         <ListBox x:Name="logList" ItemsSource="{Binding Log.LogList}" Margin="10" Grid.Row="2"/>
         <ComboBox x:Name="profileBox" ItemsSource="{Binding Profiles}" DisplayMemberPath="ProfileName" SelectedItem="{Binding ActiveProfile}" SelectedIndex="{Binding ActiveProfile.ProfileIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,35,0,0" VerticalAlignment="Top" Width="176" Height="22"/>
-        <Button x:Name="addProfile" Click="addProfile_Click" Content="Add profile" HorizontalAlignment="Left" Margin="191,10,0,0" VerticalAlignment="Top" Width="84" RenderTransformOrigin="1.311,0.826" Height="20"/>
+        <Button x:Name="addProfile" Click="addProfile_Click" Content="Add profile" Margin="436,61,10,0" VerticalAlignment="Top" RenderTransformOrigin="1.311,0.826" Height="20" Grid.Column="1" Grid.RowSpan="2"/>
         <Button x:Name="removeProfile" Click="removeProfile_Click" Content="Remove selected profile" HorizontalAlignment="Left" Margin="191,35,0,0" VerticalAlignment="Top" Width="137" Height="22"/>
-        <TextBox x:Name="profileName" Text="{Binding profileInput.ProfileName,Mode=OneWayToSource,UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Height="20" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="176" RenderTransformOrigin="0.459,-0.163"/>
-        <TextBlock x:Name="gameFolderName" Margin="10,10,10,0" TextWrapping="Wrap" Text="{Binding Loc.LocationLeftFullName}" VerticalAlignment="Top" Height="20" Grid.Row="1"/>
-        <TextBlock x:Name="storageFolderName" Grid.Column="1" Margin="10,10,10,0" TextWrapping="Wrap" Text="{Binding Loc.LocationRightFullName}" VerticalAlignment="Top" Height="20" Grid.Row="1"/>
+        <TextBox x:Name="profileName" Text="{Binding profileInput.ProfileName,Mode=OneWayToSource,UpdateSourceTrigger=PropertyChanged}" Margin="198,60,99,0" TextWrapping="Wrap" RenderTransformOrigin="0.459,-0.163" Grid.Column="1" Height="20" VerticalAlignment="Top"/>
+        <TextBlock x:Name="gameFolderName" Margin="10,10,0,0" TextWrapping="Wrap" Text="{Binding Loc.LocationLeftFullName}" VerticalAlignment="Top" Height="20" Grid.Row="1" HorizontalAlignment="Left" Width="405"/>
+        <TextBlock x:Name="storageFolderName" Grid.Column="1" Margin="10,10,0,0" TextWrapping="Wrap" Text="{Binding Loc.LocationRightFullName}" VerticalAlignment="Top" Height="20" Grid.Row="1" HorizontalAlignment="Left" Width="405"/>
         <TextBlock x:Name="selectedGame" Margin="90,0,0,8" Grid.Row="1" TextWrapping="Wrap" Text="{Binding Loc.SelectedFolderLeft.DirInfo.Name}" Height="18" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="296"/>
         <TextBlock x:Name="selectedStoredGame" Grid.Column="1" Margin="90,0,0,8" Grid.Row="1" TextWrapping="Wrap" Text="{Binding Loc.SelectedFolderRight.DirInfo.Name}" Height="18" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="296"/>
         <TextBlock x:Name="currentCopiedFile" Margin="10,18,81,0" Grid.Row="3" TextWrapping="Wrap" Text="{Binding Log.CurrentFile}" VerticalAlignment="Top" Background="#FFE4E4E4" Height="16"/>
@@ -102,19 +135,36 @@
             <ListView.View>
                 <GridView>
                     <GridViewColumn Width="400" Header="Action" DisplayMemberBinding="{Binding Action}"/>
+                    <GridViewColumn Width="100" Header="Status" DisplayMemberBinding="{Binding Status}"/>
                     <GridViewColumn Width="200" Header="Progress">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <ProgressBar Height="10" Maximum="100" Value="{Binding Progress}" HorizontalContentAlignment="Stretch"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
+                    </GridViewColumn>                    
+                    <GridViewColumn Width="100" Header="Copied Bytes">
+                    <GridViewColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock HorizontalAlignment="Right" Text="{Binding ProcString}" />
+                        </DataTemplate>
+                    </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Width="100" Header="Status" DisplayMemberBinding="{Binding Status}"/>
-                    <GridViewColumn Width="100" Header="ProcessedBits" DisplayMemberBinding="{Binding ProcString}"/>
-                    <GridViewColumn Width="100" Header="Size" DisplayMemberBinding="{Binding SizeString}"/>
+                    <GridViewColumn Width="100" Header="Size">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock HorizontalAlignment="Right" Text="{Binding SizeString}" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                 </GridView>
             </ListView.View>
         </ListView>
+        
+        
+        <TextBlock x:Name="Desc_GameFolder" HorizontalAlignment="Right" Margin="0,10,10,0" TextWrapping="Wrap" Text="Game Folder" VerticalAlignment="Top"  Grid.Row="1" Width="100" Height="20"/>
+        <TextBlock x:Name="Desc_StorageFolder" HorizontalAlignment="Right" Margin="0,10,10,0" TextWrapping="Wrap" Text="Storage Folder" VerticalAlignment="Top" Grid.Column="1" Grid.Row="1" Width="100" Height="20"/>
+        <TextBlock x:Name="Desc_Unlinked" Grid.Column="1" Margin="0,0,10,0" Grid.Row="2" TextWrapping="Wrap" Text="Unlinked Folders in Storage Folder" Height="20" VerticalAlignment="Top" HorizontalAlignment="Right" Width="200"/>
 
 
 

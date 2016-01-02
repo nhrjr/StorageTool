@@ -73,8 +73,6 @@ namespace StorageTool
             //Profiles.Add(new Profile("Origin", @"C:\Games\Origin\OriginApps", @"D:\Games\Origin"));
             //Profiles.Add(new Profile("TestFolders", @"C:\FolderGames", @"C:\FolderStorage"));
             Properties.Settings.Default.Config.Profiles = Profiles.GetProfileBase();
-            MessageBox.Show(Properties.Settings.Default.Config.Name);
-            Properties.Settings.Default.Config.Name = "Saved Storage Tool";
             //InputProfile = null; // new Profile("", "C:\\", "C:\\");
             //ActiveProfile = Profiles[2];
 
@@ -128,7 +126,7 @@ namespace StorageTool
         {
             var dialog = new System.Windows.Forms.FolderBrowserDialog();
             System.Windows.Forms.DialogResult result = dialog.ShowDialog();
-            Log.LogMessage = "Picked: " + dialog.SelectedPath + " as Storage folder.";
+            Log.LogMessage = "Picked " + dialog.SelectedPath + " as Storage folder.";
             //nputProfile.StorageFolder = new DirectoryInfo(dialog.SelectedPath);
             profileInput.AddRight(new DirectoryInfo(dialog.SelectedPath));
         }
@@ -160,7 +158,7 @@ namespace StorageTool
 
         private void moveToRight_Click(object sender, RoutedEventArgs e)
         {
-            Log.LogMessage = "Moving: " + Loc.SelectedFolderLeft.DirInfo.Name + " to Storage.";
+            Log.LogMessage = "Moving " + Loc.SelectedFolderLeft.DirInfo.Name + " to Storage.";
             //moveFolders.GamesToStorage.Enqueue(new Profile(Loc.SelectedFolderLeft, ActiveProfile.StorageFolder));
             //moveFolders.MoveGamesToStorage();
             moveFolders.addToMoveQueue(TaskMode.STORE, new Profile(Loc.SelectedFolderLeft.DirInfo, ActiveProfile.StorageFolder));
@@ -170,7 +168,7 @@ namespace StorageTool
 
         private void moveToLeft_Click(object sender, RoutedEventArgs e)
         {
-            Log.LogMessage = "Moving: " + Loc.SelectedFolderRight.DirInfo.Name + " to Game folder.";
+            Log.LogMessage = "Moving " + Loc.SelectedFolderRight.DirInfo.Name + " to Game folder.";
             //moveFolders.StorageToGames.Enqueue(new Profile(ActiveProfile.GameFolder, Loc.SelectedFolderRight));
             //moveFolders.MoveStorageToGames();
             moveFolders.addToMoveQueue(TaskMode.RESTORE, new Profile(ActiveProfile.GameFolder, Loc.SelectedFolderRight.DirInfo));
@@ -179,7 +177,7 @@ namespace StorageTool
 
         private void relinkButton_Click(object sender, RoutedEventArgs e)
         {
-            Log.LogMessage = "Linking: " + Loc.SelectedFolderReLink.DirInfo.Name + " to Game folder.";
+            Log.LogMessage = "Linking " + Loc.SelectedFolderReLink.DirInfo.Name + " to Game folder.";
             //moveFolders.LinkToGames.Enqueue(new Profile(ActiveProfile.GameFolder, Loc.SelectedFolderReLink));
             //moveFolders.LinkStorageToGames();
             moveFolders.addToMoveQueue(TaskMode.RELINK, new Profile(ActiveProfile.GameFolder, Loc.SelectedFolderReLink.DirInfo));

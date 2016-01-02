@@ -60,8 +60,12 @@ namespace StorageTool
             }
             if (!moveQueueIsWorking)
             {
-                log.LogMessage = "Added to queue. Is already working";
+                log.LogMessage = "Started queue.";
                 this.startMoveQueue();
+            }
+            else
+            {
+                log.LogMessage = "Added to queue. Is already working";
             }
         }
 
