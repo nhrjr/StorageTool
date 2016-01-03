@@ -5,5 +5,5 @@ Very handy to stash your Steamgames on a different harddrive. ;) (Or Origin/GoG/
 
 Thanks go out to SteamTool at http://www.stefanjones.ca/steam/ for the inspiration and to Jeff Brown's .NET Junction Library at http://www.codeproject.com/Articles/15633/Manipulating-NTFS-Junction-Points-in-NET.
 
-You probably need .NET Framework 4 (https://www.microsoft.com/en-us/download/details.aspx?id=49981)
+You probably need .NET Framework 4 (https://www.microsoft.com/en-us/download/details.aspx?id=49981) if not already installed.
 
