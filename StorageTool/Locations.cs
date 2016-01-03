@@ -146,8 +146,6 @@ namespace StorageTool
 
         private FolderStash activePane = new FolderStash();
 
-
-
         //private ObservableCollection<LocationsDirInfo> foldersLeft = new ObservableCollection<LocationsDirInfo>();
         //private ObservableCollection<LocationsDirInfo> foldersRight = new ObservableCollection<LocationsDirInfo>();
         //private ObservableCollection<LocationsDirInfo> foldersUnlinked = new ObservableCollection<LocationsDirInfo>();
@@ -161,6 +159,12 @@ namespace StorageTool
 
         private AnalyzeFolders setFolders = new AnalyzeFolders();
         //private AnalyzeFolders refreshFolders = new AnalyzeFolders();
+
+        public void RemoveActiveProfile()
+        {
+            Stash.Remove(ActivePane);
+            ActivePane = null;
+        }
 
         public void SetActiveProfile(Profile ActiveProfile)
         {

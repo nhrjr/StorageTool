@@ -71,30 +71,45 @@ namespace StorageTool
         {
             var dialog = new System.Windows.Forms.FolderBrowserDialog();
             System.Windows.Forms.DialogResult result = dialog.ShowDialog();
-            Log.LogMessage = "Picked: " + dialog.SelectedPath + " as Source folder.";
-            ProfileInput.AddLeft(new DirectoryInfo(dialog.SelectedPath));
+            if (result == System.Windows.Forms.DialogResult.OK)
+            {
+                Log.LogMessage = "Picked: " + dialog.SelectedPath + " as Source folder.";
+                DirectoryInfo info = new DirectoryInfo(dialog.SelectedPath);
+                if(info.Exists)
+                ProfileInput.AddLeft(info);
+            }
         }
 
         private void pickFolderRight_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new System.Windows.Forms.FolderBrowserDialog();
             System.Windows.Forms.DialogResult result = dialog.ShowDialog();
-            Log.LogMessage = "Picked " + dialog.SelectedPath + " as Storage folder.";
-            ProfileInput.AddRight(new DirectoryInfo(dialog.SelectedPath));
+            if (result == System.Windows.Forms.DialogResult.OK)
+            {
+                Log.LogMessage = "Picked " + dialog.SelectedPath + " as Storage folder.";
+                DirectoryInfo info = new DirectoryInfo(dialog.SelectedPath);
+                if (info.Exists)
+                    ProfileInput.AddRight(info);
+            }
         }
 
 
         private void addProfile_Click(object sender, RoutedEventArgs e)
         {
+            
             Profile input = ProfileInput.GetProfile();
-            if(Loc.Stash.Exists(item => item.Profile.ProfileName == input.ProfileName)){
-                MessageBox.Show("A profile with that name already exists, try again.");
-            }
-            else
+            if (input != null)
             {
-                Profiles.Add(ProfileInput.GetProfile());
-                ProfileInput.Clear();
-                Properties.Settings.Default.Config.Profiles = Profiles.GetProfileBase();
+                if (Loc.Stash.Exists(item => item.Profile.ProfileName == input.ProfileName))
+                {
+                    MessageBox.Show("A profile with that name already exists, try again.");
+                }
+                else
+                {
+                    Profiles.Add(ProfileInput.GetProfile());
+                    ProfileInput.Clear();
+                    Properties.Settings.Default.Config.Profiles = Profiles.GetProfileBase();
+                }
             }
 
         }
@@ -109,6 +124,7 @@ namespace StorageTool
             {
                 case MessageBoxResult.Yes :
                     Profiles.RemoveProfile();
+                    Loc.RemoveActiveProfile();
                     profileBox.SelectedItem = null;
                     break;
             }
@@ -118,32 +134,41 @@ namespace StorageTool
 
         private void moveToRight_Click(object sender, RoutedEventArgs e)
         {
-            Log.LogMessage = "Moving " + Loc.SelectedFolderLeft.DirInfo.Name + " to Storage.";
-            LocationsDirInfo tmp1 = Loc.SelectedFolderLeft;
-            DirectoryInfo tmp2 = Profiles[Profiles.ActiveProfileIndex].StorageFolder;
-            this.MoveFolders.addToMoveQueue(TaskMode.STORE, new Profile(tmp1.DirInfo, tmp2));
-            Loc.SelectedFolderLeft = null;
-            Loc.ActivePane.FoldersLeft.Remove(tmp1);
+            if (Loc.SelectedFolderLeft != null)
+            {
+                Log.LogMessage = "Moving " + Loc.SelectedFolderLeft.DirInfo.Name + " to Storage.";
+                LocationsDirInfo tmp1 = Loc.SelectedFolderLeft;
+                DirectoryInfo tmp2 = Profiles[Profiles.ActiveProfileIndex].StorageFolder;
+                this.MoveFolders.addToMoveQueue(TaskMode.STORE, new Profile(tmp1.DirInfo, tmp2));
+                Loc.SelectedFolderLeft = null;
+                Loc.ActivePane.FoldersLeft.Remove(tmp1);
+            }
         }
 
         private void moveToLeft_Click(object sender, RoutedEventArgs e)
         {
-            Log.LogMessage = "Moving " + Loc.SelectedFolderRight.DirInfo.Name + " to Game folder.";
-            DirectoryInfo tmp1 = Profiles[Profiles.ActiveProfileIndex].GameFolder;
-            LocationsDirInfo tmp2 = Loc.SelectedFolderRight;
-            this.MoveFolders.addToMoveQueue(TaskMode.RESTORE, new Profile(tmp1,tmp2.DirInfo ));
-            Loc.SelectedFolderRight = null;
-            Loc.ActivePane.FoldersRight.Remove(tmp2);
+            if (Loc.SelectedFolderRight != null)
+            {
+                Log.LogMessage = "Moving " + Loc.SelectedFolderRight.DirInfo.Name + " to Game folder.";
+                DirectoryInfo tmp1 = Profiles[Profiles.ActiveProfileIndex].GameFolder;
+                LocationsDirInfo tmp2 = Loc.SelectedFolderRight;
+                this.MoveFolders.addToMoveQueue(TaskMode.RESTORE, new Profile(tmp1, tmp2.DirInfo));
+                Loc.SelectedFolderRight = null;
+                Loc.ActivePane.FoldersRight.Remove(tmp2);
+            }
         }
 
         private void relinkButton_Click(object sender, RoutedEventArgs e)
         {
-            Log.LogMessage = "Linking " + Loc.SelectedFolderReLink.DirInfo.Name + " to Game folder.";
-            DirectoryInfo tmp1 = Profiles[Profiles.ActiveProfileIndex].GameFolder;
-            LocationsDirInfo tmp2 = Loc.SelectedFolderReLink;
-            this.MoveFolders.addToMoveQueue(TaskMode.RELINK, new Profile( tmp1, tmp2.DirInfo ));
-            Loc.SelectedFolderReLink = null;
-            Loc.ActivePane.FoldersUnlinked.Remove(tmp2);
+            if (Loc.SelectedFolderReLink != null)
+            {
+                Log.LogMessage = "Linking " + Loc.SelectedFolderReLink.DirInfo.Name + " to Game folder.";
+                DirectoryInfo tmp1 = Profiles[Profiles.ActiveProfileIndex].GameFolder;
+                LocationsDirInfo tmp2 = Loc.SelectedFolderReLink;
+                this.MoveFolders.addToMoveQueue(TaskMode.RELINK, new Profile(tmp1, tmp2.DirInfo));
+                Loc.SelectedFolderReLink = null;
+                Loc.ActivePane.FoldersUnlinked.Remove(tmp2);
+            }
         }
 
         private void sortLocations_Click(object sender, RoutedEventArgs e)

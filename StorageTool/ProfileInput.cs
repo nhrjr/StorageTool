@@ -24,7 +24,7 @@ namespace StorageTool
         {
             LeftInput = "Select your game folder.";
             RightInput = "Select your storage folder.";
-            ProfileName = "Name this profile.";
+            ProfileName = "ProfileName";
         }
 
         public void SetName(string name)
@@ -43,9 +43,16 @@ namespace StorageTool
         }
         public Profile GetProfile()
         {
-            _returnableProfile = new Profile(_leftFolder,_rightFolder );
-            _returnableProfile.ProfileName = _profileName;
-            return _returnableProfile;
+            if (_leftFolder != null && _rightFolder != null)
+            {
+                _returnableProfile = new Profile(_leftFolder, _rightFolder);
+                _returnableProfile.ProfileName = _profileName;
+                return _returnableProfile;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public string LeftInput

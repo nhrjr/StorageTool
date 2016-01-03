@@ -159,20 +159,48 @@ namespace StorageTool
                 string targetDir = StorageToGames.Peek().GameFolder.FullName + @"\" + StorageToGames.Peek().StorageFolder.Name;
                 try {
 
-                    if (JunctionPoint.Exists(@targetDir))
+                /// find a junction, which has a different name, than the folder to be moved
+                List<string> ListOfJunctions = StorageToGames.Peek().GameFolder.GetDirectories().Select(dir => dir.FullName).ToList().Where(str => JunctionPoint.Exists(@str)).ToList();
+                List<string> ListOfTargets = ListOfJunctions.Select(str => JunctionPoint.GetTarget(@str)).ToList();
+                List<Tuple<string, string>> pairsOfJaT = new List<Tuple<string, string>>();
+                for(int i = 0; i < ListOfJunctions.Count; i++)
+                {
+                    string JunctionName = (new DirectoryInfo(ListOfJunctions[i])).Name;
+                    string TargetName = (new DirectoryInfo(ListOfTargets[i])).Name;
+                    if (JunctionName != TargetName)
                     {
-                        JunctionPoint.Delete(@targetDir);
-                        CopyFolders(StorageToGames.Peek().StorageFolder, StorageToGames.Peek().GameFolder,currentFile,sizeFromHell);
-                        DirectoryInfo deletableDirInfo = StorageToGames.Peek().StorageFolder;
-                        StorageToGames.Dequeue();
-                        deletableDirInfo.Delete(true);
-                    }
-                    else
-                    {
-                        StorageToGames.Dequeue();
+                        MessageBox.Show(JunctionName + " " + TargetName);
+                        pairsOfJaT.Add(new Tuple<string, string>(JunctionName, TargetName));
                     }
                 }
-                catch
+                string renamedJunction = pairsOfJaT.FirstOrDefault(str => str.Item2 == StorageToGames.Peek().StorageFolder.Name).Item1;
+                if(renamedJunction != null)
+                {
+                    renamedJunction = StorageToGames.Peek().GameFolder.FullName + @"\" + renamedJunction;
+                }
+
+                if (JunctionPoint.Exists(@targetDir))
+                {
+                    JunctionPoint.Delete(@targetDir);
+                    CopyFolders(StorageToGames.Peek().StorageFolder, StorageToGames.Peek().GameFolder,currentFile,sizeFromHell);
+                    DirectoryInfo deletableDirInfo = StorageToGames.Peek().StorageFolder;
+                    StorageToGames.Dequeue();
+                    deletableDirInfo.Delete(true);
+                }
+                else if(JunctionPoint.Exists(@renamedJunction))
+                {
+                    JunctionPoint.Delete(@renamedJunction);
+                    CopyFolders(StorageToGames.Peek().StorageFolder, StorageToGames.Peek().GameFolder, currentFile, sizeFromHell);
+                    DirectoryInfo deletableDirInfo = StorageToGames.Peek().StorageFolder;
+                    StorageToGames.Dequeue();
+                    deletableDirInfo.Delete(true);
+                }
+                else
+                {
+                    StorageToGames.Dequeue();
+                }
+                }
+                catch(Exception ex)
                 {
                     //log.LogMessage = "Couldn't delete " + sourceDir;
                 }

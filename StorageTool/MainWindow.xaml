@@ -116,7 +116,7 @@
 
         <ListBox x:Name="logList" ItemsSource="{Binding Log.LogList}" Margin="10" Grid.Row="2"/>
         <ComboBox x:Name="profileBox" ItemsSource="{Binding Profiles}" DisplayMemberPath="ProfileName" SelectionChanged="profileBox_SelectionChanged" SelectedIndex="{Binding Profiles.ActiveProfileIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,35,0,0" VerticalAlignment="Top" Width="176" Height="22"/>
-        <Button x:Name="addProfile" Click="addProfile_Click" Content="Add profile" Margin="436,61,10,0" VerticalAlignment="Top" RenderTransformOrigin="1.311,0.826" Height="20" Grid.Column="1" Grid.RowSpan="2"/>
+        <Button x:Name="addProfile" Click="addProfile_Click" Content="Add profile" Margin="0,61,10,0" VerticalAlignment="Top" RenderTransformOrigin="1.311,0.826" Height="20" Grid.Column="1" Grid.RowSpan="2" HorizontalAlignment="Right" Width="84"/>
         <Button x:Name="removeProfile" Click="removeProfile_Click" Content="Remove selected profile" HorizontalAlignment="Left" Margin="191,35,0,0" VerticalAlignment="Top" Width="137" Height="22"/>
         <TextBox x:Name="profileName" Text="{Binding ProfileInput.ProfileName,UpdateSourceTrigger=PropertyChanged}" Margin="198,60,99,0" TextWrapping="Wrap" RenderTransformOrigin="0.459,-0.163" Grid.Column="1" Height="20" VerticalAlignment="Top"/>
         <TextBlock x:Name="gameFolderName" Margin="10,10,0,0" TextWrapping="Wrap" Text="{Binding Loc.LocationLeftFullName}" VerticalAlignment="Top" Height="20" Grid.Row="1" HorizontalAlignment="Left" Width="405"/>
@@ -142,13 +142,13 @@
                                 <ProgressBar Height="10" Maximum="100" Value="{Binding Progress}" HorizontalContentAlignment="Stretch"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
-                    </GridViewColumn>                    
+                    </GridViewColumn>
                     <GridViewColumn Width="100" Header="Copied Bytes">
-                    <GridViewColumn.CellTemplate>
-                        <DataTemplate>
-                            <TextBlock HorizontalAlignment="Right" Text="{Binding ProcString}" />
-                        </DataTemplate>
-                    </GridViewColumn.CellTemplate>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock HorizontalAlignment="Right" Text="{Binding ProcString}" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
                     </GridViewColumn>
                     <GridViewColumn Width="100" Header="Size">
                         <GridViewColumn.CellTemplate>
@@ -160,8 +160,8 @@
                 </GridView>
             </ListView.View>
         </ListView>
-        
-        
+
+
         <TextBlock x:Name="Desc_GameFolder" HorizontalAlignment="Right" Margin="0,10,10,0" TextWrapping="Wrap" Text="Game Folder" VerticalAlignment="Top"  Grid.Row="1" Width="100" Height="20"/>
         <TextBlock x:Name="Desc_StorageFolder" HorizontalAlignment="Right" Margin="0,10,10,0" TextWrapping="Wrap" Text="Storage Folder" VerticalAlignment="Top" Grid.Column="1" Grid.Row="1" Width="100" Height="20"/>
         <TextBlock x:Name="Desc_Unlinked" Grid.Column="1" Margin="0,0,10,0" Grid.Row="2" TextWrapping="Wrap" Text="Unlinked Folders in Storage Folder" Height="20" VerticalAlignment="Top" HorizontalAlignment="Right" Width="200"/>
