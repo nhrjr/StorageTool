@@ -35,35 +35,53 @@ namespace StorageTool
 
         public void addToMoveQueue(TaskMode mode, Profile prof)
         {
-            switch (mode)
-            {
-                case TaskMode.STORE:
-                    MoveQueue.Enqueue(mode);
-                    GamesToStorage.Enqueue(prof);
-                    moveStack.Add(new MoveItem() { Action = "Storing " + prof.GameFolder.Name.ToString(), Progress = 0, Status = "Waiting", Size = AnalyzeFolders.DirSizeSync(prof.GameFolder) });
-                    break;
+            string name = null;
+            DirectoryInfo dir = null;
+           
+                switch (mode)
+                {
+                    case TaskMode.STORE:
+                        MoveQueue.Enqueue(mode);
+                        GamesToStorage.Enqueue(prof);
+                        name = "Storing " + prof.GameFolder.Name;
+                        dir = prof.GameFolder;
+                        
+                        break;
+ 
+                    case TaskMode.RESTORE:
+                        MoveQueue.Enqueue(mode);
+                        StorageToGames.Enqueue(prof);
+                        name = "Restoring " + prof.StorageFolder.Name;
+                        dir = prof.StorageFolder;
+                        break;
 
-                case TaskMode.RESTORE:
-                    MoveQueue.Enqueue(mode);
-                    StorageToGames.Enqueue(prof);
-                    moveStack.Add(new MoveItem() { Action = "Restoring " + prof.StorageFolder.Name.ToString(), Progress = 0, Status = "Waiting", Size = AnalyzeFolders.DirSizeSync(prof.StorageFolder) });
-                    break;
+                    case TaskMode.RELINK:
+                        MoveQueue.Enqueue(mode);
+                        LinkToGames.Enqueue(prof);
+                        name = "Linking " + prof.StorageFolder.Name;
+                        dir = prof.StorageFolder;
+                        break;
+                }
+            try
+            {
+                moveStack.Add(new MoveItem() { Action = name, Progress = 0, Status = "Waiting", Size = AnalyzeFolders.DirSizeSync(dir) });
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                moveStack.Add(new MoveItem() { Action = name, Progress = 0, Status = "Waiting", Size = 0 });
+            }
 
-                case TaskMode.RELINK:
-                    MoveQueue.Enqueue(mode);
-                    LinkToGames.Enqueue(prof);
-                    moveStack.Add(new MoveItem() { Action = "Linking " + prof.StorageFolder.Name.ToString(), Progress = 0, Status = "Waiting", Size = AnalyzeFolders.DirSizeSync(prof.StorageFolder) });
-                    break;
-            }
-            if (!moveQueueIsWorking)
-            {
-                log.LogMessage = "Started queue.";
-                this.startMoveQueue();
-            }
-            else
-            {
-                log.LogMessage = "Added to queue. Is already working";
-            }
+                if (!moveQueueIsWorking)
+                {
+                    log.LogMessage = "Started queue.";
+                    this.startMoveQueue();
+                }
+                else
+                {
+                    log.LogMessage = "Added to queue. Is already working";
+                }           
+
         }
 
         private async void startMoveQueue()
@@ -95,6 +113,7 @@ namespace StorageTool
             finally
             {
                 this.moveQueueIsWorking = false;
+                log.LogMessage = "Finished queue.";
             }
         }
 
@@ -126,14 +145,22 @@ namespace StorageTool
             state.Report(State.FINISHED_QUEUE);
         }
 
-
-
         private void LinkStorageToGames(IProgress<string> currentFile)
         {
+            try {
                 string sourceDir = LinkToGames.Peek().StorageFolder.FullName;
                 string targetDir = LinkToGames.Peek().GameFolder.FullName + @"\" + LinkToGames.Peek().StorageFolder.Name;
                 JunctionPoint.Create(@targetDir, @sourceDir, false);
+                
+            }
+            catch (IOException ioexp)
+            {
+                MessageBox.Show(ioexp.Message);
+            }
+            finally
+            {
                 LinkToGames.Dequeue();
+            }
         }
 
         private void MoveGamesToStorage(IProgress<string> currentFile, IProgress<long> sizeFromHell)
@@ -143,38 +170,49 @@ namespace StorageTool
                 try {
 
                     CopyFolders(GamesToStorage.Peek().GameFolder, GamesToStorage.Peek().StorageFolder,currentFile,sizeFromHell);
-                    DirectoryInfo deletableDirInfo = GamesToStorage.Peek().GameFolder;
-                    GamesToStorage.Dequeue();
+                    DirectoryInfo deletableDirInfo = GamesToStorage.Peek().GameFolder;                    
                     deletableDirInfo.Delete(true);
                     JunctionPoint.Create(@sourceDir, @targetDir, false);
                 }
-                catch
+                catch (IOException ioexp)
                 {
-                    //log.LogMessage = "Couldn't delete " + sourceDir;
+                    MessageBox.Show(ioexp.Message);
                 }
+                catch(UnauthorizedAccessException unauth)
+                {
+                    MessageBox.Show(unauth.Message);
+                }
+            finally
+            {
+                GamesToStorage.Dequeue();
+            }
+
         }
         private void MoveStorageToGames(IProgress<string> currentFile, IProgress<long> sizeFromHell)
         {
                 string sourceDir = StorageToGames.Peek().StorageFolder.FullName;
                 string targetDir = StorageToGames.Peek().GameFolder.FullName + @"\" + StorageToGames.Peek().StorageFolder.Name;
-                try {
-
+            
+            try
+            {
                 /// find a junction, which has a different name, than the folder to be moved
                 List<string> ListOfJunctions = StorageToGames.Peek().GameFolder.GetDirectories().Select(dir => dir.FullName).ToList().Where(str => JunctionPoint.Exists(@str)).ToList();
                 List<string> ListOfTargets = ListOfJunctions.Select(str => JunctionPoint.GetTarget(@str)).ToList();
                 List<Tuple<string, string>> pairsOfJaT = new List<Tuple<string, string>>();
-                for(int i = 0; i < ListOfJunctions.Count; i++)
+                for (int i = 0; i < ListOfJunctions.Count; i++)
                 {
                     string JunctionName = (new DirectoryInfo(ListOfJunctions[i])).Name;
                     string TargetName = (new DirectoryInfo(ListOfTargets[i])).Name;
                     if (JunctionName != TargetName)
                     {
-                        MessageBox.Show(JunctionName + " " + TargetName);
+                        //MessageBox.Show(JunctionName + " " + TargetName);
                         pairsOfJaT.Add(new Tuple<string, string>(JunctionName, TargetName));
                     }
                 }
-                string renamedJunction = pairsOfJaT.FirstOrDefault(str => str.Item2 == StorageToGames.Peek().StorageFolder.Name).Item1;
-                if(renamedJunction != null)
+                string renamedJunction = null;
+                if(pairsOfJaT.Count > 0)
+                    renamedJunction = pairsOfJaT.FirstOrDefault(str => str.Item2 == StorageToGames.Peek().StorageFolder.Name).Item1;
+                if (renamedJunction != null)
                 {
                     renamedJunction = StorageToGames.Peek().GameFolder.FullName + @"\" + renamedJunction;
                 }
@@ -182,28 +220,34 @@ namespace StorageTool
                 if (JunctionPoint.Exists(@targetDir))
                 {
                     JunctionPoint.Delete(@targetDir);
-                    CopyFolders(StorageToGames.Peek().StorageFolder, StorageToGames.Peek().GameFolder,currentFile,sizeFromHell);
+                    CopyFolders(StorageToGames.Peek().StorageFolder, StorageToGames.Peek().GameFolder, currentFile, sizeFromHell);
                     DirectoryInfo deletableDirInfo = StorageToGames.Peek().StorageFolder;
-                    StorageToGames.Dequeue();
                     deletableDirInfo.Delete(true);
                 }
-                else if(JunctionPoint.Exists(@renamedJunction))
+                else if (JunctionPoint.Exists(@renamedJunction))
                 {
                     JunctionPoint.Delete(@renamedJunction);
                     CopyFolders(StorageToGames.Peek().StorageFolder, StorageToGames.Peek().GameFolder, currentFile, sizeFromHell);
                     DirectoryInfo deletableDirInfo = StorageToGames.Peek().StorageFolder;
-                    StorageToGames.Dequeue();
                     deletableDirInfo.Delete(true);
                 }
-                else
-                {
-                    StorageToGames.Dequeue();
-                }
-                }
-                catch(Exception ex)
-                {
-                    //log.LogMessage = "Couldn't delete " + sourceDir;
-                }
+            }
+            catch (IOException ioexp)
+            {
+                MessageBox.Show(ioexp.Message);
+            }
+            catch (UnauthorizedAccessException unauth)
+            {
+                MessageBox.Show(unauth.Message);
+            }
+            catch (ArgumentNullException tada)
+            {
+                MessageBox.Show(tada.Message);
+            }
+            finally
+            {
+                StorageToGames.Dequeue();
+            }
         }
 
         private void CopyFolders(DirectoryInfo StartDirectory, DirectoryInfo EndDirectory, IProgress<string> currentFile, IProgress<long> sizeFromHell)

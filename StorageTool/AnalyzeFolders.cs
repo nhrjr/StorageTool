@@ -53,7 +53,7 @@ namespace StorageTool
                 }
                 catch (IOException ex)
                 {
-
+                    MessageBox.Show(ex.Message);
                 }
             }
 
