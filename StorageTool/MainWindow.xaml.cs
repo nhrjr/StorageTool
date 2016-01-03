@@ -7,7 +7,6 @@ using System.Windows;
 using System.IO;
 using System.ComponentModel;
 using System.Windows.Controls;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Data;
 using System.Windows.Documents;
@@ -151,21 +150,24 @@ namespace StorageTool
         {
             ListView listView_local = sender as ListView;
             GridViewColumnHeader column = e.OriginalSource as GridViewColumnHeader;
-            string sortBy = column.Tag.ToString();
-            if (listViewSortCol != null)
+            if (column != null && column.Tag != null)
             {
-                AdornerLayer.GetAdornerLayer(listViewSortCol).Remove(listViewSortAdorner);
-                listView_local.Items.SortDescriptions.Clear();
+                string sortBy = column.Tag.ToString();
+                if (listViewSortCol != null)
+                {
+                    AdornerLayer.GetAdornerLayer(listViewSortCol).Remove(listViewSortAdorner);
+                    listView_local.Items.SortDescriptions.Clear();
+                }
+
+                ListSortDirection newDir = ListSortDirection.Ascending;
+                if (listViewSortCol == column && listViewSortAdorner.Direction == newDir)
+                    newDir = ListSortDirection.Descending;
+
+                listViewSortCol = column;
+                listViewSortAdorner = new SortAdorner(listViewSortCol, newDir);
+                AdornerLayer.GetAdornerLayer(listViewSortCol).Add(listViewSortAdorner);
+                listView_local.Items.SortDescriptions.Add(new SortDescription(sortBy, newDir));
             }
-
-            ListSortDirection newDir = ListSortDirection.Ascending;
-            if (listViewSortCol == column && listViewSortAdorner.Direction == newDir)
-                newDir = ListSortDirection.Descending;
-
-            listViewSortCol = column;
-            listViewSortAdorner = new SortAdorner(listViewSortCol, newDir);
-            AdornerLayer.GetAdornerLayer(listViewSortCol).Add(listViewSortAdorner);
-            listView_local.Items.SortDescriptions.Add(new SortDescription(sortBy, newDir));
         }
     }
 
