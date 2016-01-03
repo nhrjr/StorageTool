@@ -46,7 +46,7 @@ namespace StorageTool
             InitializeComponent();
             var msg = new Progress<State>(fu =>
             {
-                if (fu == State.FINISHED_QUEUE) { Loc.RefreshFolders(Profiles[Profiles.ActiveProfileIndex]); }//Loc.SetActiveProfile(Profiles[Profiles.ActiveProfileIndex]); }
+                if (fu == State.FINISHED_QUEUE) { Loc.RefreshFolders(); }//Loc.SetActiveProfile(Profiles[Profiles.ActiveProfileIndex]); }
             });
 
             MoveFolders = new MoveFolders(Log, MoveStack, msg);
@@ -87,9 +87,17 @@ namespace StorageTool
 
         private void addProfile_Click(object sender, RoutedEventArgs e)
         {
-            Profiles.Add(ProfileInput.GetProfile());
-            ProfileInput.Clear();
-            Properties.Settings.Default.Config.Profiles = Profiles.GetProfileBase();
+            Profile input = ProfileInput.GetProfile();
+            if(Loc.Stash.Exists(item => item.Profile.ProfileName == input.ProfileName)){
+                MessageBox.Show("A profile with that name already exists, try again.");
+            }
+            else
+            {
+                Profiles.Add(ProfileInput.GetProfile());
+                ProfileInput.Clear();
+                Properties.Settings.Default.Config.Profiles = Profiles.GetProfileBase();
+            }
+
         }
 
         private void removeProfile_Click(object sender, RoutedEventArgs e)
@@ -116,7 +124,7 @@ namespace StorageTool
             DirectoryInfo tmp2 = Profiles[Profiles.ActiveProfileIndex].StorageFolder;
             this.MoveFolders.addToMoveQueue(TaskMode.STORE, new Profile(tmp1.DirInfo, tmp2));
             Loc.SelectedFolderLeft = null;
-            Loc.FoldersLeft.Remove(tmp1);
+            Loc.ActivePane.FoldersLeft.Remove(tmp1);
         }
 
         private void moveToLeft_Click(object sender, RoutedEventArgs e)
@@ -126,7 +134,7 @@ namespace StorageTool
             LocationsDirInfo tmp2 = Loc.SelectedFolderRight;
             this.MoveFolders.addToMoveQueue(TaskMode.RESTORE, new Profile(tmp1,tmp2.DirInfo ));
             Loc.SelectedFolderRight = null;
-            Loc.FoldersRight.Remove(tmp2);
+            Loc.ActivePane.FoldersRight.Remove(tmp2);
         }
 
         private void relinkButton_Click(object sender, RoutedEventArgs e)
@@ -136,7 +144,7 @@ namespace StorageTool
             LocationsDirInfo tmp2 = Loc.SelectedFolderReLink;
             this.MoveFolders.addToMoveQueue(TaskMode.RELINK, new Profile( tmp1, tmp2.DirInfo ));
             Loc.SelectedFolderReLink = null;
-            Loc.FoldersUnlinked.Remove(tmp2);
+            Loc.ActivePane.FoldersUnlinked.Remove(tmp2);
         }
 
         private void sortLocations_Click(object sender, RoutedEventArgs e)

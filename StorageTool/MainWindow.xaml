@@ -44,7 +44,7 @@
         <TextBlock x:Name="inputLeft" Text="{Binding ProfileInput.LeftInput}"  Margin="10,10,39,0" Height="20" VerticalAlignment="Top" Background="#FF9B9B9B" Grid.Column="1"/>
         <TextBlock x:Name="inputRight" Text="{Binding ProfileInput.RightInput}" Margin="10,35,39,0" Grid.Column="1" Height="20" VerticalAlignment="Top" Background="#FF9B9B9B"/>
 
-        <ListView x:Name="listView" ItemsSource="{Binding Loc.FoldersLeft}" SelectedItem="{Binding Loc.SelectedFolderLeft}" GridViewColumnHeader.Click="sortLocations_Click" Margin="10,30,10,33" Grid.Row="1">
+        <ListView x:Name="listView" ItemsSource="{Binding Loc.ActivePane.FoldersLeft}" SelectedItem="{Binding Loc.SelectedFolderLeft}" GridViewColumnHeader.Click="sortLocations_Click" Margin="10,30,10,33" Grid.Row="1">
             <ListView.View>
                 <GridView>
                     <GridViewColumn  DisplayMemberBinding="{Binding DirInfo.Name}" Width="250">
@@ -66,7 +66,7 @@
             </ListView.View>
         </ListView>
 
-        <ListView x:Name="dirListRight" ItemsSource="{Binding Loc.FoldersRight}" GridViewColumnHeader.Click="sortLocations_Click" SelectedItem="{Binding Loc.SelectedFolderRight}" Margin="10,30,10,33" Grid.Column="1" Grid.Row="1">
+        <ListView x:Name="dirListRight" ItemsSource="{Binding Loc.ActivePane.FoldersRight}" GridViewColumnHeader.Click="sortLocations_Click" SelectedItem="{Binding Loc.SelectedFolderRight}" Margin="10,30,10,33" Grid.Column="1" Grid.Row="1">
             <ListView.View>
                 <GridView>
                     <GridViewColumn  DisplayMemberBinding="{Binding DirInfo.Name}" Width="250">
@@ -88,7 +88,7 @@
             </ListView.View>
         </ListView>
 
-        <ListView x:Name="relinkList" ItemsSource="{Binding Loc.FoldersUnlinked}" GridViewColumnHeader.Click="sortLocations_Click" SelectedItem="{Binding Loc.SelectedFolderReLink}" Grid.Column="1" Margin="10,20,10,25" Grid.Row="2">
+        <ListView x:Name="relinkList" ItemsSource="{Binding Loc.ActivePane.FoldersUnlinked}" GridViewColumnHeader.Click="sortLocations_Click" SelectedItem="{Binding Loc.SelectedFolderReLink}" Grid.Column="1" Margin="10,20,10,25" Grid.Row="2">
             <ListView.View>
                 <GridView>
                     <GridViewColumn  DisplayMemberBinding="{Binding DirInfo.Name}" Width="250">

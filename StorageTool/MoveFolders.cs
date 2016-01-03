@@ -66,7 +66,7 @@ namespace StorageTool
             }
         }
 
-        private async Task startMoveQueue()
+        private async void startMoveQueue()
         {
             
             var currentFile = new Progress<string>((fu) =>

@@ -17,6 +17,14 @@ namespace StorageTool
         private DirectoryInfo storageFolder;
         private DirectoryInfo gameFolder;
 
+        public Profile(Profile prof)
+        {
+            ProfileIndex = prof.ProfileIndex;
+            ProfileName = prof.ProfileName;
+            StorageFolder = prof.StorageFolder;
+            GameFolder = prof.GameFolder;
+        }
+
         public Profile (string name, string gF, string sF)
         {
             profileName = name;
