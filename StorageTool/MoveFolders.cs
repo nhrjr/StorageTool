@@ -140,6 +140,7 @@ namespace StorageTool
                 moveStack[moveStack.Index].Status = "Finished";
                 moveStack.Index++;
                 MoveQueue.Dequeue();
+                state.Report(State.FINISHED_ITEM);
                 
             }
             state.Report(State.FINISHED_QUEUE);

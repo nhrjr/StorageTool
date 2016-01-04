@@ -21,7 +21,7 @@ using Monitor.Core.Utilities;
 
 namespace StorageTool
 {
-    public enum State { FINISHED_QUEUE };
+    public enum State { FINISHED_QUEUE, FINISHED_ITEM };
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -46,6 +46,7 @@ namespace StorageTool
             var msg = new Progress<State>(fu =>
             {
                 if (fu == State.FINISHED_QUEUE) { Loc.RefreshFolders(); }//Loc.SetActiveProfile(Profiles[Profiles.ActiveProfileIndex]); }
+                if (fu == State.FINISHED_ITEM) { Loc.WorkedFolders.RemoveAt(0); }
             });
 
             MoveFolders = new MoveFolders(Log, MoveStack, msg);
@@ -54,10 +55,22 @@ namespace StorageTool
             //Profiles.Add(new Profile("Steam", @"C:\Games\Steam\SteamApps\common", @"D:\Games\Steam"));
             //Profiles.Add(new Profile("Origin", @"C:\Games\Origin\OriginApps", @"D:\Games\Origin"));
             //Profiles.Add(new Profile("TestFolders", @"C:\FolderGames", @"C:\FolderStorage"));
-            Properties.Settings.Default.Config.Profiles = Profiles.GetProfileBase();
+            //Properties.Settings.Default.Config.Profiles = Profiles.GetProfileBase();
 
             this.DataContext = this;
+            //StartFileSystemWatcher(@"C:\FolderGames");
+            
+
         }
+
+        public void WriteToLog (string msg)
+        {
+            Log.LogMessage = msg;
+        }
+            
+
+
+
 
         private void profileBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -141,6 +154,7 @@ namespace StorageTool
                 DirectoryInfo tmp2 = Profiles[Profiles.ActiveProfileIndex].StorageFolder;
                 this.MoveFolders.addToMoveQueue(TaskMode.STORE, new Profile(tmp1.DirInfo, tmp2));
                 Loc.SelectedFolderLeft = null;
+                Loc.WorkedFolders.Add(tmp1);
                 Loc.ActivePane.FoldersLeft.Remove(tmp1);
             }
         }
@@ -154,6 +168,7 @@ namespace StorageTool
                 LocationsDirInfo tmp2 = Loc.SelectedFolderRight;
                 this.MoveFolders.addToMoveQueue(TaskMode.RESTORE, new Profile(tmp1, tmp2.DirInfo));
                 Loc.SelectedFolderRight = null;
+                Loc.WorkedFolders.Add(tmp2);
                 Loc.ActivePane.FoldersRight.Remove(tmp2);
             }
         }
@@ -167,6 +182,7 @@ namespace StorageTool
                 LocationsDirInfo tmp2 = Loc.SelectedFolderReLink;
                 this.MoveFolders.addToMoveQueue(TaskMode.RELINK, new Profile(tmp1, tmp2.DirInfo));
                 Loc.SelectedFolderReLink = null;
+                Loc.WorkedFolders.Add(tmp2);
                 Loc.ActivePane.FoldersUnlinked.Remove(tmp2);
             }
         }

@@ -110,6 +110,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Config.cs" />
+    <Compile Include="FolderWatcher.cs" />
     <Compile Include="MoveStack.cs" />
     <Compile Include="ProfileInput.cs" />
     <Compile Include="SortAdorner.cs" />

@@ -165,6 +165,7 @@
         <TextBlock x:Name="Desc_GameFolder" HorizontalAlignment="Right" Margin="0,10,10,0" TextWrapping="Wrap" Text="Game Folder" VerticalAlignment="Top"  Grid.Row="1" Width="100" Height="20"/>
         <TextBlock x:Name="Desc_StorageFolder" HorizontalAlignment="Right" Margin="0,10,10,0" TextWrapping="Wrap" Text="Storage Folder" VerticalAlignment="Top" Grid.Column="1" Grid.Row="1" Width="100" Height="20"/>
         <TextBlock x:Name="Desc_Unlinked" Grid.Column="1" Margin="0,0,10,0" Grid.Row="2" TextWrapping="Wrap" Text="Unlinked Folders in Storage Folder" Height="20" VerticalAlignment="Top" HorizontalAlignment="Right" Width="200"/>
+        <!--<ListBox x:Name="worked_Folders" ItemsSource="{Binding Loc.WorkedFolders}" DisplayMemberPath="DirInfo.Name" HorizontalAlignment="Left" Height="160" Margin="349,10,0,0" VerticalAlignment="Top" Width="171" Grid.Row="2"/>-->
 
 
 

@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Windows;
 using System.ComponentModel;
+using System.Windows.Controls;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -140,15 +141,17 @@ namespace StorageTool
         }
     }
 
+    public delegate void NotifyFileSystemChangesEventHandler();
+
     public class FolderPane : INotifyPropertyChanged {
+
+        private bool isRefreshing = false;
 
         private List<FolderStash> stash = new List<FolderStash>();
 
         private FolderStash activePane = new FolderStash();
 
-        //private ObservableCollection<LocationsDirInfo> foldersLeft = new ObservableCollection<LocationsDirInfo>();
-        //private ObservableCollection<LocationsDirInfo> foldersRight = new ObservableCollection<LocationsDirInfo>();
-        //private ObservableCollection<LocationsDirInfo> foldersUnlinked = new ObservableCollection<LocationsDirInfo>();
+        private ObservableCollection<LocationsDirInfo> workedFolders = new ObservableCollection<LocationsDirInfo>();
 
         private LocationsDirInfo selectedFolderLeft = null;
         private LocationsDirInfo selectedFolderRight = null;
@@ -158,11 +161,23 @@ namespace StorageTool
         private string locationRightFullName = null;
 
         private AnalyzeFolders setFolders = new AnalyzeFolders();
-        //private AnalyzeFolders refreshFolders = new AnalyzeFolders();
+        private FolderWatcher folderWatcher = new FolderWatcher();
+
+        public FolderPane()
+        {
+            folderWatcher.NotifyFileSystemChangesEvent += new NotifyFileSystemChangesEventHandler(OnFileSystemChanged);
+        }
+
+        private void OnFileSystemChanged()
+        {
+            RefreshFolders();            
+        }
 
         public void RemoveActiveProfile()
         {
             Stash.Remove(ActivePane);
+            folderWatcher.StopFileSystemWatcher(ActivePane.Profile.GameFolder.FullName);
+            folderWatcher.StopFileSystemWatcher(ActivePane.Profile.StorageFolder.FullName);
             ActivePane = null;
         }
 
@@ -170,17 +185,11 @@ namespace StorageTool
         {
             if (ActiveProfile != null)
             {
-                //setFolders.SetFolders(ActiveProfile);
                 this.LocationLeftFullName = ActiveProfile.GameFolder.FullName;
-                this.LocationRightFullName = ActiveProfile.StorageFolder.FullName;
+                this.LocationRightFullName = ActiveProfile.StorageFolder.FullName;                
 
-                
-                //this.ActivePane.FoldersLeft = new ObservableCollection<LocationsDirInfo>(setFolders.StorableFolders);
-                //this.ActivePane.FoldersRight = new ObservableCollection<LocationsDirInfo>(setFolders.LinkedFolders);
-                //this.ActivePane.FoldersUnlinked = new ObservableCollection<LocationsDirInfo>(setFolders.UnlinkedFolders);
                 if (!stash.Exists(item => item.Profile.ProfileName == ActiveProfile.ProfileName))
                 {
-                    //this.ActivePane.Profile = ActiveProfile;
                     stash.Add(new FolderStash(ActiveProfile));
                     RefreshFolders();
                 }
@@ -189,7 +198,9 @@ namespace StorageTool
                 {
                     if (s.Profile.ProfileName == ActiveProfile.ProfileName) ActivePane = s;
                 }
-                                
+                folderWatcher.StartFileSystemWatcher(ActivePane.Profile.GameFolder.FullName);
+                folderWatcher.StartFileSystemWatcher(ActivePane.Profile.StorageFolder.FullName);
+
             }
             else
             {
@@ -201,27 +212,47 @@ namespace StorageTool
             }
         }
 
+
+
         public void RefreshFolders()
         {
-            foreach( FolderStash pane in stash)
-            {
-                setFolders.SetFolders(pane.Profile);
-                var tmpList1 = setFolders.StorableFolders; //.Where(n => !FoldersLeft.Select(n1 => n1.DirInfo.FullName).Contains(n.DirInfo.FullName)).ToList();
-                var tmpList2 = setFolders.LinkedFolders; //.Where(n => !FoldersRight.Select(n1 => n1.DirInfo.FullName).Contains(n.DirInfo.FullName)).ToList();
-                var tmpList3 = setFolders.UnlinkedFolders; //.Where(n => !FoldersUnlinked.Select(n1 => n1.DirInfo.FullName).Contains(n.DirInfo.FullName)).ToList();
-                foreach (LocationsDirInfo g in tmpList1) if (!pane.FoldersLeft.Any(f => f.DirInfo.FullName == g.DirInfo.FullName)) pane.FoldersLeft.Add(g);
-                foreach (LocationsDirInfo g in tmpList2) if (!pane.FoldersRight.Any(f => f.DirInfo.FullName == g.DirInfo.FullName)) pane.FoldersRight.Add(g);
-                foreach (LocationsDirInfo g in tmpList3) if (!pane.FoldersUnlinked.Any(f => f.DirInfo.FullName == g.DirInfo.FullName)) pane.FoldersUnlinked.Add(g);
-                foreach (LocationsDirInfo g in pane.FoldersLeft.Reverse()) if (!tmpList1.Any(f => f.DirInfo.FullName == g.DirInfo.FullName)) pane.FoldersLeft.Remove(g);
-                foreach (LocationsDirInfo g in pane.FoldersRight.Reverse()) if (!tmpList2.Any(f => f.DirInfo.FullName == g.DirInfo.FullName)) pane.FoldersRight.Remove(g);
-                foreach (LocationsDirInfo g in pane.FoldersUnlinked.Reverse()) if (!tmpList3.Any(f => f.DirInfo.FullName == g.DirInfo.FullName)) pane.FoldersUnlinked.Remove(g);
-                //if (pane.Profile.ProfileName == ActivePane.Profile.ProfileName)
+            if (isRefreshing == true)
+                return;
+            try {
+
+                //await Task.Run(() =>
                 //{
-                //    ActivePane = pane;                    
-                //}
-                pane.RefreshSizes();
+                    isRefreshing = true;
+                    foreach (FolderStash pane in stash)
+                    {
+                        setFolders.SetFolders(pane.Profile);
+                        var tmpList1 = setFolders.StorableFolders; //.Where(n => !FoldersLeft.Select(n1 => n1.DirInfo.FullName).Contains(n.DirInfo.FullName)).ToList();
+                        var tmpList2 = setFolders.LinkedFolders; //.Where(n => !FoldersRight.Select(n1 => n1.DirInfo.FullName).Contains(n.DirInfo.FullName)).ToList();
+                        var tmpList3 = setFolders.UnlinkedFolders; //.Where(n => !FoldersUnlinked.Select(n1 => n1.DirInfo.FullName).Contains(n.DirInfo.FullName)).ToList();
+                        foreach (LocationsDirInfo g in tmpList1) if (!pane.FoldersLeft.Any(f => f.DirInfo.FullName == g.DirInfo.FullName ) && !WorkedFolders.Any(h => h.DirInfo.Name == g.DirInfo.Name)) pane.FoldersLeft.Add(g);
+                        foreach (LocationsDirInfo g in tmpList2) if (!pane.FoldersRight.Any(f => f.DirInfo.FullName == g.DirInfo.FullName ) && !WorkedFolders.Any(h => h.DirInfo.Name == g.DirInfo.Name)) pane.FoldersRight.Add(g);
+                        foreach (LocationsDirInfo g in tmpList3) if (!pane.FoldersUnlinked.Any(f => f.DirInfo.FullName == g.DirInfo.FullName ) && !WorkedFolders.Any(h => h.DirInfo.Name == g.DirInfo.Name)) pane.FoldersUnlinked.Add(g);
+                        foreach (LocationsDirInfo g in pane.FoldersLeft.Reverse()) if (!tmpList1.Any(f => f.DirInfo.FullName == g.DirInfo.FullName)) pane.FoldersLeft.Remove(g);
+                        foreach (LocationsDirInfo g in pane.FoldersRight.Reverse()) if (!tmpList2.Any(f => f.DirInfo.FullName == g.DirInfo.FullName)) pane.FoldersRight.Remove(g);
+                        foreach (LocationsDirInfo g in pane.FoldersUnlinked.Reverse()) if (!tmpList3.Any(f => f.DirInfo.FullName == g.DirInfo.FullName)) pane.FoldersUnlinked.Remove(g);
+                        //if (pane.Profile.ProfileName == ActivePane.Profile.ProfileName)
+                        //{
+                        //    ActivePane = pane;                    
+                        //}
+                        pane.RefreshSizes();
+                    }
+                //}).ContinueWith((x) => { isRefreshing = false; });
+
             }
-            
+            catch(Exception e)
+            {                
+                MessageBox.Show(e.Message);
+            }
+            finally
+            {
+                isRefreshing = false;
+            }
+                     
         }
 
         public string LocationLeftFullName
@@ -300,33 +331,16 @@ namespace StorageTool
             }
         }
 
-        //public ObservableCollection<LocationsDirInfo> FoldersLeft
-        //{
-        //    get { return this.foldersLeft; }
-        //    set
-        //    {
-        //        this.foldersLeft = value;
-        //        this.OnPropertyChanged("FoldersLeft");
-        //    }
-        //}
-        //public ObservableCollection<LocationsDirInfo> FoldersRight
-        //{
-        //    get { return this.foldersRight; }
-        //    set
-        //    {
-        //        this.foldersRight = value;
-        //        this.OnPropertyChanged("FoldersRight");
-        //    }
-        //}
-        //public ObservableCollection<LocationsDirInfo> FoldersUnlinked
-        //{
-        //    get { return this.foldersUnlinked; }
-        //    set
-        //    {
-        //        this.foldersUnlinked = value;
-        //        this.OnPropertyChanged("FoldersUnlinked");
-        //    }
-        //}
+        public ObservableCollection<LocationsDirInfo> WorkedFolders
+        {
+            get { return this.workedFolders; }
+            set
+            {
+                this.workedFolders = value;
+                this.OnPropertyChanged("WorkedFolders");
+            }
+        }
+
 
         public event PropertyChangedEventHandler PropertyChanged;
 
