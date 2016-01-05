@@ -238,11 +238,14 @@ namespace StorageTool
             if(b.Content.ToString() == "Pause")
             {
                 b.Content = "Unpause";
+                b.Background = Brushes.Red;
                 MoveFolders.Pause();
             }
             else
             {
                 b.Content = "Pause";
+                //TODO set to a default value, instead if lightGray which ignores the windows theme or stuff
+                b.Background = Brushes.LightGray;
                 MoveFolders.Resume();
             }
         }
