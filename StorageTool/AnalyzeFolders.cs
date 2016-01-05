@@ -14,11 +14,13 @@ namespace StorageTool
         public List<string> LinkedFolders { get; set; }
         public List<string> UnlinkedFolders { get; set; }
         public List<string> StorableFolders { get; set; }
+        public List<string> DuplicateFolders { get; set; }
         public AnalyzeFolders()
         {
             LinkedFolders = new List<string>();
             UnlinkedFolders = new List<string>();
             StorableFolders = new List<string>();
+            DuplicateFolders = new List<string>();
         }
 
 
@@ -28,15 +30,19 @@ namespace StorageTool
             LinkedFolders.Clear();
             StorableFolders.Clear();
             UnlinkedFolders.Clear();
+            DuplicateFolders.Clear();
 
+            List<string> dGFolders = new List<string>();
             List<DirectoryInfo> gFolders = new List<DirectoryInfo>();
             gFolders.AddRange(input.GameFolder.GetDirectories());
             List<DirectoryInfo> sFolders = new List<DirectoryInfo>();
             sFolders.AddRange(input.StorageFolder.GetDirectories());
 
-            List<DirectoryInfo> junctionsInGameFolder = new List<DirectoryInfo>(); 
+            List<DirectoryInfo> _gFolders = new List<DirectoryInfo>();
+            List<DirectoryInfo> _uFolders = new List<DirectoryInfo>();
+            List<DirectoryInfo> _lFolders = new List<DirectoryInfo>();
 
-            foreach(DirectoryInfo g in gFolders)
+            foreach (DirectoryInfo g in gFolders)
             {
                 try
                 {
@@ -49,6 +55,8 @@ namespace StorageTool
                     else
                     {
                         this.StorableFolders.Add(g.FullName);
+                        _gFolders.Add(g);
+                        dGFolders.Add(g.Name);
                     }
                 }
                 catch (IOException ex)
@@ -56,20 +64,31 @@ namespace StorageTool
                     MessageBox.Show(ex.Message);
                 }
             }
-
-            List<DirectoryInfo> tmpList1 = sFolders.Where(n => LinkedFolders.Select(n1 => n1).Contains(n.FullName)).ToList();
+            List<string> dSFolders = new List<string>();
+            List<DirectoryInfo> tmpList1 = sFolders.Where(n => LinkedFolders.Contains(n.FullName) && !JunctionPoint.Exists(@n.FullName)).ToList();
             this.LinkedFolders.Clear();
             foreach (DirectoryInfo d in tmpList1)
             {
                 this.LinkedFolders.Add(d.FullName);
+                _lFolders.Add(d);
+                dSFolders.Add(d.Name);
             }
 
-            List<DirectoryInfo> tmpList = sFolders.Where(n => !LinkedFolders.Select(n1 => n1).Contains(n.FullName)).ToList();
+            List<DirectoryInfo> tmpList = sFolders.Where(n => !LinkedFolders.Contains(n.FullName) && !JunctionPoint.Exists(@n.FullName)).ToList();
 
             foreach (DirectoryInfo d in tmpList)
             {
                 this.UnlinkedFolders.Add(d.FullName);
+                _uFolders.Add(d);
+                dSFolders.Add(d.Name);
             }
+            DuplicateFolders = dGFolders.Intersect(dSFolders).ToList();
+            _gFolders.RemoveAll(n => DuplicateFolders.Contains(n.Name));
+            _uFolders.RemoveAll(n => DuplicateFolders.Contains(n.Name));
+            _lFolders.RemoveAll(n => DuplicateFolders.Contains(n.Name));
+            this.StorableFolders = _gFolders.Select(n => n.FullName).ToList();
+            this.UnlinkedFolders = _uFolders.Select(n => n.FullName).ToList();
+            this.LinkedFolders = _lFolders.Select(n => n.FullName).ToList();
 
         }
 

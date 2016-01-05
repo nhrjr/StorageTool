@@ -157,12 +157,12 @@ namespace StorageTool
             }
             try
             {
-                moveStack.Add(new MoveItem() { Action = mode, FullName = dir.FullName, Name = dir.Name, NotDone = true, Progress = 0, Status = "Waiting", Size = AnalyzeFolders.DirSizeSync(dir) });
+                moveStack.Add(new MoveItem() { Action = mode, FullName = dir.FullName, Name = dir.Name, NotDone = Visibility.Visible, Progress = 0, Status = "Waiting", Size = AnalyzeFolders.DirSizeSync(dir) });
             }
             catch(Exception ex)
             {
                 MessageBox.Show(ex.Message);
-                moveStack.Add(new MoveItem() { Action = mode, FullName = dir.FullName, Name = dir.Name, NotDone = true, Progress = 0, Status = "Waiting", Size = 0 });
+                moveStack.Add(new MoveItem() { Action = mode, FullName = dir.FullName, Name = dir.Name, NotDone = Visibility.Visible, Progress = 0, Status = "Waiting", Size = 0 });
             }
 
             if (!moveQueueIsWorking)
@@ -192,6 +192,7 @@ namespace StorageTool
 
             try
             {
+                state.Report(State.STARTED_QUEUE);
                 this.moveQueueIsWorking = true;
 
                 var copyQueue = new Task(() => processMoveQueue(currentFile, sizeFromHell));
@@ -199,6 +200,7 @@ namespace StorageTool
                 await copyQueue.ContinueWith(task => {
                     ((IProgress<string>)currentFile).Report("Finished.");
                 });
+                state.Report(State.FINISHED_QUEUE);
             }
             catch (Exception ex)
             {
@@ -216,6 +218,7 @@ namespace StorageTool
         {
             while (MoveQueue.Count > 0)
             {
+                moveStack[moveStack.Index].NotDone = Visibility.Hidden;
                 switch (MoveQueue.Peek().Mode)
                 {
                     case TaskMode.STORE:
@@ -230,14 +233,14 @@ namespace StorageTool
                         moveStack[moveStack.Index].Status = "Linking";
                         this.LinkStorageToGames(MoveQueue.Peek(), currentFile);
                         break;
-                }
-                moveStack[moveStack.Index].NotDone = false;
+                }             
+                MoveQueue.Dequeue();                
                 moveStack.Index++;
-                MoveQueue.Dequeue();
+                
                 state.Report(State.FINISHED_ITEM);
                 
             }
-            state.Report(State.FINISHED_QUEUE);
+            
         }
 
         private void LinkStorageToGames(QueueItem prof, IProgress<string> currentFile)

@@ -103,6 +103,17 @@ namespace StorageTool
         private ObservableCollection<LocationsDirInfo> foldersLeft = new ObservableCollection<LocationsDirInfo>();
         private ObservableCollection<LocationsDirInfo> foldersRight = new ObservableCollection<LocationsDirInfo>();
         private ObservableCollection<LocationsDirInfo> foldersUnlinked = new ObservableCollection<LocationsDirInfo>();
+        private ObservableCollection<string> duplicateFolders = new ObservableCollection<string>();
+
+        public ObservableCollection<string> DuplicateFolders
+        {
+            get { return this.duplicateFolders; }
+            set
+            {
+                this.duplicateFolders = value;
+                this.OnPropertyChanged("DuplicateFolders");
+            }
+        }
 
         public ObservableCollection<LocationsDirInfo> FoldersLeft
         {
@@ -253,33 +264,34 @@ namespace StorageTool
                         setFolders.SetFolders(pane.Profile);
                         var tmpList1 = setFolders.StorableFolders; 
                         var tmpList2 = setFolders.LinkedFolders; 
-                        var tmpList3 = setFolders.UnlinkedFolders; 
+                        var tmpList3 = setFolders.UnlinkedFolders;
+                        pane.DuplicateFolders = new ObservableCollection<string>(setFolders.DuplicateFolders);
 
-                    foreach (string g in tmpList1)
-                    {
-                        if (!pane.FoldersLeft.Any(f => f.DirInfo.FullName == g))
+                        foreach (string g in tmpList1)
                         {
-                            DirectoryInfo tmp = new DirectoryInfo(g);
-                            if(!WorkedFolders.Any(h => h.DirInfo.Name == tmp.Name)) pane.FoldersLeft.Add(new LocationsDirInfo(tmp));
-                        }
+                            if (!pane.FoldersLeft.Any(f => f.DirInfo.FullName == g))
+                            {
+                                DirectoryInfo tmp = new DirectoryInfo(g);
+                                if(!WorkedFolders.Any(h => h.DirInfo.Name == tmp.Name)) pane.FoldersLeft.Add(new LocationsDirInfo(tmp));
+                            }
 
-                    }
-                    foreach (string g in tmpList2)
-                    {
-                        if (!pane.FoldersRight.Any(f => f.DirInfo.FullName == g))
-                        {
-                            DirectoryInfo tmp = new DirectoryInfo(g);
-                            if (!WorkedFolders.Any(h => h.DirInfo.Name == tmp.Name)) pane.FoldersRight.Add(new LocationsDirInfo(tmp));
                         }
-                    }
-                    foreach (string g in tmpList3)
-                    {
-                        if (!pane.FoldersUnlinked.Any(f => f.DirInfo.FullName == g))
+                        foreach (string g in tmpList2)
                         {
-                            DirectoryInfo tmp = new DirectoryInfo(g);
-                            if (!WorkedFolders.Any(h => h.DirInfo.Name == tmp.Name)) pane.FoldersUnlinked.Add(new LocationsDirInfo(tmp));
+                            if (!pane.FoldersRight.Any(f => f.DirInfo.FullName == g))
+                            {
+                                DirectoryInfo tmp = new DirectoryInfo(g);
+                                if (!WorkedFolders.Any(h => h.DirInfo.Name == tmp.Name)) pane.FoldersRight.Add(new LocationsDirInfo(tmp));
+                            }
                         }
-                    }
+                        foreach (string g in tmpList3)
+                        {
+                            if (!pane.FoldersUnlinked.Any(f => f.DirInfo.FullName == g))
+                            {
+                                DirectoryInfo tmp = new DirectoryInfo(g);
+                                if (!WorkedFolders.Any(h => h.DirInfo.Name == tmp.Name)) pane.FoldersUnlinked.Add(new LocationsDirInfo(tmp));
+                            }
+                        }
 
                         foreach (LocationsDirInfo g in pane.FoldersLeft.Reverse()) if (!tmpList1.Any(f => f == g.DirInfo.FullName)) pane.FoldersLeft.Remove(g);
                         foreach (LocationsDirInfo g in pane.FoldersRight.Reverse()) if (!tmpList2.Any(f => f == g.DirInfo.FullName)) pane.FoldersRight.Remove(g);

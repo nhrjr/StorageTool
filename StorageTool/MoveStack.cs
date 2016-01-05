@@ -43,7 +43,8 @@ namespace StorageTool
         private TaskMode action;
         private string name;        
         private string status;
-        private bool notDone;
+        //private bool notDone;
+        private Visibility notDone;
         private int progress;
         private long size;
         private long processedBits;
@@ -65,7 +66,7 @@ namespace StorageTool
             }
         }
 
-        public bool NotDone
+        public Visibility NotDone
         {
             get
             {

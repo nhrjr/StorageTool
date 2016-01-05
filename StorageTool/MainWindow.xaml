@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:StorageTool"
         mc:Ignorable="d"
-        Title="StorageTool" Height="900" Width="804" Background="White">
+        Title="StorageTool" Height="900" Width="931" Background="White">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <!--<Style TargetType="GridViewColumnHeader">
@@ -95,7 +95,7 @@
                     <GridViewColumn Width="60">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <Button Content="Cancel" Click="cancelItem_Click" CommandParameter="{Binding}" Visibility="{Binding NotDone, Converter={StaticResource BoolToVis}}"/>
+                                <Button Content="Cancel" Click="cancelItem_Click" CommandParameter="{Binding}" Visibility="{Binding NotDone}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -194,6 +194,16 @@
                     </ListView.View>
                 </ListView>
             </TabItem>
+            <TabItem Header="Duplicate" >
+                <ListView x:Name="dupFolders" ItemsSource="{Binding Loc.ActivePane.DuplicateFolders}" Margin="0,0,0,0">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </TabItem>
+
 
         </TabControl>
         <Button x:Name="pauseQueue" Content="Pause" Click="pauseQueue_Click" HorizontalAlignment="Right" Margin="0,20,93,0" Grid.Row="2" Width="75" Height="20" VerticalAlignment="Top"/>

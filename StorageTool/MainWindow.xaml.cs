@@ -22,13 +22,14 @@ using System.Diagnostics;
 
 namespace StorageTool
 {
-    public enum State { FINISHED_QUEUE, FINISHED_ITEM };
+    public enum State { FINISHED_QUEUE, FINISHED_ITEM, STARTED_QUEUE };
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
         private bool isNotRefreshing = true;
+        private bool isMovingFolders = false;
         //private Profile activeProfile = null;
         private MoveFolders MoveFolders;
         private GridViewColumnHeader listViewSortCol = null;
@@ -45,34 +46,21 @@ namespace StorageTool
         public MainWindow()
         {
             InitializeComponent();
+            Closing += OnClosing;
             var msg = new Progress<State>(fu =>
             {
-                if (fu == State.FINISHED_QUEUE) { Loc.RefreshFolders(); }//Loc.SetActiveProfile(Profiles[Profiles.ActiveProfileIndex]); }
+                if (fu == State.STARTED_QUEUE) { isMovingFolders = true; }
+                if (fu == State.FINISHED_QUEUE) { isMovingFolders = false; Loc.RefreshFolders(); }
                 if (fu == State.FINISHED_ITEM) { Loc.WorkedFolders.RemoveAt(0); }
             });
 
             MoveFolders = new MoveFolders(Log, MoveStack, msg);
 
             Profiles = new Profiles(Properties.Settings.Default.Config.Profiles);         
-            //Profiles.Add(new Profile("Steam", @"C:\Games\Steam\SteamApps\common", @"D:\Games\Steam"));
-            //Profiles.Add(new Profile("Origin", @"C:\Games\Origin\OriginApps", @"D:\Games\Origin"));
-            //Profiles.Add(new Profile("TestFolders", @"C:\FolderGames", @"C:\FolderStorage"));
-            //Properties.Settings.Default.Config.Profiles = Profiles.GetProfileBase();
 
-            this.DataContext = this;
-            //StartFileSystemWatcher(@"C:\FolderGames");
-            
+            this.DataContext = this;          
 
         }
-
-        public void WriteToLog (string msg)
-        {
-            Log.LogMessage = msg;
-        }
-            
-
-
-
 
         private void profileBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -279,7 +267,23 @@ namespace StorageTool
 
         private void cancelAll_Click(object sender, RoutedEventArgs e)
         {
-            
+            MoveFolders.Pause();
+            int index = MoveStack.Count - 1;
+            int wIndex = Loc.WorkedFolders.Count - 1;
+            while(index != MoveStack.Index)
+            {
+                var m = MoveStack[index];
+                if(m.NotDone == Visibility.Visible)
+                {
+                    MoveFolders.removeFromMoveQueue(m.FullName);
+                    MoveStack.RemoveAt(index);
+                    Loc.WorkedFolders.RemoveAt(wIndex);
+                    index--;
+                    wIndex--;          
+                }
+            }
+            MoveFolders.Resume();
+            Loc.RefreshFolders();
         }
 
         private void cancelItem_Click(object sender, RoutedEventArgs e)
@@ -294,11 +298,21 @@ namespace StorageTool
                 if(Loc.WorkedFolders[i].DirInfo.FullName == toCancel.FullName)
                 {
                     Loc.WorkedFolders.RemoveAt(i);
-                    MessageBox.Show(toCancel.FullName);
                 }
             }            
             MoveFolders.Resume();
             Loc.RefreshFolders();
+        }
+
+        private void OnClosing(object sender, CancelEventArgs cancelEventArgs)
+        {
+            if (isMovingFolders)
+            {
+                if (MessageBox.Show(this, "StorageTool is still copying,\n are you sure you wish to close?\n This will leave the current folders in a broken state.", "Close StorageTool", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+                {
+                    cancelEventArgs.Cancel = true;
+                }
+            }            
         }
     }
 
