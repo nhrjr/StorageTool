@@ -16,6 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Monitor.Core.Utilities;
+using System.Diagnostics;
 
 
 
@@ -27,6 +28,7 @@ namespace StorageTool
     /// </summary>
     public partial class MainWindow : Window
     {
+        private bool isNotRefreshing = true;
         //private Profile activeProfile = null;
         private MoveFolders MoveFolders;
         private GridViewColumnHeader listViewSortCol = null;
@@ -147,6 +149,8 @@ namespace StorageTool
 
         private void moveToRight_Click(object sender, RoutedEventArgs e)
         {
+            Button b = sender as Button;
+            Loc.SelectedFolderLeft = b.CommandParameter as LocationsDirInfo;
             if (Loc.SelectedFolderLeft != null)
             {
                 Log.LogMessage = "Moving " + Loc.SelectedFolderLeft.DirInfo.Name + " to Storage.";
@@ -157,10 +161,13 @@ namespace StorageTool
                 Loc.WorkedFolders.Add(tmp1);
                 Loc.ActivePane.FoldersLeft.Remove(tmp1);
             }
+
         }
 
         private void moveToLeft_Click(object sender, RoutedEventArgs e)
         {
+            Button b = sender as Button;
+            Loc.SelectedFolderRight = b.CommandParameter as LocationsDirInfo;
             if (Loc.SelectedFolderRight != null)
             {
                 Log.LogMessage = "Moving " + Loc.SelectedFolderRight.DirInfo.Name + " to Game folder.";
@@ -175,6 +182,8 @@ namespace StorageTool
 
         private void relinkButton_Click(object sender, RoutedEventArgs e)
         {
+            Button b = sender as Button;
+            Loc.SelectedFolderReLink = b.CommandParameter as LocationsDirInfo;
             if (Loc.SelectedFolderReLink != null)
             {
                 Log.LogMessage = "Linking " + Loc.SelectedFolderReLink.DirInfo.Name + " to Game folder.";
@@ -208,6 +217,60 @@ namespace StorageTool
                 listViewSortAdorner = new SortAdorner(listViewSortCol, newDir);
                 AdornerLayer.GetAdornerLayer(listViewSortCol).Add(listViewSortAdorner);
                 listView_local.Items.SortDescriptions.Add(new SortDescription(sortBy, newDir));
+            }
+        }
+
+        private void Desc_GameFolder_Click(object sender, RoutedEventArgs e)
+        {
+            if (Loc.ActivePane.Profile != null)
+                Process.Start(Loc.ActivePane.Profile.GameFolder.FullName);
+        }
+
+        private void Desc_StorageFolder_Click(object sender, RoutedEventArgs e)
+        {
+            if (Loc.ActivePane.Profile != null)
+                Process.Start(Loc.ActivePane.Profile.StorageFolder.FullName);
+        }
+
+        private void pauseQueue_Click(object sender, RoutedEventArgs e)
+        {
+            Button b = sender as Button;
+            if(b.Content.ToString() == "Pause")
+            {
+                b.Content = "Unpause";
+                MoveFolders.Pause();
+            }
+            else
+            {
+                b.Content = "Pause";
+                MoveFolders.Resume();
+            }
+        }
+
+        private void refresh_Click(object sender, RoutedEventArgs e)
+        {
+            if (isNotRefreshing)
+            {
+                isNotRefreshing = false;
+                foreach (FolderStash s in Loc.Stash)
+                {
+                    foreach (LocationsDirInfo l in s.FoldersLeft) l.DirSize = 0;
+                    foreach (LocationsDirInfo l in s.FoldersRight) l.DirSize = 0;
+                    foreach (LocationsDirInfo l in s.FoldersUnlinked) l.DirSize = 0;
+                    s.RefreshSizes();
+                }
+                isNotRefreshing = true;
+            }
+        }
+
+        private void deleteHistory_Click(object sender, RoutedEventArgs e)
+        {
+            int numberofdeletes = MoveStack.Index - 1;
+            while(numberofdeletes >= 0)
+            {
+                MoveStack.RemoveAt(0);
+                MoveStack.Index--;
+                numberofdeletes--;
             }
         }
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 using System.Windows;
 using System.IO;
 using Monitor.Core.Utilities;
@@ -13,6 +14,8 @@ namespace StorageTool
 
     public class MoveFolders
     {
+        private object pauseLock = new object();
+        private bool paused = false;
         private bool moveQueueIsWorking = false;
         private Queue<Profile> GamesToStorage;
         private Queue<Profile> StorageToGames;
@@ -31,6 +34,33 @@ namespace StorageTool
             StorageToGames = new Queue<Profile>();
             LinkToGames = new Queue<Profile>();
             MoveQueue = new Queue<TaskMode>();
+        }
+
+        public void Cancel()
+        {
+
+        }
+
+        public void Pause()
+        {
+            if (paused == false)
+            {
+                // This will acquire the lock on the syncObj,
+                // which, in turn will "freeze" the loop
+                // as soon as you hit a lock(syncObj) statement
+                System.Threading.Monitor.Enter(pauseLock);
+                paused = true;
+            }
+        }
+
+        public void Resume()
+        {
+            if (paused)
+            {
+                paused = false;
+                // This will allow the lock to be taken, which will let the loop continue
+                System.Threading.Monitor.Exit(pauseLock);
+            }
         }
 
         public void addToMoveQueue(TaskMode mode, Profile prof)
@@ -100,8 +130,10 @@ namespace StorageTool
             try
             {
                 this.moveQueueIsWorking = true;
-                
-                await Task.Run(() => processMoveQueue(currentFile,sizeFromHell)).ContinueWith(task => {
+
+                var copyQueue = new Task(() => processMoveQueue(currentFile, sizeFromHell));
+                copyQueue.Start();
+                await copyQueue.ContinueWith(task => {
                     ((IProgress<string>)currentFile).Report("Finished.");
                 });
             }
@@ -136,8 +168,8 @@ namespace StorageTool
                         this.LinkStorageToGames(currentFile);                       
                         break;
                 }
-                moveStack[moveStack.Index].Progress = 100;
-                moveStack[moveStack.Index].Status = "Finished";
+                //moveStack[moveStack.Index].Progress = 100;
+                //moveStack[moveStack.Index].Status = "Finished";
                 moveStack.Index++;
                 MoveQueue.Dequeue();
                 state.Report(State.FINISHED_ITEM);
@@ -152,11 +184,14 @@ namespace StorageTool
                 string sourceDir = LinkToGames.Peek().StorageFolder.FullName;
                 string targetDir = LinkToGames.Peek().GameFolder.FullName + @"\" + LinkToGames.Peek().StorageFolder.Name;
                 JunctionPoint.Create(@targetDir, @sourceDir, false);
-                
+                moveStack[moveStack.Index].Status = "Finished";
+                moveStack[moveStack.Index].Progress = 100;
+
             }
             catch (IOException ioexp)
             {
-                MessageBox.Show(ioexp.Message);
+                moveStack[moveStack.Index].Status = "Finished - Linking Failed";
+                //MessageBox.Show(ioexp.Message);
             }
             finally
             {
@@ -166,23 +201,27 @@ namespace StorageTool
 
         private void MoveGamesToStorage(IProgress<string> currentFile, IProgress<long> sizeFromHell)
         {
-                string sourceDir = GamesToStorage.Peek().GameFolder.FullName;
-                string targetDir = GamesToStorage.Peek().StorageFolder.FullName + @"\" + GamesToStorage.Peek().GameFolder.Name;
-                try {
+            string sourceDir = GamesToStorage.Peek().GameFolder.FullName;
+            string targetDir = GamesToStorage.Peek().StorageFolder.FullName + @"\" + GamesToStorage.Peek().GameFolder.Name;
+            try
+            {
+                CopyFolders(GamesToStorage.Peek().GameFolder, GamesToStorage.Peek().StorageFolder, currentFile, sizeFromHell);
+                DirectoryInfo deletableDirInfo = GamesToStorage.Peek().GameFolder;
+                deletableDirInfo.Delete(true);
+                JunctionPoint.Create(@sourceDir, @targetDir, false);
+                moveStack[moveStack.Index].Status = "Finished";
+            }
 
-                    CopyFolders(GamesToStorage.Peek().GameFolder, GamesToStorage.Peek().StorageFolder,currentFile,sizeFromHell);
-                    DirectoryInfo deletableDirInfo = GamesToStorage.Peek().GameFolder;                    
-                    deletableDirInfo.Delete(true);
-                    JunctionPoint.Create(@sourceDir, @targetDir, false);
-                }
-                catch (IOException ioexp)
-                {
-                    MessageBox.Show(ioexp.Message);
-                }
-                catch(UnauthorizedAccessException unauth)
-                {
-                    MessageBox.Show(unauth.Message);
-                }
+            catch (IOException ioexp)
+            {
+                //MessageBox.Show(ioexp.Message);
+                moveStack[moveStack.Index].Status = "Finished - Linking Failed";
+
+            }
+            catch (UnauthorizedAccessException unauth)
+            {
+                MessageBox.Show(unauth.Message);
+            }
             finally
             {
                 GamesToStorage.Dequeue();
@@ -232,10 +271,12 @@ namespace StorageTool
                     DirectoryInfo deletableDirInfo = StorageToGames.Peek().StorageFolder;
                     deletableDirInfo.Delete(true);
                 }
+                moveStack[moveStack.Index].Status = "Finished";
             }
             catch (IOException ioexp)
             {
-                MessageBox.Show(ioexp.Message);
+                //MessageBox.Show(ioexp.Message);
+                moveStack[moveStack.Index].Status = "Failed.";
             }
             catch (UnauthorizedAccessException unauth)
             {
@@ -267,6 +308,7 @@ namespace StorageTool
 
                 foreach (FileInfo file in dirInfo.EnumerateFiles())
                 {
+                    lock(pauseLock)
                     currentFile.Report(file.Name);                    
                     using (FileStream SourceStream = file.OpenRead())
                     {

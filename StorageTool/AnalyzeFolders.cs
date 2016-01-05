@@ -11,14 +11,14 @@ namespace StorageTool
 {
     public class AnalyzeFolders
     {
-        public List<LocationsDirInfo> LinkedFolders { get; set; }
-        public List<LocationsDirInfo> UnlinkedFolders { get; set; }
-        public List<LocationsDirInfo> StorableFolders { get; set; }
+        public List<string> LinkedFolders { get; set; }
+        public List<string> UnlinkedFolders { get; set; }
+        public List<string> StorableFolders { get; set; }
         public AnalyzeFolders()
         {
-            LinkedFolders = new List<LocationsDirInfo>();
-            UnlinkedFolders = new List<LocationsDirInfo>();
-            StorableFolders = new List<LocationsDirInfo>();
+            LinkedFolders = new List<string>();
+            UnlinkedFolders = new List<string>();
+            StorableFolders = new List<string>();
         }
 
 
@@ -34,7 +34,7 @@ namespace StorageTool
             List<DirectoryInfo> sFolders = new List<DirectoryInfo>();
             sFolders.AddRange(input.StorageFolder.GetDirectories());
 
-            List<LocationsDirInfo> junctionsInGameFolder = new List<LocationsDirInfo>(); 
+            List<DirectoryInfo> junctionsInGameFolder = new List<DirectoryInfo>(); 
 
             foreach(DirectoryInfo g in gFolders)
             {
@@ -44,11 +44,11 @@ namespace StorageTool
 
                     if (isJunction)
                     {
-                        this.LinkedFolders.Add(new LocationsDirInfo(JunctionPoint.GetTarget(@g.FullName)));
+                        this.LinkedFolders.Add(JunctionPoint.GetTarget(@g.FullName));
                     }
                     else
                     {
-                        this.StorableFolders.Add(new LocationsDirInfo(g));
+                        this.StorableFolders.Add(g.FullName);
                     }
                 }
                 catch (IOException ex)
@@ -57,17 +57,18 @@ namespace StorageTool
                 }
             }
 
-            List<DirectoryInfo> tmpList1 = sFolders.Where(n => LinkedFolders.Select(n1 => n1.DirInfo.FullName).Contains(n.FullName)).ToList();
+            List<DirectoryInfo> tmpList1 = sFolders.Where(n => LinkedFolders.Select(n1 => n1).Contains(n.FullName)).ToList();
             this.LinkedFolders.Clear();
             foreach (DirectoryInfo d in tmpList1)
             {
-                this.LinkedFolders.Add(new LocationsDirInfo(d));
+                this.LinkedFolders.Add(d.FullName);
             }
 
-            List<DirectoryInfo> tmpList = sFolders.Where(n => !LinkedFolders.Select(n1 => n1.DirInfo.FullName).Contains(n.FullName)).ToList();
+            List<DirectoryInfo> tmpList = sFolders.Where(n => !LinkedFolders.Select(n1 => n1).Contains(n.FullName)).ToList();
+
             foreach (DirectoryInfo d in tmpList)
             {
-                this.UnlinkedFolders.Add(new LocationsDirInfo(d));
+                this.UnlinkedFolders.Add(d.FullName);
             }
 
         }

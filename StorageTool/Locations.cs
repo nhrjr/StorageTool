@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace StorageTool
 {
@@ -18,7 +19,10 @@ namespace StorageTool
         private string sizeString;
         public string SizeString
         {
-            get { return sizeString; }
+            get
+            {                
+                return sizeString;
+            }
             set
             {
                 sizeString = value;
@@ -34,14 +38,30 @@ namespace StorageTool
                 OnPropertyChanged("DirSize");
             }
         }
-        public LocationsDirInfo(string path) {
+        public LocationsDirInfo(string path)
+        {
             DirInfo = new DirectoryInfo(path);
             DirSize = 0;
+            GetSize();
         }
         public LocationsDirInfo(DirectoryInfo dir)
         {
             DirInfo = dir;
             DirSize = 0;
+            GetSize();
+        }      
+        public async void GetSize()
+        {
+            if(DirSize == 0)
+            {
+                await Task.Factory.StartNew(() => ScanFolderAsync(DirInfo).ContinueWith(task => DirSize = task.Result).ConfigureAwait(false), TaskCreationOptions.LongRunning);
+            }
+            
+        }
+
+        private async Task<long> ScanFolderAsync(DirectoryInfo dir)
+        {
+            return await AnalyzeFolders.DirSizeAsync(dir).ConfigureAwait(false);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -146,6 +166,8 @@ namespace StorageTool
     public class FolderPane : INotifyPropertyChanged {
 
         private bool isRefreshing = false;
+        private bool showUnlinkedFolders = false;
+
 
         private List<FolderStash> stash = new List<FolderStash>();
 
@@ -190,14 +212,13 @@ namespace StorageTool
 
                 if (!stash.Exists(item => item.Profile.ProfileName == ActiveProfile.ProfileName))
                 {
-                    stash.Add(new FolderStash(ActiveProfile));
-                    RefreshFolders();
-                }
-                
+                    stash.Add(new FolderStash(ActiveProfile));                    
+                }                
                 foreach(FolderStash s in Stash)
                 {
                     if (s.Profile.ProfileName == ActiveProfile.ProfileName) ActivePane = s;
                 }
+                RefreshFolders();
                 folderWatcher.StartFileSystemWatcher(ActivePane.Profile.GameFolder.FullName);
                 folderWatcher.StartFileSystemWatcher(ActivePane.Profile.StorageFolder.FullName);
 
@@ -219,29 +240,58 @@ namespace StorageTool
             if (isRefreshing == true)
                 return;
             try {
-
-                //await Task.Run(() =>
-                //{
                     isRefreshing = true;
                     foreach (FolderStash pane in stash)
                     {
                         setFolders.SetFolders(pane.Profile);
-                        var tmpList1 = setFolders.StorableFolders; //.Where(n => !FoldersLeft.Select(n1 => n1.DirInfo.FullName).Contains(n.DirInfo.FullName)).ToList();
-                        var tmpList2 = setFolders.LinkedFolders; //.Where(n => !FoldersRight.Select(n1 => n1.DirInfo.FullName).Contains(n.DirInfo.FullName)).ToList();
-                        var tmpList3 = setFolders.UnlinkedFolders; //.Where(n => !FoldersUnlinked.Select(n1 => n1.DirInfo.FullName).Contains(n.DirInfo.FullName)).ToList();
-                        foreach (LocationsDirInfo g in tmpList1) if (!pane.FoldersLeft.Any(f => f.DirInfo.FullName == g.DirInfo.FullName ) && !WorkedFolders.Any(h => h.DirInfo.Name == g.DirInfo.Name)) pane.FoldersLeft.Add(g);
-                        foreach (LocationsDirInfo g in tmpList2) if (!pane.FoldersRight.Any(f => f.DirInfo.FullName == g.DirInfo.FullName ) && !WorkedFolders.Any(h => h.DirInfo.Name == g.DirInfo.Name)) pane.FoldersRight.Add(g);
-                        foreach (LocationsDirInfo g in tmpList3) if (!pane.FoldersUnlinked.Any(f => f.DirInfo.FullName == g.DirInfo.FullName ) && !WorkedFolders.Any(h => h.DirInfo.Name == g.DirInfo.Name)) pane.FoldersUnlinked.Add(g);
-                        foreach (LocationsDirInfo g in pane.FoldersLeft.Reverse()) if (!tmpList1.Any(f => f.DirInfo.FullName == g.DirInfo.FullName)) pane.FoldersLeft.Remove(g);
-                        foreach (LocationsDirInfo g in pane.FoldersRight.Reverse()) if (!tmpList2.Any(f => f.DirInfo.FullName == g.DirInfo.FullName)) pane.FoldersRight.Remove(g);
-                        foreach (LocationsDirInfo g in pane.FoldersUnlinked.Reverse()) if (!tmpList3.Any(f => f.DirInfo.FullName == g.DirInfo.FullName)) pane.FoldersUnlinked.Remove(g);
+                        var tmpList1 = setFolders.StorableFolders; 
+                        var tmpList2 = setFolders.LinkedFolders; 
+                        var tmpList3 = setFolders.UnlinkedFolders; 
+
+                    foreach (string g in tmpList1)
+                    {
+                        if (!pane.FoldersLeft.Any(f => f.DirInfo.FullName == g))
+                        {
+                            DirectoryInfo tmp = new DirectoryInfo(g);
+                            if(!WorkedFolders.Any(h => h.DirInfo.Name == tmp.Name)) pane.FoldersLeft.Add(new LocationsDirInfo(tmp));
+                        }
+
+                    }
+                    foreach (string g in tmpList2)
+                    {
+                        if (!pane.FoldersRight.Any(f => f.DirInfo.FullName == g))
+                        {
+                            DirectoryInfo tmp = new DirectoryInfo(g);
+                            if (!WorkedFolders.Any(h => h.DirInfo.Name == tmp.Name)) pane.FoldersRight.Add(new LocationsDirInfo(tmp));
+                        }
+                    }
+                    foreach (string g in tmpList3)
+                    {
+                        if (!pane.FoldersUnlinked.Any(f => f.DirInfo.FullName == g))
+                        {
+                            DirectoryInfo tmp = new DirectoryInfo(g);
+                            if (!WorkedFolders.Any(h => h.DirInfo.Name == tmp.Name)) pane.FoldersUnlinked.Add(new LocationsDirInfo(tmp));
+                        }
+                    }
+
+                        foreach (LocationsDirInfo g in pane.FoldersLeft.Reverse()) if (!tmpList1.Any(f => f == g.DirInfo.FullName)) pane.FoldersLeft.Remove(g);
+                        foreach (LocationsDirInfo g in pane.FoldersRight.Reverse()) if (!tmpList2.Any(f => f == g.DirInfo.FullName)) pane.FoldersRight.Remove(g);
+                        foreach (LocationsDirInfo g in pane.FoldersUnlinked.Reverse()) if (!tmpList3.Any(f => f == g.DirInfo.FullName)) pane.FoldersUnlinked.Remove(g);
+                        
                         //if (pane.Profile.ProfileName == ActivePane.Profile.ProfileName)
                         //{
                         //    ActivePane = pane;                    
                         //}
-                        pane.RefreshSizes();
+                        //pane.RefreshSizes();
                     }
-                //}).ContinueWith((x) => { isRefreshing = false; });
+                if(ActivePane.FoldersUnlinked.Count > 0)
+                {
+                    ShowUnlinkedFolders = true;
+                }
+                else
+                {
+                    ShowUnlinkedFolders = false;
+                }
 
             }
             catch(Exception e)
@@ -331,6 +381,16 @@ namespace StorageTool
             }
         }
 
+        public bool ShowUnlinkedFolders
+        {
+            get { return this.showUnlinkedFolders; }
+            set
+            {
+                this.showUnlinkedFolders = value;
+                this.OnPropertyChanged("ShowUnlinkedFolders");
+            }
+        }
+
         public ObservableCollection<LocationsDirInfo> WorkedFolders
         {
             get { return this.workedFolders; }
@@ -340,7 +400,6 @@ namespace StorageTool
                 this.OnPropertyChanged("WorkedFolders");
             }
         }
-
 
         public event PropertyChangedEventHandler PropertyChanged;
 
