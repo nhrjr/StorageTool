@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:StorageTool"
         mc:Ignorable="d"
-        Title="StorageTool" Height="900" Width="800" Background="White">
+        Title="StorageTool" Height="900" Width="804" Background="White">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <!--<Style TargetType="GridViewColumnHeader">
@@ -28,8 +28,8 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="100"/>
-            <RowDefinition Height="600*"/>
-            <RowDefinition Height="200"/>
+            <RowDefinition/>
+            <RowDefinition Height="300"/>
         </Grid.RowDefinitions>
         <Button x:Name="pickFolderLeft" Click="pickFolderLeft_Click" Content="..." Margin="0,12,13,0" VerticalAlignment="Top" Height="20" HorizontalAlignment="Right" Width="24"/>
         <Button x:Name="pickFolderRight" Click="pickFolderRight_Click" Content="..." Margin="0,37,13,0" HorizontalAlignment="Right" Width="24" Height="20" VerticalAlignment="Top"/>
@@ -68,8 +68,9 @@
             </ListView.ItemContainerStyle>
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Width="200" Header="Action" DisplayMemberBinding="{Binding Action}"/>
-                    <GridViewColumn Width="100" Header="Status" DisplayMemberBinding="{Binding Status}"/>
+                    <GridViewColumn Width="100" Header="Action" DisplayMemberBinding="{Binding Action}"/>
+                    <GridViewColumn Width="150" Header="Name" DisplayMemberBinding="{Binding Name}"/>
+                    <GridViewColumn Width="140" Header="Status" DisplayMemberBinding="{Binding Status}"/>
                     <GridViewColumn Width="100" Header="Progress">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
@@ -88,6 +89,13 @@
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <TextBlock HorizontalAlignment="Right" Text="{Binding SizeString}" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Width="60">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="Cancel" Click="cancelItem_Click" CommandParameter="{Binding}" Visibility="{Binding NotDone, Converter={StaticResource BoolToVis}}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
@@ -189,9 +197,10 @@
 
         </TabControl>
         <Button x:Name="pauseQueue" Content="Pause" Click="pauseQueue_Click" HorizontalAlignment="Right" Margin="0,20,93,0" Grid.Row="2" Width="75" Height="20" VerticalAlignment="Top"/>
-        <Button x:Name="cancelAll" Content="Cancel All" Margin="0,20,13,0" Grid.Row="2" HorizontalAlignment="Right" Width="75" Height="20" VerticalAlignment="Top"/>
+        <Button x:Name="cancelAll" Content="Cancel All" Click="cancelAll_Click" Margin="0,20,13,0" Grid.Row="2" HorizontalAlignment="Right" Width="75" Height="20" VerticalAlignment="Top"/>
         <Button x:Name="refresh" Click="refresh_Click" Content="Refresh" Margin="0,0,13,0" Grid.Row="1" VerticalAlignment="Top" Height="20" HorizontalAlignment="Right" Width="60"/>
-        <Button x:Name="deleteHistory" Click="deleteHistory_Click" Content="Clear History" Margin="0,20,173,0" Grid.Row="2" VerticalAlignment="Top" HorizontalAlignment="Right" Width="85"/>
+        <Button x:Name="deleteHistory" Click="deleteHistory_Click" Content="Clear History" Margin="0,20,173,0" Grid.Row="2" VerticalAlignment="Top" HorizontalAlignment="Right" Width="85" Height="20"/>
+        <TextBlock x:Name="moveStackIndex" HorizontalAlignment="Right" Margin="0,20,263,0" Grid.Row="2" TextWrapping="Wrap" Text="{Binding MoveStack.Index}" VerticalAlignment="Top" Width="59" Height="20"/>
         <!--<ListBox x:Name="worked_Folders" ItemsSource="{Binding Loc.WorkedFolders}" DisplayMemberPath="DirInfo.Name" HorizontalAlignment="Left" Height="160" Margin="349,10,0,0" VerticalAlignment="Top" Width="171" Grid.Row="2"/>-->
 
 

@@ -40,13 +40,43 @@ namespace StorageTool
 
     public class MoveItem :INotifyPropertyChanged
     {
-        private string action;
+        private TaskMode action;
+        private string name;        
         private string status;
+        private bool notDone;
         private int progress;
         private long size;
         private long processedBits;
         private string procString;
         private string sizeString;
+
+        public string FullName { get; set; }
+
+        public string Name
+        {
+            get
+            {
+                return name;
+            }
+            set
+            {
+                name = value;
+                OnPropertyChanged("Name");
+            }
+        }
+
+        public bool NotDone
+        {
+            get
+            {
+                return notDone;
+            }
+            set
+            {
+                notDone = value;
+                OnPropertyChanged("NotDone");
+            }
+        }
         
         public string ProcString
         {
@@ -73,7 +103,7 @@ namespace StorageTool
             }
         }
 
-        public string Action
+        public TaskMode Action
         {
             get
             {
@@ -145,10 +175,26 @@ namespace StorageTool
                 this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
         }
     }
-    public class MovePane : ObservableCollection<MoveItem>
+    public class MovePane : ObservableCollection<MoveItem>, INotifyPropertyChanged
     {
-        public int Index { get; set; }
+        private int index;
+        public int Index {
+            get { return index; }
+            set
+            {
+                index = value;
+                OnPropertyChanged("Index");
+            }
+        }
         public MovePane() : base() { Index = 0; }
         public MovePane(List<MoveItem> list) : base(list) { Index = 0; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public void OnPropertyChanged(string propName)
+        {
+            if (this.PropertyChanged != null)
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
+        }
     }
 }

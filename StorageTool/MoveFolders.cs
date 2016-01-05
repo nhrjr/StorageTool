@@ -12,15 +12,84 @@ namespace StorageTool
 {
     public enum TaskMode { STORE, RESTORE, RELINK };
 
+    public class SpecialQueue<T>
+    {
+        LinkedList<T> list = new LinkedList<T>();
+
+        public void Enqueue(T t)
+        {
+            list.AddLast(t);
+        }
+
+        public T Dequeue()
+        {
+            var result = list.First.Value;
+            list.RemoveFirst();
+            return result;
+        }
+        //public bool Remove(string name, TaskMode mode)
+        //{
+
+        //}
+        public void RemoveAll(Func<T, bool> predicate)
+        {
+            var currentNode = list.First;
+            while (currentNode != null)
+            {
+                if (predicate(currentNode.Value))
+                {
+                    var toRemove = currentNode;
+                    currentNode = currentNode.Next;
+                    list.Remove(toRemove);
+                }
+                else
+                {
+                    currentNode = currentNode.Next;
+                }
+            }
+        }
+
+        public T Peek()
+        {
+            return list.First.Value;
+        }
+        
+        public bool Remove(T t)
+        {
+            return list.Remove(t);
+        }
+
+        public int Count { get { return list.Count; } }
+    }
+
+    public class QueueItem
+    {
+        public DirectoryInfo Source { get; set; }
+        public DirectoryInfo Target { get; set; }
+        public TaskMode Mode { get; set; }
+        public QueueItem(TaskMode m, Profile prof)
+        {
+            Mode = m;
+            if(m == TaskMode.STORE)
+            {
+                Source = prof.GameFolder;
+                Target = prof.StorageFolder;
+            }
+            if(m == TaskMode.RESTORE || m == TaskMode.RELINK)
+            {
+                Source = prof.StorageFolder;
+                Target = prof.GameFolder;
+            }
+                
+        }
+    }
+
     public class MoveFolders
     {
         private object pauseLock = new object();
         private bool paused = false;
         private bool moveQueueIsWorking = false;
-        private Queue<Profile> GamesToStorage;
-        private Queue<Profile> StorageToGames;
-        private Queue<Profile> LinkToGames;
-        private Queue<TaskMode> MoveQueue;
+        private SpecialQueue<QueueItem> MoveQueue;
         private Log log;
         private MovePane moveStack;
         private IProgress<State> state;
@@ -30,10 +99,7 @@ namespace StorageTool
             log = logvalue;
             moveStack = stack;
             state = msg;
-            GamesToStorage = new Queue<Profile>();
-            StorageToGames = new Queue<Profile>();
-            LinkToGames = new Queue<Profile>();
-            MoveQueue = new Queue<TaskMode>();
+            MoveQueue = new SpecialQueue<QueueItem>();
         }
 
         public void Cancel()
@@ -62,55 +128,52 @@ namespace StorageTool
                 System.Threading.Monitor.Exit(pauseLock);
             }
         }
+        public void removeFromMoveQueue(string name)
+        {
+            MoveQueue.RemoveAll(item => item.Source.FullName == name);
+        }
 
         public void addToMoveQueue(TaskMode mode, Profile prof)
         {
-            string name = null;
-            DirectoryInfo dir = null;
+            //string name = null;
+            DirectoryInfo dir = null;          
            
-                switch (mode)
-                {
-                    case TaskMode.STORE:
-                        MoveQueue.Enqueue(mode);
-                        GamesToStorage.Enqueue(prof);
-                        name = "Storing " + prof.GameFolder.Name;
-                        dir = prof.GameFolder;
-                        
-                        break;
+            switch (mode)
+            {
+                case TaskMode.STORE:
+                MoveQueue.Enqueue(new QueueItem(mode,prof));
+                dir = prof.GameFolder;
+                break;
  
-                    case TaskMode.RESTORE:
-                        MoveQueue.Enqueue(mode);
-                        StorageToGames.Enqueue(prof);
-                        name = "Restoring " + prof.StorageFolder.Name;
-                        dir = prof.StorageFolder;
-                        break;
+                case TaskMode.RESTORE:
+                MoveQueue.Enqueue(new QueueItem(mode, prof));
+                dir = prof.StorageFolder;
+                break;
 
-                    case TaskMode.RELINK:
-                        MoveQueue.Enqueue(mode);
-                        LinkToGames.Enqueue(prof);
-                        name = "Linking " + prof.StorageFolder.Name;
-                        dir = prof.StorageFolder;
-                        break;
-                }
+                case TaskMode.RELINK:
+                MoveQueue.Enqueue(new QueueItem(mode, prof));
+                dir = prof.StorageFolder;
+                break;
+            }
             try
             {
-                moveStack.Add(new MoveItem() { Action = name, Progress = 0, Status = "Waiting", Size = AnalyzeFolders.DirSizeSync(dir) });
+                moveStack.Add(new MoveItem() { Action = mode, FullName = dir.FullName, Name = dir.Name, NotDone = true, Progress = 0, Status = "Waiting", Size = AnalyzeFolders.DirSizeSync(dir) });
             }
             catch(Exception ex)
             {
                 MessageBox.Show(ex.Message);
-                moveStack.Add(new MoveItem() { Action = name, Progress = 0, Status = "Waiting", Size = 0 });
+                moveStack.Add(new MoveItem() { Action = mode, FullName = dir.FullName, Name = dir.Name, NotDone = true, Progress = 0, Status = "Waiting", Size = 0 });
             }
 
-                if (!moveQueueIsWorking)
-                {
-                    log.LogMessage = "Started queue.";
-                    this.startMoveQueue();
-                }
-                else
-                {
-                    log.LogMessage = "Added to queue. Is already working";
-                }           
+            if (!moveQueueIsWorking)
+            {
+                log.LogMessage = "Started queue.";
+                this.startMoveQueue();
+            }
+            else
+            {
+                log.LogMessage = "Added to queue. Is already working";
+            }           
 
         }
 
@@ -153,23 +216,22 @@ namespace StorageTool
         {
             while (MoveQueue.Count > 0)
             {
-                switch (MoveQueue.Peek())
+                switch (MoveQueue.Peek().Mode)
                 {
                     case TaskMode.STORE:
                         moveStack[moveStack.Index].Status = "Copying";
-                        this.MoveGamesToStorage(currentFile, sizeFromHell);                        
+                        this.MoveGamesToStorage(MoveQueue.Peek(), currentFile, sizeFromHell);
                         break;
                     case TaskMode.RESTORE:
                         moveStack[moveStack.Index].Status = "Copying";
-                        this.MoveStorageToGames(currentFile, sizeFromHell);                        
+                        this.MoveStorageToGames(MoveQueue.Peek(), currentFile, sizeFromHell);
                         break;
                     case TaskMode.RELINK:
                         moveStack[moveStack.Index].Status = "Linking";
-                        this.LinkStorageToGames(currentFile);                       
+                        this.LinkStorageToGames(MoveQueue.Peek(), currentFile);
                         break;
                 }
-                //moveStack[moveStack.Index].Progress = 100;
-                //moveStack[moveStack.Index].Status = "Finished";
+                moveStack[moveStack.Index].NotDone = false;
                 moveStack.Index++;
                 MoveQueue.Dequeue();
                 state.Report(State.FINISHED_ITEM);
@@ -178,11 +240,11 @@ namespace StorageTool
             state.Report(State.FINISHED_QUEUE);
         }
 
-        private void LinkStorageToGames(IProgress<string> currentFile)
+        private void LinkStorageToGames(QueueItem prof, IProgress<string> currentFile)
         {
             try {
-                string sourceDir = LinkToGames.Peek().StorageFolder.FullName;
-                string targetDir = LinkToGames.Peek().GameFolder.FullName + @"\" + LinkToGames.Peek().StorageFolder.Name;
+                string sourceDir = prof.Source.FullName;
+                string targetDir = prof.Target.FullName + @"\" + prof.Source.Name;
                 JunctionPoint.Create(@targetDir, @sourceDir, false);
                 moveStack[moveStack.Index].Status = "Finished";
                 moveStack[moveStack.Index].Progress = 100;
@@ -191,22 +253,17 @@ namespace StorageTool
             catch (IOException ioexp)
             {
                 moveStack[moveStack.Index].Status = "Finished - Linking Failed";
-                //MessageBox.Show(ioexp.Message);
-            }
-            finally
-            {
-                LinkToGames.Dequeue();
             }
         }
 
-        private void MoveGamesToStorage(IProgress<string> currentFile, IProgress<long> sizeFromHell)
+        private void MoveGamesToStorage(QueueItem prof, IProgress<string> currentFile, IProgress<long> sizeFromHell)
         {
-            string sourceDir = GamesToStorage.Peek().GameFolder.FullName;
-            string targetDir = GamesToStorage.Peek().StorageFolder.FullName + @"\" + GamesToStorage.Peek().GameFolder.Name;
+            string sourceDir = prof.Source.FullName;
+            string targetDir = prof.Target.FullName + @"\" + prof.Source.Name;
             try
             {
-                CopyFolders(GamesToStorage.Peek().GameFolder, GamesToStorage.Peek().StorageFolder, currentFile, sizeFromHell);
-                DirectoryInfo deletableDirInfo = GamesToStorage.Peek().GameFolder;
+                CopyFolders(prof, currentFile, sizeFromHell);
+                DirectoryInfo deletableDirInfo = prof.Source;
                 deletableDirInfo.Delete(true);
                 JunctionPoint.Create(@sourceDir, @targetDir, false);
                 moveStack[moveStack.Index].Status = "Finished";
@@ -214,29 +271,23 @@ namespace StorageTool
 
             catch (IOException ioexp)
             {
-                //MessageBox.Show(ioexp.Message);
                 moveStack[moveStack.Index].Status = "Finished - Linking Failed";
-
             }
             catch (UnauthorizedAccessException unauth)
             {
                 MessageBox.Show(unauth.Message);
             }
-            finally
-            {
-                GamesToStorage.Dequeue();
-            }
 
         }
-        private void MoveStorageToGames(IProgress<string> currentFile, IProgress<long> sizeFromHell)
+        private void MoveStorageToGames(QueueItem prof, IProgress<string> currentFile, IProgress<long> sizeFromHell)
         {
-                string sourceDir = StorageToGames.Peek().StorageFolder.FullName;
-                string targetDir = StorageToGames.Peek().GameFolder.FullName + @"\" + StorageToGames.Peek().StorageFolder.Name;
+            string sourceDir = prof.Source.FullName;
+            string targetDir = prof.Target.FullName + @"\" + prof.Source.Name;
             
             try
             {
                 /// find a junction, which has a different name, than the folder to be moved
-                List<string> ListOfJunctions = StorageToGames.Peek().GameFolder.GetDirectories().Select(dir => dir.FullName).ToList().Where(str => JunctionPoint.Exists(@str)).ToList();
+                List<string> ListOfJunctions = prof.Source.GetDirectories().Select(dir => dir.FullName).ToList().Where(str => JunctionPoint.Exists(@str)).ToList();
                 List<string> ListOfTargets = ListOfJunctions.Select(str => JunctionPoint.GetTarget(@str)).ToList();
                 List<Tuple<string, string>> pairsOfJaT = new List<Tuple<string, string>>();
                 for (int i = 0; i < ListOfJunctions.Count; i++)
@@ -245,37 +296,35 @@ namespace StorageTool
                     string TargetName = (new DirectoryInfo(ListOfTargets[i])).Name;
                     if (JunctionName != TargetName)
                     {
-                        //MessageBox.Show(JunctionName + " " + TargetName);
                         pairsOfJaT.Add(new Tuple<string, string>(JunctionName, TargetName));
                     }
                 }
                 string renamedJunction = null;
                 if(pairsOfJaT.Count > 0)
-                    renamedJunction = pairsOfJaT.FirstOrDefault(str => str.Item2 == StorageToGames.Peek().StorageFolder.Name).Item1;
+                    renamedJunction = pairsOfJaT.FirstOrDefault(str => str.Item2 == prof.Source.Name).Item1;
                 if (renamedJunction != null)
                 {
-                    renamedJunction = StorageToGames.Peek().GameFolder.FullName + @"\" + renamedJunction;
+                    renamedJunction = prof.Target.FullName + @"\" + renamedJunction;
                 }
 
                 if (JunctionPoint.Exists(@targetDir))
                 {
                     JunctionPoint.Delete(@targetDir);
-                    CopyFolders(StorageToGames.Peek().StorageFolder, StorageToGames.Peek().GameFolder, currentFile, sizeFromHell);
-                    DirectoryInfo deletableDirInfo = StorageToGames.Peek().StorageFolder;
+                    CopyFolders(prof, currentFile, sizeFromHell);
+                    DirectoryInfo deletableDirInfo = prof.Source;
                     deletableDirInfo.Delete(true);
                 }
                 else if (JunctionPoint.Exists(@renamedJunction))
                 {
                     JunctionPoint.Delete(@renamedJunction);
-                    CopyFolders(StorageToGames.Peek().StorageFolder, StorageToGames.Peek().GameFolder, currentFile, sizeFromHell);
-                    DirectoryInfo deletableDirInfo = StorageToGames.Peek().StorageFolder;
+                    CopyFolders(prof, currentFile, sizeFromHell);
+                    DirectoryInfo deletableDirInfo = prof.Source;
                     deletableDirInfo.Delete(true);
                 }
                 moveStack[moveStack.Index].Status = "Finished";
             }
             catch (IOException ioexp)
             {
-                //MessageBox.Show(ioexp.Message);
                 moveStack[moveStack.Index].Status = "Failed.";
             }
             catch (UnauthorizedAccessException unauth)
@@ -286,24 +335,20 @@ namespace StorageTool
             {
                 MessageBox.Show(tada.Message);
             }
-            finally
-            {
-                StorageToGames.Dequeue();
-            }
         }
 
-        private void CopyFolders(DirectoryInfo StartDirectory, DirectoryInfo EndDirectory, IProgress<string> currentFile, IProgress<long> sizeFromHell)
+        private void CopyFolders(QueueItem item, IProgress<string> currentFile, IProgress<long> sizeFromHell)
         {           
-            string targetDir = EndDirectory.FullName + @"\" + StartDirectory.Name;
+            string targetDir = item.Target.FullName + @"\" + item.Source.Name;
             Directory.CreateDirectory(targetDir);
-            EndDirectory = new DirectoryInfo(targetDir);
-            List<DirectoryInfo> allDirs = StartDirectory.GetDirectories("*",SearchOption.AllDirectories).ToList();
-            allDirs.Add(StartDirectory);
+            item.Target = new DirectoryInfo(targetDir);
+            List<DirectoryInfo> allDirs = item.Source.GetDirectories("*",SearchOption.AllDirectories).ToList();
+            allDirs.Add(item.Source);
             //Creates all of the directories and subdirectories
             foreach (DirectoryInfo dirInfo in allDirs)
             {
                 string dirPath = dirInfo.FullName;
-                string outputPath = dirPath.Replace(StartDirectory.FullName, EndDirectory.FullName);
+                string outputPath = dirPath.Replace(item.Source.FullName, item.Target.FullName);
                 Directory.CreateDirectory(outputPath);
 
                 foreach (FileInfo file in dirInfo.EnumerateFiles())

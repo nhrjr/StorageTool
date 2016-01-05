@@ -276,6 +276,30 @@ namespace StorageTool
                 numberofdeletes--;
             }
         }
+
+        private void cancelAll_Click(object sender, RoutedEventArgs e)
+        {
+            
+        }
+
+        private void cancelItem_Click(object sender, RoutedEventArgs e)
+        {
+            Button b = sender as Button;
+            MoveItem toCancel = b.CommandParameter as MoveItem;
+            MoveFolders.Pause();
+            MoveFolders.removeFromMoveQueue(toCancel.FullName);
+            MoveStack.Remove(toCancel);
+            for(int i = 0; i < Loc.WorkedFolders.Count; i++)
+            {
+                if(Loc.WorkedFolders[i].DirInfo.FullName == toCancel.FullName)
+                {
+                    Loc.WorkedFolders.RemoveAt(i);
+                    MessageBox.Show(toCancel.FullName);
+                }
+            }            
+            MoveFolders.Resume();
+            Loc.RefreshFolders();
+        }
     }
 
 }

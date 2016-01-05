@@ -54,7 +54,14 @@ namespace StorageTool
         {
             if(DirSize == 0)
             {
-                await Task.Factory.StartNew(() => ScanFolderAsync(DirInfo).ContinueWith(task => DirSize = task.Result).ConfigureAwait(false), TaskCreationOptions.LongRunning);
+                try
+                {
+                    await Task.Factory.StartNew(() => ScanFolderAsync(DirInfo).ContinueWith(task => DirSize = task.Result).ConfigureAwait(false), TaskCreationOptions.LongRunning);
+                }
+                catch(Exception ex)
+                {
+                    DirSize = 0;
+                }                
             }
             
         }
