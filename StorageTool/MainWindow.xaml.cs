@@ -17,6 +17,9 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Monitor.Core.Utilities;
 using System.Diagnostics;
+using Microsoft.WindowsAPICodePack.Dialogs;
+
+using StorageTool.FolderView;
 
 
 
@@ -78,9 +81,11 @@ namespace StorageTool
             {
                 Log.LogMessage = "Picked: " + dialog.SelectedPath + " as Source folder.";
                 DirectoryInfo info = new DirectoryInfo(dialog.SelectedPath);
-                if(info.Exists)
-                ProfileInput.AddLeft(info);
+                if (info.Exists)
+                    ProfileInput.AddLeft(info);
             }
+
+            //var dialog = Microsoft.WindowsAPICodePack.Dialogs.
         }
 
         private void pickFolderRight_Click(object sender, RoutedEventArgs e)
@@ -138,11 +143,11 @@ namespace StorageTool
         private void moveToRight_Click(object sender, RoutedEventArgs e)
         {
             Button b = sender as Button;
-            Loc.SelectedFolderLeft = b.CommandParameter as LocationsDirInfo;
+            Loc.SelectedFolderLeft = b.CommandParameter as FolderInfo;
             if (Loc.SelectedFolderLeft != null)
             {
                 Log.LogMessage = "Moving " + Loc.SelectedFolderLeft.DirInfo.Name + " to Storage.";
-                LocationsDirInfo tmp1 = Loc.SelectedFolderLeft;
+                FolderInfo tmp1 = Loc.SelectedFolderLeft;
                 DirectoryInfo tmp2 = Profiles[Profiles.ActiveProfileIndex].StorageFolder;
                 this.MoveFolders.addToMoveQueue(TaskMode.STORE, new Profile(tmp1.DirInfo, tmp2));
                 Loc.SelectedFolderLeft = null;
@@ -155,12 +160,12 @@ namespace StorageTool
         private void moveToLeft_Click(object sender, RoutedEventArgs e)
         {
             Button b = sender as Button;
-            Loc.SelectedFolderRight = b.CommandParameter as LocationsDirInfo;
+            Loc.SelectedFolderRight = b.CommandParameter as FolderInfo;
             if (Loc.SelectedFolderRight != null)
             {
                 Log.LogMessage = "Moving " + Loc.SelectedFolderRight.DirInfo.Name + " to Game folder.";
                 DirectoryInfo tmp1 = Profiles[Profiles.ActiveProfileIndex].GameFolder;
-                LocationsDirInfo tmp2 = Loc.SelectedFolderRight;
+                FolderInfo tmp2 = Loc.SelectedFolderRight;
                 this.MoveFolders.addToMoveQueue(TaskMode.RESTORE, new Profile(tmp1, tmp2.DirInfo));
                 Loc.SelectedFolderRight = null;
                 Loc.WorkedFolders.Add(tmp2);
@@ -171,12 +176,12 @@ namespace StorageTool
         private void relinkButton_Click(object sender, RoutedEventArgs e)
         {
             Button b = sender as Button;
-            Loc.SelectedFolderReLink = b.CommandParameter as LocationsDirInfo;
+            Loc.SelectedFolderReLink = b.CommandParameter as FolderInfo;
             if (Loc.SelectedFolderReLink != null)
             {
                 Log.LogMessage = "Linking " + Loc.SelectedFolderReLink.DirInfo.Name + " to Game folder.";
                 DirectoryInfo tmp1 = Profiles[Profiles.ActiveProfileIndex].GameFolder;
-                LocationsDirInfo tmp2 = Loc.SelectedFolderReLink;
+                FolderInfo tmp2 = Loc.SelectedFolderReLink;
                 this.MoveFolders.addToMoveQueue(TaskMode.RELINK, new Profile(tmp1, tmp2.DirInfo));
                 Loc.SelectedFolderReLink = null;
                 Loc.WorkedFolders.Add(tmp2);
@@ -245,9 +250,9 @@ namespace StorageTool
                 isNotRefreshing = false;
                 foreach (FolderStash s in Loc.Stash)
                 {
-                    foreach (LocationsDirInfo l in s.FoldersLeft) l.DirSize = 0;
-                    foreach (LocationsDirInfo l in s.FoldersRight) l.DirSize = 0;
-                    foreach (LocationsDirInfo l in s.FoldersUnlinked) l.DirSize = 0;
+                    foreach (FolderInfo l in s.FoldersLeft) l.DirSize = 0;
+                    foreach (FolderInfo l in s.FoldersRight) l.DirSize = 0;
+                    foreach (FolderInfo l in s.FoldersUnlinked) l.DirSize = 0;
                     s.RefreshSizes();
                 }
                 isNotRefreshing = true;

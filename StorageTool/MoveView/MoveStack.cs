@@ -184,18 +184,18 @@ namespace StorageTool
             set
             {
                 index = value;
-                OnPropertyChanged("Index");
+                //OnPropertyChanged("Index");
             }
         }
         public MovePane() : base() { Index = 0; }
         public MovePane(List<MoveItem> list) : base(list) { Index = 0; }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        //public event PropertyChangedEventHandler PropertyChanged;
 
-        public void OnPropertyChanged(string propName)
-        {
-            if (this.PropertyChanged != null)
-                this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
-        }
+        //public void OnPropertyChanged(string propName)
+        //{
+        //    if (this.PropertyChanged != null)
+        //        this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
+        //}
     }
 }

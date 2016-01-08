@@ -92,37 +92,7 @@ namespace StorageTool
 
         }
 
-        public static async Task<long> DirSizeAsync(DirectoryInfo dir)
-        {
-            long Size = 0;
-            FileInfo[] fis = dir.GetFiles();
-            foreach(FileInfo fi in fis)
-            {
-                Size += fi.Length;
-            }
-            DirectoryInfo[] dis = dir.GetDirectories();
-            foreach(DirectoryInfo di in dis)
-            {
-                Size += await DirSizeAsync(di).ConfigureAwait(false);
-            }
-            return Size;
 
-        }
-        public static long DirSizeSync(DirectoryInfo dir)
-        {
-            long Size = 0;
-            FileInfo[] fis = dir.GetFiles();
-            foreach (FileInfo fi in fis)
-            {
-                Size += fi.Length;
-            }
-            DirectoryInfo[] dis = dir.GetDirectories();
-            foreach (DirectoryInfo di in dis)
-            {
-                Size += DirSizeSync(di);
-            }
-            return Size;
-
-        }
     }
+
 }

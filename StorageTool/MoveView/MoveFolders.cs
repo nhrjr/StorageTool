@@ -8,6 +8,8 @@ using System.Windows;
 using System.IO;
 using Monitor.Core.Utilities;
 
+using StorageTool.Resources;
+
 namespace StorageTool
 {
     public enum TaskMode { STORE, RESTORE, RELINK };
@@ -157,7 +159,7 @@ namespace StorageTool
             }
             try
             {
-                moveStack.Add(new MoveItem() { Action = mode, FullName = dir.FullName, Name = dir.Name, NotDone = Visibility.Visible, Progress = 0, Status = "Waiting", Size = AnalyzeFolders.DirSizeSync(dir) });
+                moveStack.Add(new MoveItem() { Action = mode, FullName = dir.FullName, Name = dir.Name, NotDone = Visibility.Visible, Progress = 0, Status = "Waiting", Size = DirectorySize.DirSizeSync(dir) });
             }
             catch(Exception ex)
             {

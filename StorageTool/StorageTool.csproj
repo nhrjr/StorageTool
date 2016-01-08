@@ -88,6 +88,22 @@
     <SignManifests>true</SignManifests>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Gat.Controls.OpenDialog, Version=1.1.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenDialog.1.1.1\lib\net45\Gat.Controls.OpenDialog.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WindowsAPICodePack-Core.1.1.1\lib\Microsoft.WindowsAPICodePack.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WindowsAPICodePack-Shell.1.1.1\lib\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack.ShellExtensions, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WindowsAPICodePack-ShellExtensions.1.1.1\lib\Microsoft.WindowsAPICodePack.ShellExtensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Windows.Forms" />
@@ -109,11 +125,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Config.cs" />
-    <Compile Include="FolderWatcher.cs" />
-    <Compile Include="MoveStack.cs" />
-    <Compile Include="ProfileInput.cs" />
-    <Compile Include="SortAdorner.cs" />
+    <Compile Include="FolderView\FolderStash.cs" />
+    <Compile Include="Resources\Config.cs" />
+    <Compile Include="FolderView\FolderInfo.cs" />
+    <Compile Include="FolderView\FolderWatcher.cs" />
+    <Compile Include="MoveView\MoveStack.cs" />
+    <Compile Include="ProfileView\ProfileInput.cs" />
+    <Compile Include="FolderView\SortAdorner.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -122,12 +140,13 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="AnalyzeFolders.cs" />
-    <Compile Include="MoveFolders.cs" />
-    <Compile Include="Profiles.cs" />
-    <Compile Include="JunctionPoint.cs" />
-    <Compile Include="Locations.cs" />
-    <Compile Include="Log.cs" />
+    <Compile Include="FolderView\AnalyzeFolders.cs" />
+    <Compile Include="MoveView\MoveFolders.cs" />
+    <Compile Include="ProfileView\Profiles.cs" />
+    <Compile Include="Resources\DirectorySize.cs" />
+    <Compile Include="Resources\JunctionPoint.cs" />
+    <Compile Include="FolderView\FolderPane.cs" />
+    <Compile Include="Resources\Log.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -151,6 +170,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="ClassDiagram1.cd" />
+    <None Include="ClassDiagram2.cd" />
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -171,6 +193,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
