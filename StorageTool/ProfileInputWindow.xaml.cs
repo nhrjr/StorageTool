@@ -15,11 +15,8 @@ using System.Windows.Shapes;
 
 namespace StorageTool
 {
-    /// <summary>
-    /// Interaction logic for ProfileInputWindow.xaml
-    /// </summary>
-    /// 
-    public delegate bool TestForValidProfileEventHandler(Profile input);    
+    public delegate bool TestForValidProfileEventHandler(Profile input);
+    
 
     public partial class ProfileInputWindow : Window
     {
@@ -30,6 +27,7 @@ namespace StorageTool
         public ProfileInputWindow()
         {
             InitializeComponent();
+            this_prof_input.addProfileReturnPressEvent += new addProfileReturnPressEventHandler(addProfile);
         }
         private void addProfile_Click(object sender, RoutedEventArgs e)
         {
@@ -41,6 +39,19 @@ namespace StorageTool
             else
             {
                 if(input != null)
+                    this_prof_input.ProfileInput.ProfileName = input.ProfileName;
+            }
+        }
+        private void addProfile()
+        {
+            input = this_prof_input.ProfileInput.GetProfile();
+            if (TestForValidProfileEvent(input))
+            {
+                this.Close();
+            }
+            else
+            {
+                if (input != null)
                     this_prof_input.ProfileInput.ProfileName = input.ProfileName;
             }
         }

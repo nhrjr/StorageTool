@@ -16,11 +16,10 @@ using System.IO;
 
 namespace StorageTool
 {
-    /// <summary>
-    /// Interaction logic for UserControl1.xaml
-    /// </summary>
+    public delegate void addProfileReturnPressEventHandler();
     public partial class ProfileInputUC : UserControl
     {
+        public event addProfileReturnPressEventHandler addProfileReturnPressEvent;
         public ProfileInput ProfileInput { get; set; } = new ProfileInput();
         public Profile input = null;
         public ProfileInputUC()
@@ -34,7 +33,6 @@ namespace StorageTool
             System.Windows.Forms.DialogResult result = dialog.ShowDialog();
             if (result == System.Windows.Forms.DialogResult.OK)
             {
-                //Messages.LogMessage = "Picked: " + dialog.SelectedPath + " as Source folder.";
                 DirectoryInfo info = new DirectoryInfo(dialog.SelectedPath);
                 if (info.Exists)
                     ProfileInput.AddLeft(info);
@@ -47,11 +45,44 @@ namespace StorageTool
             System.Windows.Forms.DialogResult result = dialog.ShowDialog();
             if (result == System.Windows.Forms.DialogResult.OK)
             {
-                //Messages.LogMessage = "Picked " + dialog.SelectedPath + " as Storage folder.";
                 DirectoryInfo info = new DirectoryInfo(dialog.SelectedPath);
                 if (info.Exists)
                     ProfileInput.AddRight(info);
             }
+        }
+
+        private ICommand returnKey;
+        public ICommand ReturnKey
+        {
+            get
+            {
+                return returnKey ?? (returnKey = new ActionCommand(() =>
+                {
+                    addProfileReturnPressEvent();
+                }));
+            }
+        }
+
+        public class ActionCommand : ICommand
+        {
+            private readonly Action _action;
+
+            public ActionCommand(Action action)
+            {
+                _action = action;
+            }
+
+            public void Execute(object parameter)
+            {
+                _action();
+            }
+
+            public bool CanExecute(object parameter)
+            {
+                return true;
+            }
+
+            public event EventHandler CanExecuteChanged;
         }
     }
 }

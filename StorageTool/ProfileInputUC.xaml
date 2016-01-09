@@ -7,7 +7,11 @@
              mc:Ignorable="d" Height="105" Width="300">
     <Grid>
 
-        <TextBox x:Name="profileName"  Padding="5,1,1,0" Text="{Binding ProfileInput.ProfileName,UpdateSourceTrigger=PropertyChanged}" Margin="0,70,10,-13" TextWrapping="Wrap" RenderTransformOrigin="0.459,-0.163" Height="20" VerticalAlignment="Top" HorizontalAlignment="Right" Width="280"/>
+        <TextBox x:Name="profileName" Padding="5,1,1,0" Text="{Binding ProfileInput.ProfileName,UpdateSourceTrigger=PropertyChanged}" Margin="0,70,10,-13" TextWrapping="Wrap" RenderTransformOrigin="0.459,-0.163" Height="20" VerticalAlignment="Top" HorizontalAlignment="Right" Width="280">
+            <TextBox.InputBindings>
+                <KeyBinding Key="Return" Command="{Binding ReturnKey}" />
+            </TextBox.InputBindings>
+        </TextBox>
         <Button x:Name="pickFolderLeft" Click="pickFolderLeft_Click" Content="..." Margin="0,10,266,0" VerticalAlignment="Top" Height="20" HorizontalAlignment="Right" Width="24"/>
         <Button x:Name="pickFolderRight" Click="pickFolderRight_Click" Content="..." Margin="0,35,266,0" HorizontalAlignment="Right" Width="24" Height="20" VerticalAlignment="Top"/>
         <TextBlock x:Name="inputLeft" Padding="5,1,1,0" Text="{Binding ProfileInput.LeftInput}"  Margin="0,10,10,0" Height="20" VerticalAlignment="Top" Background="White" HorizontalAlignment="Right" Width="251"/>

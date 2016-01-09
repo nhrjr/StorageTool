@@ -125,11 +125,15 @@
                     </ListView.View>
                 </ListView>
             </TabItem>
-            <TabItem Header="Duplicate" >
+            <TabItem Header="Duplicate" Visibility="{Binding FolderPane.ShowDuplicateFolders, Converter={StaticResource BoolToVis}}">
                 <ListView x:Name="dupFolders" ItemsSource="{Binding FolderPane.ActivePane.DuplicateFolders}" Margin="0,0,0,0">
                     <ListView.View>
                         <GridView>
-                            <GridViewColumn/>
+                            <GridViewColumn  DisplayMemberBinding="{Binding}" Width="250">
+                                <GridViewColumn.Header>
+                                    <GridViewColumnHeader>Duplicate Folders</GridViewColumnHeader>
+                                </GridViewColumn.Header>
+                            </GridViewColumn>
                         </GridView>
                     </ListView.View>
                 </ListView>

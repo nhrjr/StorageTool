@@ -19,6 +19,7 @@ namespace StorageTool
 
         private bool isRefreshing = false;
         private bool showUnlinkedFolders = false;
+        private bool showDuplicateFolders = false;
 
 
         private List<FolderStash> stash = new List<FolderStash>();
@@ -150,6 +151,14 @@ namespace StorageTool
                     {
                         ShowUnlinkedFolders = false;
                     }
+                    if (ActivePane.DuplicateFolders.Count > 0)
+                    {
+                        ShowDuplicateFolders = true;
+                    }
+                    else
+                    {
+                        ShowDuplicateFolders = false;
+                    }
                 }
 
             }
@@ -247,6 +256,15 @@ namespace StorageTool
             {
                 this.showUnlinkedFolders = value;
                 this.OnPropertyChanged("ShowUnlinkedFolders");
+            }
+        }
+        public bool ShowDuplicateFolders
+        {
+            get { return this.showDuplicateFolders; }
+            set
+            {
+                this.showDuplicateFolders = value;
+                this.OnPropertyChanged("ShowDuplicateFolders");
             }
         }
 

@@ -10,8 +10,8 @@
         Title="Add Profile" Height="160" Width="341.553">
     <Grid Margin="0,0,2,0">
         <local:ProfileInputUC x:Name="this_prof_input" Margin="11,10,21,37"></local:ProfileInputUC>
-        <Button x:Name="addProfile" Click="addProfile_Click" Content="Add profile" Margin="0,115,170,0" VerticalAlignment="Top" RenderTransformOrigin="1.311,0.826" Height="20" HorizontalAlignment="Right" Width="84"/>
-        <Button x:Name="cancel" Click="cancel_Click" Content="Cancel" HorizontalAlignment="Left" Margin="170,115,0,0" VerticalAlignment="Top" Width="75"/>
+        <Button x:Name="addProfileButton" Click="addProfile_Click" Content="Add profile" Margin="0,115,170,0" VerticalAlignment="Top" RenderTransformOrigin="1.311,0.826" Height="20" HorizontalAlignment="Right" Width="84"/>
+        <Button x:Name="cancelButton" Click="cancel_Click" Content="Cancel" HorizontalAlignment="Left" Margin="170,115,0,0" VerticalAlignment="Top" Width="75"/>
         <!--<Button x:Name="addProfile" Click="addProfile_Click" Content="Add profile" Margin="0,85,157,0" VerticalAlignment="Top" RenderTransformOrigin="1.311,0.826" Height="20" HorizontalAlignment="Right" Width="84"/>
         <TextBox x:Name="profileName" Text="{Binding ProfileInput.ProfileName,UpdateSourceTrigger=PropertyChanged}" Margin="0,60,10,0" TextWrapping="Wrap" RenderTransformOrigin="0.459,-0.163" Height="20" VerticalAlignment="Top" HorizontalAlignment="Right" Width="272"/>
         <Button x:Name="pickFolderLeft" Click="pickFolderLeft_Click" Content="..." Margin="0,10,258,0" VerticalAlignment="Top" Height="20" HorizontalAlignment="Right" Width="24"/>
