@@ -15,13 +15,13 @@ namespace StorageTool
         private DirectoryInfo _leftFolder;
         private DirectoryInfo _rightFolder;
 
-        private string _leftInput = "Select your game folder.";
+        private string _leftInput = "Select your source folder.";
         private string _rightInput = "Select your storage folder.";
         private string _profileName = "ProfileName";
 
         public void Clear()
         {
-            LeftInput = "Select your game folder.";
+            LeftInput = "Select your source folder.";
             RightInput = "Select your storage folder.";
             ProfileName = "ProfileName";
         }

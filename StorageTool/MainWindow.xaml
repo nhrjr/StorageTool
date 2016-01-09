@@ -22,8 +22,8 @@
         </Grid.RowDefinitions>
 
         <!--PROFILE SELECTOR-->
-        <ComboBox x:Name="profileBox" ItemsSource="{Binding Profiles}" DisplayMemberPath="ProfileName" SelectionChanged="profileBox_SelectionChanged" SelectedIndex="{Binding Profiles.ActiveProfileIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="176" Height="22"/>
-        <Button x:Name="removeProfile" Click="removeProfile_Click" Content="Remove selected profile" HorizontalAlignment="Left" Margin="191,10,0,0" VerticalAlignment="Top" Width="137" Height="22"/>
+        <ComboBox x:Name="profileBox" ItemsSource="{Binding Profiles}" DisplayMemberPath="ProfileName" SelectionChanged="profileBox_SelectionChanged" SelectedIndex="{Binding Profiles.ActiveProfileIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="227" Height="22"/>
+        <Button x:Name="removeProfile" Click="removeProfile_Click" Content="Remove selected profile" HorizontalAlignment="Left" Margin="242,10,0,0" VerticalAlignment="Top" Width="137" Height="22"/>
         <TextBlock x:Name="gameFolderName" Margin="115,37,0,0" TextWrapping="Wrap" Text="{Binding FolderPane.LocationLeftFullName}" VerticalAlignment="Top" Height="20" HorizontalAlignment="Left" Width="213"/>
         <TextBlock x:Name="storageFolderName" Margin="115,62,0,0" TextWrapping="Wrap" Text="{Binding FolderPane.LocationRightFullName}" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Width="213"/>
         <Button x:Name="Desc_GameFolder" Click="Desc_GameFolder_Click" HorizontalAlignment="Left" Margin="10,37,0,0" Content="Source Folder:" Width="100" Height="20" VerticalAlignment="Top"/>
@@ -37,7 +37,7 @@
         <TextBlock x:Name="inputLeft" Text="{Binding ProfileInput.LeftInput}"  Margin="0,12,42,0" Height="20" VerticalAlignment="Top" Background="#FF9B9B9B" HorizontalAlignment="Right" Width="377"/>
         <TextBlock x:Name="inputRight" Text="{Binding ProfileInput.RightInput}" Margin="0,37,42,0" Height="20" VerticalAlignment="Top" Background="#FF9B9B9B" HorizontalAlignment="Right" Width="377"/>-->
 
-        <!--FOLDERPANE-->        
+        <!--FOLDERPANE-->
         <TabControl x:Name="tabControl" Margin="10" Grid.Row="1">
             <TabItem Header="Source">
                 <ListView x:Name="listView" ItemsSource="{Binding FolderPane.ActivePane.FoldersLeft}" ButtonBase.Click="sortLocations_Click" Margin="0,0,-0,-0">
@@ -135,9 +135,9 @@
                 </ListView>
             </TabItem>
         </TabControl>
-        
+
         <!--MOVEPANE-->
-        <TextBlock x:Name="currentCopiedFile" Margin="10,20,263,0" Grid.Row="2" TextWrapping="Wrap" Text="{Binding Messages.CurrentFile}" VerticalAlignment="Top" Background="#FFE4E4E4" Height="20"/>
+        <TextBlock x:Name="currentCopiedFile" Margin="10,20,263,0" Grid.Row="2" TextWrapping="Wrap" Text="{Binding Messages.CurrentFile}" VerticalAlignment="Top" Background="White" Height="20"/>
         <Button x:Name="pauseQueue" Content="Pause" Click="pauseQueue_Click" HorizontalAlignment="Right" Margin="0,20,93,0" Grid.Row="2" Width="75" Height="20" VerticalAlignment="Top"/>
         <Button x:Name="cancelAll" Content="Cancel All" Click="cancelAll_Click" Margin="0,20,13,0" Grid.Row="2" HorizontalAlignment="Right" Width="75" Height="20" VerticalAlignment="Top"/>
         <Button x:Name="refresh" Click="refresh_Click" Content="Refresh" Margin="0,0,13,0" Grid.Row="1" VerticalAlignment="Top" Height="20" HorizontalAlignment="Right" Width="60"/>
@@ -200,7 +200,7 @@
                 </GridView>
             </ListView.View>
         </ListView>
-        <Button x:Name="openProfileInputDialogue" Click="openProfileInputDialogue_Click" Content="Add new profile" HorizontalAlignment="Left" Margin="333,10,0,0" VerticalAlignment="Top" Width="135" Height="22"/>
+        <Button x:Name="openProfileInputDialogue" Click="openProfileInputDialogue_Click" Content="Add new profile" HorizontalAlignment="Left" Margin="384,10,0,0" VerticalAlignment="Top" Width="135" Height="22"/>
 
     </Grid>
 </Window>
