@@ -10,9 +10,8 @@ using System.Threading.Tasks;
 
 namespace StorageTool
 {
-    public class ProfileInput :INotifyPropertyChanged
+    public class ProfileInput : INotifyPropertyChanged
     {
-        private Profile _returnableProfile;
         private DirectoryInfo _leftFolder;
         private DirectoryInfo _rightFolder;
 
@@ -45,9 +44,7 @@ namespace StorageTool
         {
             if (_leftFolder != null && _rightFolder != null)
             {
-                _returnableProfile = new Profile(_leftFolder, _rightFolder);
-                _returnableProfile.ProfileName = _profileName;
-                return _returnableProfile;
+                return new Profile(_profileName, _leftFolder, _rightFolder);
             }
             else
             {

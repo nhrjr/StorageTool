@@ -13,6 +13,13 @@ namespace StorageTool.FolderView
 {
     public class FolderStash : INotifyPropertyChanged
     {
+        public Profile Profile { get; set; } = new Profile();
+        private ObservableCollection<FolderInfo> foldersLeft = new ObservableCollection<FolderInfo>();
+        private ObservableCollection<FolderInfo> foldersRight = new ObservableCollection<FolderInfo>();
+        private ObservableCollection<FolderInfo> foldersUnlinked = new ObservableCollection<FolderInfo>();
+        private ObservableCollection<string> duplicateFolders = new ObservableCollection<string>();
+
+        #region Constructor/Destructor
         public FolderStash(Profile prof, ObservableCollection<FolderInfo> fLeft, ObservableCollection<FolderInfo> fRight, ObservableCollection<FolderInfo> fUnlinked)
         {
             Profile = prof;
@@ -20,20 +27,38 @@ namespace StorageTool.FolderView
             FoldersRight = fRight;
             FoldersUnlinked = fUnlinked;
         }
+
         public FolderStash()
         {
         }
+
         public FolderStash(Profile prof)
         {
             Profile = prof;
         }
+        #endregion
 
-        public Profile Profile { get; set; }
-        private ObservableCollection<FolderInfo> foldersLeft = new ObservableCollection<FolderInfo>();
-        private ObservableCollection<FolderInfo> foldersRight = new ObservableCollection<FolderInfo>();
-        private ObservableCollection<FolderInfo> foldersUnlinked = new ObservableCollection<FolderInfo>();
-        private ObservableCollection<string> duplicateFolders = new ObservableCollection<string>();
 
+        // replace with event/command
+        public async void RefreshSizes()
+        {
+            foreach (FolderInfo dir in foldersLeft)
+            {
+                if (dir.DirSize == 0) await Task.Factory.StartNew(() => DirectorySize.DirSizeAsync(dir.DirInfo).ContinueWith(task => dir.DirSize = task.Result).ConfigureAwait(false));
+            }
+            foreach (FolderInfo dir in foldersRight)
+            {
+                if (dir.DirSize == 0) await Task.Factory.StartNew(() => DirectorySize.DirSizeAsync(dir.DirInfo).ContinueWith(task => dir.DirSize = task.Result).ConfigureAwait(false));
+            }
+            foreach (FolderInfo dir in foldersUnlinked)
+            {
+                if (dir.DirSize == 0) await Task.Factory.StartNew(() => DirectorySize.DirSizeAsync(dir.DirInfo).ContinueWith(task => dir.DirSize = task.Result).ConfigureAwait(false));
+            }
+
+        }
+
+
+        #region Properties
         public ObservableCollection<string> DuplicateFolders
         {
             get { return this.duplicateFolders; }
@@ -71,33 +96,7 @@ namespace StorageTool.FolderView
                 this.OnPropertyChanged("FoldersUnlinked");
             }
         }
-
-        public async void RefreshSizes()
-        {
-            foreach (FolderInfo dir in foldersLeft)
-            {
-                if (dir.DirSize == 0) await Task.Factory.StartNew(() => ScanFolderAsync(dir.DirInfo).ContinueWith(task => dir.DirSize = task.Result).ConfigureAwait(false), TaskCreationOptions.LongRunning);
-            }
-            foreach (FolderInfo dir in foldersRight)
-            {
-                if (dir.DirSize == 0) await Task.Factory.StartNew(() => ScanFolderAsync(dir.DirInfo).ContinueWith(task => dir.DirSize = task.Result).ConfigureAwait(false), TaskCreationOptions.LongRunning);
-            }
-            foreach (FolderInfo dir in foldersUnlinked)
-            {
-                if (dir.DirSize == 0) await Task.Factory.StartNew(() => ScanFolderAsync(dir.DirInfo).ContinueWith(task => dir.DirSize = task.Result).ConfigureAwait(false), TaskCreationOptions.LongRunning);
-            }
-
-        }
-
-        private async Task<long> ScanFolderAsync(DirectoryInfo dir)
-        {
-            return await DirectorySize.DirSizeAsync(dir).ConfigureAwait(false);
-        }
-
-        private void ScanFolderSync(FolderInfo dir, long size)
-        {
-            size = DirectorySize.DirSizeSync(dir.DirInfo);
-        }
+        #endregion
 
         public event PropertyChangedEventHandler PropertyChanged;
 

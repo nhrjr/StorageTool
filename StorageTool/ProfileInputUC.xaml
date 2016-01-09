@@ -1,0 +1,18 @@
+﻿<UserControl x:Class="StorageTool.ProfileInputUC"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:StorageTool"
+             mc:Ignorable="d" Height="90" Width="300">
+    <Grid Margin="0,0,0,10">
+
+        <TextBox x:Name="profileName"  Padding="5,1,1,0" Text="{Binding ProfileInput.ProfileName,UpdateSourceTrigger=PropertyChanged}" Margin="0,60,10,0" TextWrapping="Wrap" RenderTransformOrigin="0.459,-0.163" Height="20" VerticalAlignment="Top" HorizontalAlignment="Right" Width="280"/>
+        <Button x:Name="pickFolderLeft" Click="pickFolderLeft_Click" Content="..." Margin="0,10,266,0" VerticalAlignment="Top" Height="20" HorizontalAlignment="Right" Width="24"/>
+        <Button x:Name="pickFolderRight" Click="pickFolderRight_Click" Content="..." Margin="0,35,266,0" HorizontalAlignment="Right" Width="24" Height="20" VerticalAlignment="Top"/>
+        <TextBlock x:Name="inputLeft" Padding="5,1,1,0" Text="{Binding ProfileInput.LeftInput}"  Margin="0,10,10,0" Height="20" VerticalAlignment="Top" Background="#FF9B9B9B" HorizontalAlignment="Right" Width="251"/>
+        <TextBlock x:Name="inputRight"  Padding="5,1,1,0" Text="{Binding ProfileInput.RightInput}" Margin="0,35,10,0" Height="20" VerticalAlignment="Top" Background="#FF9B9B9B" HorizontalAlignment="Right" Width="251"/>
+
+
+    </Grid>
+</UserControl>

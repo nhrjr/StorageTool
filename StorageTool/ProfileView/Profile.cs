@@ -12,14 +12,16 @@ namespace StorageTool
 {
     public class Profile :INotifyPropertyChanged
     {
-        private int profileIndex;
-        private string profileName;
-        private DirectoryInfo storageFolder;
-        private DirectoryInfo gameFolder;
+        private string profileName = null;
+        private DirectoryInfo storageFolder = null;
+        private DirectoryInfo gameFolder = null;
+
+        public Profile()
+        {
+        }
 
         public Profile(Profile prof)
         {
-            ProfileIndex = prof.ProfileIndex;
             ProfileName = prof.ProfileName;
             StorageFolder = prof.StorageFolder;
             GameFolder = prof.GameFolder;
@@ -33,6 +35,13 @@ namespace StorageTool
         }
         public Profile (DirectoryInfo left, DirectoryInfo right)
         {
+            GameFolder = left;
+            StorageFolder = right;
+        }
+
+        public Profile(string name, DirectoryInfo left, DirectoryInfo right)
+        {
+            ProfileName = name;
             GameFolder = left;
             StorageFolder = right;
         }
@@ -64,15 +73,15 @@ namespace StorageTool
                 OnPropertyChanged("StorageFolder");
             }
         }
-        public int ProfileIndex
-        {
-            get { return profileIndex; }
-            set
-            {
-                this.profileIndex = value;
-                this.OnPropertyChanged("ProfileIndex");
-            }
-        }
+        //public int ProfileIndex
+        //{
+        //    get { return profileIndex; }
+        //    set
+        //    {
+        //        this.profileIndex = value;
+        //        this.OnPropertyChanged("ProfileIndex");
+        //    }
+        //}
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -90,39 +99,5 @@ namespace StorageTool
         public string GameFolder { get; set; }
         public string StorageFolder { get; set; }
     }
-
-    public class Profiles : ObservableCollection<Profile>
-    {
-        public Profiles() : base () { }
-        public Profiles(List<ProfileBase> input) : base(convertProfileBaseToProfile(input)) { }
-
-        private static List<Profile> convertProfileBaseToProfile(List<ProfileBase> input)
-        {
-            List<Profile> var = new List<Profile>();
-            foreach( ProfileBase g in input){
-                var.Add(new Profile(g.ProfileName,g.GameFolder,g.StorageFolder));
-            }
-            return var;
-        }
-
-        public List<ProfileBase> GetProfileBase()
-        {
-            List<ProfileBase> var = new List<ProfileBase>();
-            foreach (Profile g in this)
-            {
-                var.Add(new ProfileBase() { ProfileName = g.ProfileName, GameFolder = g.GameFolder.FullName, StorageFolder = g.StorageFolder.FullName });
-            }
-            return var;
-        }
-        //public Profile ActiveProfile { get; set; } = null;
-        public int ActiveProfileIndex { get; set; }
-        public void RemoveProfile()
-        {
-            int index = ActiveProfileIndex;
-            ActiveProfileIndex = 0;
-            this.RemoveAt(index);
-        }
-    }
-
-
+    
 }

@@ -5,114 +5,44 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:StorageTool"
         mc:Ignorable="d"
-        Title="StorageTool" Height="900" Width="931" Background="White">
+        Title="StorageTool" Height="700" Width="540" Background="White">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
-        <!--<Style TargetType="GridViewColumnHeader">
-            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-            <Setter Property="VerticalContentAlignment" Value="Stretch" />
-        </Style>-->
-        <!--<Style TargetType="DataGridColumnHeader">
-            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-            <Setter Property="VerticalContentAlignment" Value="Stretch" />
-        </Style>-->
         <Style TargetType="ListViewItem">
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
             <Setter Property="VerticalContentAlignment" Value="Stretch" />
         </Style>
-        <!--<Style TargetType="DataGridCell">
-            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-            <Setter Property="VerticalContentAlignment" Value="Stretch" />
-        </Style>-->
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="100"/>
             <RowDefinition/>
-            <RowDefinition Height="300"/>
+            <RowDefinition Height="190"/>
         </Grid.RowDefinitions>
-        <Button x:Name="pickFolderLeft" Click="pickFolderLeft_Click" Content="..." Margin="0,12,13,0" VerticalAlignment="Top" Height="20" HorizontalAlignment="Right" Width="24"/>
-        <Button x:Name="pickFolderRight" Click="pickFolderRight_Click" Content="..." Margin="0,37,13,0" HorizontalAlignment="Right" Width="24" Height="20" VerticalAlignment="Top"/>
 
-        <!--<TextBox x:Name="inputLeft" Text="{Binding profileInput.LeftInput,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"  Margin="10,35,39,0" Height="20" VerticalAlignment="Top"/>
-        <TextBox x:Name="inputRight" Text="{Binding profileInput.RightInput,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Margin="10,35,35,0" Grid.Column="1" Height="20" VerticalAlignment="Top"/>-->
-
-        <TextBlock x:Name="inputLeft" Text="{Binding ProfileInput.LeftInput}"  Margin="0,12,42,0" Height="20" VerticalAlignment="Top" Background="#FF9B9B9B" HorizontalAlignment="Right" Width="377"/>
-        <TextBlock x:Name="inputRight" Text="{Binding ProfileInput.RightInput}" Margin="0,37,42,0" Height="20" VerticalAlignment="Top" Background="#FF9B9B9B" HorizontalAlignment="Right" Width="377"/>
-
-
-
-
-
-        <!--<Button x:Name="moveToRight" Click="moveToRight_Click" Content="Store" Margin="10,0,0,8" Grid.Row="1" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="75"/>-->
-        <!--<Button x:Name="moveToLeft" Click="moveToLeft_Click" Content="Restore" Grid.Column="1" Margin="10,0,0,8" Grid.Row="1" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="75"/>-->
-        <!--<Button x:Name="relinkButton" Click="relinkButton_Click" Content="Link" Grid.Column="1" Margin="10,0,0,0" Grid.Row="2" Height="20" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="75"/>-->
-
-        <!--<ListBox x:Name="logList" ItemsSource="{Binding Log.LogList}" Margin="134,184,10,10" Grid.Row="1" Grid.Column="1"/>-->
+        <!--PROFILE SELECTOR-->
         <ComboBox x:Name="profileBox" ItemsSource="{Binding Profiles}" DisplayMemberPath="ProfileName" SelectionChanged="profileBox_SelectionChanged" SelectedIndex="{Binding Profiles.ActiveProfileIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="176" Height="22"/>
-        <Button x:Name="addProfile" Click="addProfile_Click" Content="Add profile" Margin="0,62,77,0" VerticalAlignment="Top" RenderTransformOrigin="1.311,0.826" Height="20" HorizontalAlignment="Right" Width="84"/>
         <Button x:Name="removeProfile" Click="removeProfile_Click" Content="Remove selected profile" HorizontalAlignment="Left" Margin="191,10,0,0" VerticalAlignment="Top" Width="137" Height="22"/>
-        <TextBox x:Name="profileName" Text="{Binding ProfileInput.ProfileName,UpdateSourceTrigger=PropertyChanged}" Margin="0,62,166,0" TextWrapping="Wrap" RenderTransformOrigin="0.459,-0.163" Height="20" VerticalAlignment="Top" HorizontalAlignment="Right" Width="233"/>
-        <TextBlock x:Name="gameFolderName" Margin="115,37,0,0" TextWrapping="Wrap" Text="{Binding Loc.LocationLeftFullName}" VerticalAlignment="Top" Height="20" HorizontalAlignment="Left" Width="213"/>
-        <TextBlock x:Name="storageFolderName" Margin="115,62,0,0" TextWrapping="Wrap" Text="{Binding Loc.LocationRightFullName}" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Width="213"/>
-        <!--<TextBlock x:Name="selectedGame" Margin="90,0,0,8" Grid.Row="1" TextWrapping="Wrap" Text="{Binding Loc.SelectedFolderLeft.DirInfo.Name}" Height="18" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="296"/>-->
-        <!--<TextBlock x:Name="selectedStoredGame" Grid.Column="1" Margin="90,0,0,8" Grid.Row="1" TextWrapping="Wrap" Text="{Binding Loc.SelectedFolderRight.DirInfo.Name}" Height="18" VerticalAlignment="Bottom" HorizontalAlignment="Left" Width="296"/>-->
-        <TextBlock x:Name="currentCopiedFile" Margin="10,20,380,0" Grid.Row="2" TextWrapping="Wrap" Text="{Binding Log.CurrentFile}" VerticalAlignment="Top" Background="#FFE4E4E4" Height="20"/>
-
-        <ListView x:Name="Move_Queue" ItemsSource="{Binding MoveStack}" Margin="10,45,10,10" Grid.Row="2">
-            <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
-                    <Setter Property="HorizontalContentAlignment"
-                Value="Stretch" />
-                </Style>
-            </ListView.ItemContainerStyle>
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Width="100" Header="Action" DisplayMemberBinding="{Binding Action}"/>
-                    <GridViewColumn Width="150" Header="Name" DisplayMemberBinding="{Binding Name}"/>
-                    <GridViewColumn Width="140" Header="Status" DisplayMemberBinding="{Binding Status}"/>
-                    <GridViewColumn Width="100" Header="Progress">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <ProgressBar Height="10" Maximum="100" Value="{Binding Progress}" HorizontalContentAlignment="Stretch"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Width="100" Header="Copied Bytes">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock HorizontalAlignment="Right" Text="{Binding ProcString}" />
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Width="100" Header="Size">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock HorizontalAlignment="Right" Text="{Binding SizeString}" />
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                    <GridViewColumn Width="60">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <Button Content="Cancel" Click="cancelItem_Click" CommandParameter="{Binding}" Visibility="{Binding NotDone}"/>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                </GridView>
-            </ListView.View>
-        </ListView>
-
-
+        <TextBlock x:Name="gameFolderName" Margin="115,37,0,0" TextWrapping="Wrap" Text="{Binding FolderPane.LocationLeftFullName}" VerticalAlignment="Top" Height="20" HorizontalAlignment="Left" Width="213"/>
+        <TextBlock x:Name="storageFolderName" Margin="115,62,0,0" TextWrapping="Wrap" Text="{Binding FolderPane.LocationRightFullName}" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Width="213"/>
         <Button x:Name="Desc_GameFolder" Click="Desc_GameFolder_Click" HorizontalAlignment="Left" Margin="10,37,0,0" Content="Source Folder:" Width="100" Height="20" VerticalAlignment="Top"/>
         <Button x:Name="Desc_StorageFolder" Click="Desc_StorageFolder_Click" HorizontalAlignment="Left" Margin="10,62,0,0" Content="Storage Folder:" Width="100" Height="20" VerticalAlignment="Top"/>
-        <!--<TextBlock x:Name="Desc_Unlinked" Grid.Column="1" Margin="0,0,10,0" Grid.Row="2" TextWrapping="Wrap" Text="Unlinked Folders in Storage Folder" Height="20" VerticalAlignment="Top" HorizontalAlignment="Right" Width="200"/>-->
+
+        <!--PROFILE INPUT-->
+        <!--<Button x:Name="addProfile" Click="addProfile_Click" Content="Add profile" Margin="0,62,77,0" VerticalAlignment="Top" RenderTransformOrigin="1.311,0.826" Height="20" HorizontalAlignment="Right" Width="84"/>
+        <TextBox x:Name="profileName" Text="{Binding ProfileInput.ProfileName,UpdateSourceTrigger=PropertyChanged}" Margin="0,62,166,0" TextWrapping="Wrap" RenderTransformOrigin="0.459,-0.163" Height="20" VerticalAlignment="Top" HorizontalAlignment="Right" Width="233"/>
+        <Button x:Name="pickFolderLeft" Click="pickFolderLeft_Click" Content="..." Margin="0,12,13,0" VerticalAlignment="Top" Height="20" HorizontalAlignment="Right" Width="24"/>
+        <Button x:Name="pickFolderRight" Click="pickFolderRight_Click" Content="..." Margin="0,37,13,0" HorizontalAlignment="Right" Width="24" Height="20" VerticalAlignment="Top"/>
+        <TextBlock x:Name="inputLeft" Text="{Binding ProfileInput.LeftInput}"  Margin="0,12,42,0" Height="20" VerticalAlignment="Top" Background="#FF9B9B9B" HorizontalAlignment="Right" Width="377"/>
+        <TextBlock x:Name="inputRight" Text="{Binding ProfileInput.RightInput}" Margin="0,37,42,0" Height="20" VerticalAlignment="Top" Background="#FF9B9B9B" HorizontalAlignment="Right" Width="377"/>-->
+
+        <!--FOLDERPANE-->        
         <TabControl x:Name="tabControl" Margin="10" Grid.Row="1">
             <TabItem Header="Source">
-                <ListView x:Name="listView" ItemsSource="{Binding Loc.ActivePane.FoldersLeft}" SelectedItem="{Binding Loc.SelectedFolderLeft}" ButtonBase.Click="sortLocations_Click" Margin="0,0,-0,-0">
+                <ListView x:Name="listView" ItemsSource="{Binding FolderPane.ActivePane.FoldersLeft}" ButtonBase.Click="sortLocations_Click" Margin="0,0,-0,-0">
                     <ListView.View>
                         <GridView>
-                            <GridViewColumn  DisplayMemberBinding="{Binding DirInfo.Name}" Width="250">
+                            <GridViewColumn Width="300" DisplayMemberBinding="{Binding DirInfo.Name}">
                                 <GridViewColumnHeader Tag="DirInfo.Name" Content="Name"/>
                             </GridViewColumn>
                             <GridViewColumn  Width="100">
@@ -135,10 +65,10 @@
                 </ListView>
             </TabItem>
             <TabItem Header="Storage">
-                <ListView x:Name="dirListRight" ItemsSource="{Binding Loc.ActivePane.FoldersRight}" GridViewColumnHeader.Click="sortLocations_Click" SelectedItem="{Binding Loc.SelectedFolderRight}" Margin="0,0,0,0" Grid.Column="1" Grid.Row="1">
+                <ListView x:Name="dirListRight" ItemsSource="{Binding FolderPane.ActivePane.FoldersRight}" GridViewColumnHeader.Click="sortLocations_Click" Margin="0,0,0,0" Grid.Column="1" Grid.Row="1">
                     <ListView.View>
                         <GridView>
-                            <GridViewColumn  DisplayMemberBinding="{Binding DirInfo.Name}" Width="250">
+                            <GridViewColumn  DisplayMemberBinding="{Binding DirInfo.Name}" Width="320">
                                 <GridViewColumn.Header>
                                     <GridViewColumnHeader Tag="DirInfo.Name" >Name</GridViewColumnHeader>
                                 </GridViewColumn.Header>
@@ -164,11 +94,11 @@
                     </ListView.View>
                 </ListView>
             </TabItem>
-            <TabItem Header="Unlinked" Visibility="{Binding Loc.ShowUnlinkedFolders, Converter={StaticResource BoolToVis}}" >
-                <ListView x:Name="relinkList" ItemsSource="{Binding Loc.ActivePane.FoldersUnlinked}" GridViewColumnHeader.Click="sortLocations_Click" SelectedItem="{Binding Loc.SelectedFolderReLink}" Grid.Column="1" Margin="0,0,0,0" Grid.Row="2">
+            <TabItem Header="Unlinked" Visibility="{Binding FolderPane.ShowUnlinkedFolders, Converter={StaticResource BoolToVis}}" >
+                <ListView x:Name="relinkList" ItemsSource="{Binding FolderPane.ActivePane.FoldersUnlinked}" GridViewColumnHeader.Click="sortLocations_Click" Grid.Column="1" Margin="0,0,0,0" Grid.Row="2">
                     <ListView.View>
                         <GridView>
-                            <GridViewColumn  DisplayMemberBinding="{Binding DirInfo.Name}" Width="250">
+                            <GridViewColumn  DisplayMemberBinding="{Binding DirInfo.Name}" Width="320">
                                 <GridViewColumn.Header>
                                     <GridViewColumnHeader Tag="DirInfo.Name">Name</GridViewColumnHeader>
                                 </GridViewColumn.Header>
@@ -195,7 +125,7 @@
                 </ListView>
             </TabItem>
             <TabItem Header="Duplicate" >
-                <ListView x:Name="dupFolders" ItemsSource="{Binding Loc.ActivePane.DuplicateFolders}" Margin="0,0,0,0">
+                <ListView x:Name="dupFolders" ItemsSource="{Binding FolderPane.ActivePane.DuplicateFolders}" Margin="0,0,0,0">
                     <ListView.View>
                         <GridView>
                             <GridViewColumn/>
@@ -203,24 +133,73 @@
                     </ListView.View>
                 </ListView>
             </TabItem>
-
-
         </TabControl>
+        
+        <!--MOVEPANE-->
+        <TextBlock x:Name="currentCopiedFile" Margin="10,20,263,0" Grid.Row="2" TextWrapping="Wrap" Text="{Binding Messages.CurrentFile}" VerticalAlignment="Top" Background="#FFE4E4E4" Height="20"/>
         <Button x:Name="pauseQueue" Content="Pause" Click="pauseQueue_Click" HorizontalAlignment="Right" Margin="0,20,93,0" Grid.Row="2" Width="75" Height="20" VerticalAlignment="Top"/>
         <Button x:Name="cancelAll" Content="Cancel All" Click="cancelAll_Click" Margin="0,20,13,0" Grid.Row="2" HorizontalAlignment="Right" Width="75" Height="20" VerticalAlignment="Top"/>
         <Button x:Name="refresh" Click="refresh_Click" Content="Refresh" Margin="0,0,13,0" Grid.Row="1" VerticalAlignment="Top" Height="20" HorizontalAlignment="Right" Width="60"/>
         <Button x:Name="deleteHistory" Click="deleteHistory_Click" Content="Clear History" Margin="0,20,173,0" Grid.Row="2" VerticalAlignment="Top" HorizontalAlignment="Right" Width="85" Height="20"/>
-        <TextBlock x:Name="moveStackIndex" HorizontalAlignment="Right" Margin="0,20,263,0" Grid.Row="2" TextWrapping="Wrap" Text="{Binding MoveStack.Index}" VerticalAlignment="Top" Width="59" Height="20"/>
-        <!--<ListBox x:Name="worked_Folders" ItemsSource="{Binding Loc.WorkedFolders}" DisplayMemberPath="DirInfo.Name" HorizontalAlignment="Left" Height="160" Margin="349,10,0,0" VerticalAlignment="Top" Width="171" Grid.Row="2"/>-->
-
-
-
-
-
-
-
-
-
+        <ListView x:Name="Move_Queue" ItemsSource="{Binding MoveStack}" Margin="10,45,10,10" Grid.Row="2">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment"
+                Value="Stretch" />
+                </Style>
+            </ListView.ItemContainerStyle>
+            <ListView.View>
+                <GridView>
+                    <!--<GridViewColumn Width="40" Header="Action" DisplayMemberBinding="{Binding Action}"/>-->
+                    <GridViewColumn Width="150" Header="Name" >
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock HorizontalAlignment="Left" Text="{Binding Name}" >
+                                    <TextBlock.ToolTip>
+                                        <TextBlock Text="{Binding Action}"/>
+                                    </TextBlock.ToolTip>
+                                </TextBlock>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Width="80" Header="Status" DisplayMemberBinding="{Binding Status}"/>
+                    <GridViewColumn Width="100"  Header="Progress">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <ProgressBar Height="10" Maximum="100" Value="{Binding Progress}" HorizontalContentAlignment="Stretch">
+                                    <ProgressBar.ToolTip>
+                                        <TextBlock Text="{Binding ProcString}"/>
+                                    </ProgressBar.ToolTip>
+                                </ProgressBar>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <!--<GridViewColumn Width="80" Header="Copied Bytes">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock HorizontalAlignment="Right" Text="{Binding ProcString}" >
+                                </TextBlock>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>-->
+                    <GridViewColumn Width="80"  Header="Size">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock HorizontalAlignment="Right" Text="{Binding SizeString}" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Width="60">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="Cancel" Click="cancelItem_Click" CommandParameter="{Binding}" Visibility="{Binding NotDone}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <Button x:Name="openProfileInputDialogue" Click="openProfileInputDialogue_Click" Content="Add new profile" HorizontalAlignment="Left" Margin="333,10,0,0" VerticalAlignment="Top" Width="135" Height="22"/>
 
     </Grid>
 </Window>

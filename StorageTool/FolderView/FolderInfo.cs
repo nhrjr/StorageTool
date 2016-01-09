@@ -55,7 +55,7 @@ namespace StorageTool
             {
                 try
                 {
-                    await Task.Factory.StartNew(() => ScanFolderAsync(DirInfo).ContinueWith(task => DirSize = task.Result).ConfigureAwait(false));
+                    await Task.Run(() => DirectorySize.DirSizeAsync(DirInfo).ContinueWith(task => DirSize = task.Result).ConfigureAwait(false));
                 }
                 catch (IOException ex)
                 {
@@ -63,11 +63,6 @@ namespace StorageTool
                 }
             }
 
-        }
-
-        private async Task<long> ScanFolderAsync(DirectoryInfo dir)
-        {
-            return await DirectorySize.DirSizeAsync(dir).ConfigureAwait(false);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

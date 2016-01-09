@@ -7,6 +7,7 @@ using System.IO;
 using Monitor.Core.Utilities;
 using System.Windows;
 
+
 namespace StorageTool
 {
     public class AnalyzeFolders
@@ -15,6 +16,7 @@ namespace StorageTool
         public List<string> UnlinkedFolders { get; set; }
         public List<string> StorableFolders { get; set; }
         public List<string> DuplicateFolders { get; set; }
+
         public AnalyzeFolders()
         {
             LinkedFolders = new List<string>();
@@ -23,9 +25,7 @@ namespace StorageTool
             DuplicateFolders = new List<string>();
         }
 
-
-
-        public void SetFolders(Profile input)
+        public void GetFolderStructure(Profile input)
         {
             LinkedFolders.Clear();
             StorableFolders.Clear();
@@ -61,7 +61,7 @@ namespace StorageTool
                 }
                 catch (IOException ex)
                 {
-                    MessageBox.Show(ex.Message);
+                    //MessageBox.Show(ex.Message);
                 }
             }
             List<string> dSFolders = new List<string>();
@@ -89,10 +89,6 @@ namespace StorageTool
             this.StorableFolders = _gFolders.Select(n => n.FullName).ToList();
             this.UnlinkedFolders = _uFolders.Select(n => n.FullName).ToList();
             this.LinkedFolders = _lFolders.Select(n => n.FullName).ToList();
-
         }
-
-
     }
-
 }
