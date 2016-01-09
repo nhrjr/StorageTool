@@ -24,8 +24,8 @@
         <!--PROFILE SELECTOR-->
         <ComboBox x:Name="profileBox" ItemsSource="{Binding Profiles}" DisplayMemberPath="ProfileName" SelectionChanged="profileBox_SelectionChanged" SelectedIndex="{Binding Profiles.ActiveProfileIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="227" Height="22"/>
         <Button x:Name="removeProfile" Click="removeProfile_Click" Content="Remove selected profile" HorizontalAlignment="Left" Margin="242,10,0,0" VerticalAlignment="Top" Width="137" Height="22"/>
-        <TextBlock x:Name="gameFolderName" Margin="115,37,0,0" TextWrapping="Wrap" Text="{Binding FolderPane.LocationLeftFullName}" VerticalAlignment="Top" Height="20" HorizontalAlignment="Left" Width="213"/>
-        <TextBlock x:Name="storageFolderName" Margin="115,62,0,0" TextWrapping="Wrap" Text="{Binding FolderPane.LocationRightFullName}" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Width="213"/>
+        <TextBlock x:Name="gameFolderName" Padding="5,1,1,0" Margin="115,37,0,0" TextWrapping="Wrap" Text="{Binding FolderPane.LocationLeftFullName}" VerticalAlignment="Top" Height="20" HorizontalAlignment="Left" Width="213"/>
+        <TextBlock x:Name="storageFolderName" Padding="5,1,1,0" Margin="115,62,0,0" TextWrapping="Wrap" Text="{Binding FolderPane.LocationRightFullName}" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Width="213"/>
         <Button x:Name="Desc_GameFolder" Click="Desc_GameFolder_Click" HorizontalAlignment="Left" Margin="10,37,0,0" Content="Source Folder:" Width="100" Height="20" VerticalAlignment="Top"/>
         <Button x:Name="Desc_StorageFolder" Click="Desc_StorageFolder_Click" HorizontalAlignment="Left" Margin="10,62,0,0" Content="Storage Folder:" Width="100" Height="20" VerticalAlignment="Top"/>
 
@@ -69,7 +69,7 @@
                 <ListView x:Name="dirListRight" ItemsSource="{Binding FolderPane.ActivePane.FoldersRight}" GridViewColumnHeader.Click="sortLocations_Click" Margin="0,0,0,0" Grid.Column="1" Grid.Row="1">
                     <ListView.View>
                         <GridView>
-                            <GridViewColumn  DisplayMemberBinding="{Binding DirInfo.Name}" Width="320">
+                            <GridViewColumn  DisplayMemberBinding="{Binding DirInfo.Name}" Width="300">
                                 <GridViewColumn.Header>
                                     <GridViewColumnHeader Tag="DirInfo.Name" >Name</GridViewColumnHeader>
                                 </GridViewColumn.Header>
@@ -99,7 +99,7 @@
                 <ListView x:Name="relinkList" ItemsSource="{Binding FolderPane.ActivePane.FoldersUnlinked}" GridViewColumnHeader.Click="sortLocations_Click" Grid.Column="1" Margin="0,0,0,0" Grid.Row="2">
                     <ListView.View>
                         <GridView>
-                            <GridViewColumn  DisplayMemberBinding="{Binding DirInfo.Name}" Width="320">
+                            <GridViewColumn  DisplayMemberBinding="{Binding DirInfo.Name}" Width="300">
                                 <GridViewColumn.Header>
                                     <GridViewColumnHeader Tag="DirInfo.Name">Name</GridViewColumnHeader>
                                 </GridViewColumn.Header>

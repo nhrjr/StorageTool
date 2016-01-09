@@ -17,7 +17,6 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Monitor.Core.Utilities;
 using System.Diagnostics;
-using Microsoft.WindowsAPICodePack.Dialogs;
 
 using StorageTool.FolderView;
 

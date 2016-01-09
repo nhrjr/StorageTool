@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
+using System.Threading.Tasks;
 
 
 namespace StorageTool
@@ -103,41 +104,41 @@ namespace StorageTool
             if (isRefreshing == true)
                 return;
             try {
-                    isRefreshing = true;
-                    foreach (FolderStash pane in stash)
+                isRefreshing = true;
+                foreach (FolderStash pane in stash)
+                {
+                    analyzeFolders.GetFolderStructure(pane.Profile);
+                    pane.DuplicateFolders = new ObservableCollection<string>(analyzeFolders.DuplicateFolders);
+
+                    foreach (string g in analyzeFolders.StorableFolders)
                     {
-                        analyzeFolders.GetFolderStructure(pane.Profile);
-                        pane.DuplicateFolders = new ObservableCollection<string>(analyzeFolders.DuplicateFolders);
-
-                        foreach (string g in analyzeFolders.StorableFolders)
+                        if (!pane.FoldersLeft.Any(f => f.DirInfo.FullName == g))
                         {
-                            if (!pane.FoldersLeft.Any(f => f.DirInfo.FullName == g))
-                            {
-                                DirectoryInfo tmp = new DirectoryInfo(g);
-                                if(!WorkedFolders.Any(h => h.DirInfo.Name == tmp.Name)) pane.FoldersLeft.Add(new FolderInfo(tmp));
-                            }
-
-                        }
-                        foreach (string g in analyzeFolders.LinkedFolders)
-                        {
-                            if (!pane.FoldersRight.Any(f => f.DirInfo.FullName == g))
-                            {
-                                DirectoryInfo tmp = new DirectoryInfo(g);
-                                if (!WorkedFolders.Any(h => h.DirInfo.Name == tmp.Name)) pane.FoldersRight.Add(new FolderInfo(tmp));
-                            }
-                        }
-                        foreach (string g in analyzeFolders.UnlinkedFolders)
-                        {
-                            if (!pane.FoldersUnlinked.Any(f => f.DirInfo.FullName == g))
-                            {
-                                DirectoryInfo tmp = new DirectoryInfo(g);
-                                if (!WorkedFolders.Any(h => h.DirInfo.Name == tmp.Name)) pane.FoldersUnlinked.Add(new FolderInfo(tmp));
-                            }
+                            DirectoryInfo tmp = new DirectoryInfo(g);
+                            if (!WorkedFolders.Any(h => h.DirInfo.Name == tmp.Name)) pane.FoldersLeft.Add(new FolderInfo(tmp));
                         }
 
-                        foreach (FolderInfo g in pane.FoldersLeft.Reverse()) if (!analyzeFolders.StorableFolders.Any(f => f == g.DirInfo.FullName)) pane.FoldersLeft.Remove(g);
-                        foreach (FolderInfo g in pane.FoldersRight.Reverse()) if (!analyzeFolders.LinkedFolders.Any(f => f == g.DirInfo.FullName)) pane.FoldersRight.Remove(g);
-                        foreach (FolderInfo g in pane.FoldersUnlinked.Reverse()) if (!analyzeFolders.UnlinkedFolders.Any(f => f == g.DirInfo.FullName)) pane.FoldersUnlinked.Remove(g);                        
+                    }
+                    foreach (string g in analyzeFolders.LinkedFolders)
+                    {
+                        if (!pane.FoldersRight.Any(f => f.DirInfo.FullName == g))
+                        {
+                            DirectoryInfo tmp = new DirectoryInfo(g);
+                            if (!WorkedFolders.Any(h => h.DirInfo.Name == tmp.Name)) pane.FoldersRight.Add(new FolderInfo(tmp));
+                        }
+                    }
+                    foreach (string g in analyzeFolders.UnlinkedFolders)
+                    {
+                        if (!pane.FoldersUnlinked.Any(f => f.DirInfo.FullName == g))
+                        {
+                            DirectoryInfo tmp = new DirectoryInfo(g);
+                            if (!WorkedFolders.Any(h => h.DirInfo.Name == tmp.Name)) pane.FoldersUnlinked.Add(new FolderInfo(tmp));
+                        }
+                    }
+
+                    foreach (FolderInfo g in pane.FoldersLeft.Reverse()) if (!analyzeFolders.StorableFolders.Any(f => f == g.DirInfo.FullName)) pane.FoldersLeft.Remove(g);
+                    foreach (FolderInfo g in pane.FoldersRight.Reverse()) if (!analyzeFolders.LinkedFolders.Any(f => f == g.DirInfo.FullName)) pane.FoldersRight.Remove(g);
+                    foreach (FolderInfo g in pane.FoldersUnlinked.Reverse()) if (!analyzeFolders.UnlinkedFolders.Any(f => f == g.DirInfo.FullName)) pane.FoldersUnlinked.Remove(g);
                     }
                 if (ActivePane != null)
                 {
