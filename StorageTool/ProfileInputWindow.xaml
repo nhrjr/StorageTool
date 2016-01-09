@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         WindowStyle="None"
         AllowsTransparency="True"
-        
+        MouseDown="Window_MouseDown_ProfileInput"
         Title="Add Profile" Height="150" Width="320">
     <Grid Margin="0,0,0,0">
         <local:ProfileInputUC x:Name="this_prof_input" Margin="10,10,10,50"></local:ProfileInputUC>

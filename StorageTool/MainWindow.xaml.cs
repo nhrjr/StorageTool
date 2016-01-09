@@ -313,6 +313,13 @@ namespace StorageTool
             }
             return false;
         }
+
+        private void Window_MouseDown_Main(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left)
+                this.DragMove();
+        }
+
     }
 
 }
