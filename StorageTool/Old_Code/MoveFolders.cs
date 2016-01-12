@@ -17,7 +17,7 @@ namespace StorageTool
         private object pauseLock = new object();
         private bool paused = false;
         private bool moveQueueIsWorking = false;
-        private SpecialQueue<QueueItem> MoveQueue;
+        private SpecialQueue<Assignment> MoveQueue;
         private Log log;
         private MovePane moveStack;
         private IProgress<State> state;
@@ -27,7 +27,7 @@ namespace StorageTool
             log = logvalue;
             moveStack = stack;
             state = msg;
-            MoveQueue = new SpecialQueue<QueueItem>();
+            MoveQueue = new SpecialQueue<Assignment>();
         }
 
         public void Cancel()
@@ -68,17 +68,17 @@ namespace StorageTool
             switch (mode)
             {
                 case TaskMode.STORE:
-                MoveQueue.Enqueue(new QueueItem(mode,prof));
+                MoveQueue.Enqueue(new Assignment(mode,prof));
                 dir = prof.GameFolder;
                 break;
  
                 case TaskMode.RESTORE:
-                MoveQueue.Enqueue(new QueueItem(mode, prof));
+                MoveQueue.Enqueue(new Assignment(mode, prof));
                 dir = prof.StorageFolder;
                 break;
 
                 case TaskMode.RELINK:
-                MoveQueue.Enqueue(new QueueItem(mode, prof));
+                MoveQueue.Enqueue(new Assignment(mode, prof));
                 dir = prof.StorageFolder;
                 break;
             }
@@ -170,7 +170,7 @@ namespace StorageTool
             
         }
 
-        private void LinkStorageToGames(QueueItem prof, IProgress<string> currentFile)
+        private void LinkStorageToGames(Assignment prof, IProgress<string> currentFile)
         {
             try {
                 string sourceDir = prof.Source.FullName;
@@ -186,7 +186,7 @@ namespace StorageTool
             }
         }
 
-        private void MoveGamesToStorage(QueueItem prof, IProgress<string> currentFile, IProgress<long> sizeFromHell)
+        private void MoveGamesToStorage(Assignment prof, IProgress<string> currentFile, IProgress<long> sizeFromHell)
         {
             string sourceDir = prof.Source.FullName;
             string targetDir = prof.Target.FullName + @"\" + prof.Source.Name;
@@ -209,7 +209,7 @@ namespace StorageTool
             }
 
         }
-        private void MoveStorageToGames(QueueItem prof, IProgress<string> currentFile, IProgress<long> sizeFromHell)
+        private void MoveStorageToGames(Assignment prof, IProgress<string> currentFile, IProgress<long> sizeFromHell)
         {
             string sourceDir = prof.Source.FullName;
             string targetDir = prof.Target.FullName + @"\" + prof.Source.Name;
@@ -267,7 +267,7 @@ namespace StorageTool
             }
         }
 
-        private void CopyFolders(QueueItem item, IProgress<string> currentFile, IProgress<long> sizeFromHell)
+        private void CopyFolders(Assignment item, IProgress<string> currentFile, IProgress<long> sizeFromHell)
         {           
             string targetDir = item.Target.FullName + @"\" + item.Source.Name;
             Directory.CreateDirectory(targetDir);

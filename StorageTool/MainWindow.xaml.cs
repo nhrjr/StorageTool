@@ -46,99 +46,30 @@ namespace StorageTool
         public MovePane MoveStack { get; set; } = new MovePane();
         public ProfileCollection Profiles { get; set; }
         //public ProfileInput ProfileInput{ get; set; } = new ProfileInput();
+
+
+        public MainWindowViewModel mainWindowViewModel;
         
 
         public MainWindow()
         {
             InitializeComponent();
             Closing += OnClosing;
-            var state = new Progress<State>(fu =>
-            {
-                if (fu == State.STARTED_QUEUE) { isMovingFolders = true; }
-                if (fu == State.FINISHED_QUEUE) { isMovingFolders = false; FolderPane.RefreshFolders(); }
-                if (fu == State.FINISHED_ITEM) { FolderPane.WorkedFolders.RemoveAt(0); }
-            });
+            mainWindowViewModel = new MainWindowViewModel(new Profile("TestFolders", @"C:\FolderGames", @"C:\FolderStorage"));
 
-            MoveFolders = new MoveFolders(Messages, MoveStack, state);
+            //var state = new Progress<State>(fu =>
+            //{
+            //    if (fu == State.STARTED_QUEUE) { isMovingFolders = true; }
+            //    if (fu == State.FINISHED_QUEUE) { isMovingFolders = false; FolderPane.RefreshFolders(); }
+            //    if (fu == State.FINISHED_ITEM) { FolderPane.WorkedFolders.RemoveAt(0); }
+            //});
 
-            Profiles = new ProfileCollection(Properties.Settings.Default.Config.Profiles);         
-            FolderPane = new FolderPane(Profiles);
-            this.DataContext = this; 
-        }
+            //MoveFolders = new MoveFolders(Messages, MoveStack, state);
 
-        private void profileBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (Profiles.ActiveProfileIndex >= 0 && Profiles.ActiveProfileIndex <= Profiles.Count)
-                FolderPane.SetActiveProfile(Profiles[Profiles.ActiveProfileIndex]);
-            else
-                FolderPane.SetActiveProfile(null);
-        }
-
-        private void removeProfile_Click(object sender, RoutedEventArgs e)
-        {
-            string name = Profiles[Profiles.ActiveProfileIndex].ProfileName;
-            string message = "Are you sure you want to delete \"" + name + "\" profile?";
-            MessageBoxButton btnMessageBox = MessageBoxButton.YesNo;
-            MessageBoxResult rsltMessageBox = MessageBox.Show(message, "Delete Profile", btnMessageBox);
-            switch (rsltMessageBox)
-            {
-                case MessageBoxResult.Yes :
-                    Profiles.RemoveProfile();
-                    FolderPane.RemoveActiveProfile();
-                    profileBox.SelectedItem = null;
-                    break;
-            }
-            Properties.Settings.Default.Config.Profiles = Profiles.GetProfileBase();
-        }
-
-
-        private void moveToRight_Click(object sender, RoutedEventArgs e)
-        {
-            Button b = sender as Button;
-            FolderPane.SelectedFolderLeft = b.CommandParameter as FolderInfo;
-            if (FolderPane.SelectedFolderLeft != null)
-            {
-                Messages.LogMessage = "Moving " + FolderPane.SelectedFolderLeft.DirInfo.Name + " to Storage.";
-                FolderInfo tmp1 = FolderPane.SelectedFolderLeft;
-                DirectoryInfo tmp2 = Profiles[Profiles.ActiveProfileIndex].StorageFolder;
-                this.MoveFolders.addToMoveQueue(TaskMode.STORE, new Profile(tmp1.DirInfo, tmp2));
-                FolderPane.SelectedFolderLeft = null;
-                FolderPane.WorkedFolders.Add(tmp1);
-                FolderPane.ActivePane.FoldersLeft.Remove(tmp1);
-            }
-
-        }
-
-        private void moveToLeft_Click(object sender, RoutedEventArgs e)
-        {
-            Button b = sender as Button;
-            FolderPane.SelectedFolderRight = b.CommandParameter as FolderInfo;
-            if (FolderPane.SelectedFolderRight != null)
-            {
-                Messages.LogMessage = "Moving " + FolderPane.SelectedFolderRight.DirInfo.Name + " to Game folder.";
-                DirectoryInfo tmp1 = Profiles[Profiles.ActiveProfileIndex].GameFolder;
-                FolderInfo tmp2 = FolderPane.SelectedFolderRight;
-                this.MoveFolders.addToMoveQueue(TaskMode.RESTORE, new Profile(tmp1, tmp2.DirInfo));
-                FolderPane.SelectedFolderRight = null;
-                FolderPane.WorkedFolders.Add(tmp2);
-                FolderPane.ActivePane.FoldersRight.Remove(tmp2);
-            }
-        }
-
-        private void relinkButton_Click(object sender, RoutedEventArgs e)
-        {
-            Button b = sender as Button;
-            FolderPane.SelectedFolderReLink = b.CommandParameter as FolderInfo;
-            if (FolderPane.SelectedFolderReLink != null)
-            {
-                Messages.LogMessage = "Linking " + FolderPane.SelectedFolderReLink.DirInfo.Name + " to Game folder.";
-                DirectoryInfo tmp1 = Profiles[Profiles.ActiveProfileIndex].GameFolder;
-                FolderInfo tmp2 = FolderPane.SelectedFolderReLink;
-                this.MoveFolders.addToMoveQueue(TaskMode.RELINK, new Profile(tmp1, tmp2.DirInfo));
-                FolderPane.SelectedFolderReLink = null;
-                FolderPane.WorkedFolders.Add(tmp2);
-                FolderPane.ActivePane.FoldersUnlinked.Remove(tmp2);
-            }
+            //Profiles = new ProfileCollection(Properties.Settings.Default.Config.Profiles);         
+            //Profiles = new ProfileCollection();
+            //FolderPane = new FolderPane(Profiles);
+            this.DataContext = mainWindowViewModel; 
         }
 
         private void sortLocations_Click(object sender, RoutedEventArgs e)
@@ -165,101 +96,178 @@ namespace StorageTool
             }
         }
 
-        private void Desc_GameFolder_Click(object sender, RoutedEventArgs e)
-        {
-            if (FolderPane.ActivePane.Profile != null)
-                Process.Start(FolderPane.ActivePane.Profile.GameFolder.FullName);
-        }
+        //private void profileBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        //{
+        //    if (Profiles.ActiveProfileIndex >= 0 && Profiles.ActiveProfileIndex <= Profiles.Count)
+        //        FolderPane.SetActiveProfile(Profiles[Profiles.ActiveProfileIndex]);
+        //    else
+        //        FolderPane.SetActiveProfile(null);
+        //}
 
-        private void Desc_StorageFolder_Click(object sender, RoutedEventArgs e)
-        {
-            if (FolderPane.ActivePane.Profile != null)
-                Process.Start(FolderPane.ActivePane.Profile.StorageFolder.FullName);
-        }
+        //private void removeProfile_Click(object sender, RoutedEventArgs e)
+        //{
+        //    string name = Profiles[Profiles.ActiveProfileIndex].ProfileName;
+        //    string message = "Are you sure you want to delete \"" + name + "\" profile?";
+        //    MessageBoxButton btnMessageBox = MessageBoxButton.YesNo;
+        //    MessageBoxResult rsltMessageBox = MessageBox.Show(message, "Delete Profile", btnMessageBox);
+        //    switch (rsltMessageBox)
+        //    {
+        //        case MessageBoxResult.Yes :
+        //            Profiles.RemoveProfile();
+        //            FolderPane.RemoveActiveProfile();
+        //            profileBox.SelectedItem = null;
+        //            break;
+        //    }
+        //    Properties.Settings.Default.Config.Profiles = Profiles.GetProfileBase();
+        //}
 
-        private void pauseQueue_Click(object sender, RoutedEventArgs e)
-        {
-            Button b = sender as Button;
-            if(b.Content.ToString() == "Pause")
-            {
-                b.Content = "Unpause";
-                b.Background = Brushes.Red;
-                MoveFolders.Pause();
-            }
-            else
-            {
-                b.Content = "Pause";
-                //TODO set to a default value, instead if lightGray which ignores the windows theme or stuff
-                b.Background = Brushes.LightGray;
-                MoveFolders.Resume();
-            }
-        }
 
-        private void refresh_Click(object sender, RoutedEventArgs e)
-        {
-            if (isNotRefreshing)
-            {
-                isNotRefreshing = false;
-                foreach (FolderStash s in FolderPane.Stash)
-                {
-                    foreach (FolderInfo l in s.FoldersLeft) l.DirSize = 0;
-                    foreach (FolderInfo l in s.FoldersRight) l.DirSize = 0;
-                    foreach (FolderInfo l in s.FoldersUnlinked) l.DirSize = 0;
-                    s.RefreshSizes();
-                }
-                isNotRefreshing = true;
-            }
-        }
+        //private void moveToRight_Click(object sender, RoutedEventArgs e)
+        //{
+        //    Button b = sender as Button;
+        //    FolderPane.SelectedFolderLeft = b.CommandParameter as FolderViewModel;
+        //    if (FolderPane.SelectedFolderLeft != null)
+        //    {
+        //        Messages.LogMessage = "Moving " + FolderPane.SelectedFolderLeft.DirInfo.Name + " to Storage.";
+        //        FolderViewModel tmp1 = FolderPane.SelectedFolderLeft;
+        //        DirectoryInfo tmp2 = Profiles[Profiles.ActiveProfileIndex].StorageFolder;
+        //        this.MoveFolders.addToMoveQueue(TaskMode.STORE, new Profile(tmp1.DirInfo, tmp2));
+        //        FolderPane.SelectedFolderLeft = null;
+        //        FolderPane.WorkedFolders.Add(tmp1);
+        //        FolderPane.ActivePane.FoldersLeft.Remove(tmp1);
+        //    }
 
-        private void deleteHistory_Click(object sender, RoutedEventArgs e)
-        {
-            int numberofdeletes = MoveStack.Index - 1;
-            while(numberofdeletes >= 0)
-            {
-                MoveStack.RemoveAt(0);
-                MoveStack.Index--;
-                numberofdeletes--;
-            }
-        }
+        //}
 
-        private void cancelAll_Click(object sender, RoutedEventArgs e)
-        {
-            MoveFolders.Pause();
-            int index = MoveStack.Count - 1;
-            int wIndex = FolderPane.WorkedFolders.Count - 1;
-            while(index != MoveStack.Index)
-            {
-                var m = MoveStack[index];
-                if(m.NotDone == Visibility.Visible)
-                {
-                    MoveFolders.removeFromMoveQueue(m.FullName);
-                    MoveStack.RemoveAt(index);
-                    FolderPane.WorkedFolders.RemoveAt(wIndex);
-                    index--;
-                    wIndex--;          
-                }
-            }
-            MoveFolders.Resume();
-            FolderPane.RefreshFolders();
-        }
+        //private void moveToLeft_Click(object sender, RoutedEventArgs e)
+        //{
+        //    Button b = sender as Button;
+        //    FolderPane.SelectedFolderRight = b.CommandParameter as FolderViewModel;
+        //    if (FolderPane.SelectedFolderRight != null)
+        //    {
+        //        Messages.LogMessage = "Moving " + FolderPane.SelectedFolderRight.DirInfo.Name + " to Game folder.";
+        //        DirectoryInfo tmp1 = Profiles[Profiles.ActiveProfileIndex].GameFolder;
+        //        FolderViewModel tmp2 = FolderPane.SelectedFolderRight;
+        //        this.MoveFolders.addToMoveQueue(TaskMode.RESTORE, new Profile(tmp1, tmp2.DirInfo));
+        //        FolderPane.SelectedFolderRight = null;
+        //        FolderPane.WorkedFolders.Add(tmp2);
+        //        FolderPane.ActivePane.FoldersRight.Remove(tmp2);
+        //    }
+        //}
 
-        private void cancelItem_Click(object sender, RoutedEventArgs e)
-        {
-            Button b = sender as Button;
-            MoveItem toCancel = b.CommandParameter as MoveItem;
-            MoveFolders.Pause();
-            MoveFolders.removeFromMoveQueue(toCancel.FullName);
-            MoveStack.Remove(toCancel);
-            for(int i = 0; i < FolderPane.WorkedFolders.Count; i++)
-            {
-                if(FolderPane.WorkedFolders[i].DirInfo.FullName == toCancel.FullName)
-                {
-                    FolderPane.WorkedFolders.RemoveAt(i);
-                }
-            }            
-            MoveFolders.Resume();
-            FolderPane.RefreshFolders();
-        }
+        //private void relinkButton_Click(object sender, RoutedEventArgs e)
+        //{
+        //    Button b = sender as Button;
+        //    FolderPane.SelectedFolderReLink = b.CommandParameter as FolderViewModel;
+        //    if (FolderPane.SelectedFolderReLink != null)
+        //    {
+        //        Messages.LogMessage = "Linking " + FolderPane.SelectedFolderReLink.DirInfo.Name + " to Game folder.";
+        //        DirectoryInfo tmp1 = Profiles[Profiles.ActiveProfileIndex].GameFolder;
+        //        FolderViewModel tmp2 = FolderPane.SelectedFolderReLink;
+        //        this.MoveFolders.addToMoveQueue(TaskMode.RELINK, new Profile(tmp1, tmp2.DirInfo));
+        //        FolderPane.SelectedFolderReLink = null;
+        //        FolderPane.WorkedFolders.Add(tmp2);
+        //        FolderPane.ActivePane.FoldersUnlinked.Remove(tmp2);
+        //    }
+        //}
+
+
+
+        //private void Desc_GameFolder_Click(object sender, RoutedEventArgs e)
+        //{
+        //    if (FolderPane.ActivePane.Profile != null)
+        //        Process.Start(FolderPane.ActivePane.Profile.GameFolder.FullName);
+        //}
+
+        //private void Desc_StorageFolder_Click(object sender, RoutedEventArgs e)
+        //{
+        //    if (FolderPane.ActivePane.Profile != null)
+        //        Process.Start(FolderPane.ActivePane.Profile.StorageFolder.FullName);
+        //}
+
+        //private void pauseQueue_Click(object sender, RoutedEventArgs e)
+        //{
+        //    Button b = sender as Button;
+        //    if(b.Content.ToString() == "Pause")
+        //    {
+        //        b.Content = "Unpause";
+        //        b.Background = Brushes.Red;
+        //        MoveFolders.Pause();
+        //    }
+        //    else
+        //    {
+        //        b.Content = "Pause";
+        //        //TODO set to a default value, instead if lightGray which ignores the windows theme or stuff
+        //        b.Background = Brushes.LightGray;
+        //        MoveFolders.Resume();
+        //    }
+        //}
+
+        //private void refresh_Click(object sender, RoutedEventArgs e)
+        //{
+        //    if (isNotRefreshing)
+        //    {
+        //        isNotRefreshing = false;
+        //        foreach (FolderStash s in FolderPane.Stash)
+        //        {
+        //            foreach (FolderViewModel l in s.FoldersLeft) l.DirSize = 0;
+        //            foreach (FolderViewModel l in s.FoldersRight) l.DirSize = 0;
+        //            foreach (FolderViewModel l in s.FoldersUnlinked) l.DirSize = 0;
+        //            s.RefreshSizes();
+        //        }
+        //        isNotRefreshing = true;
+        //    }
+        //}
+
+        //private void deleteHistory_Click(object sender, RoutedEventArgs e)
+        //{
+        //    int numberofdeletes = MoveStack.Index - 1;
+        //    while(numberofdeletes >= 0)
+        //    {
+        //        MoveStack.RemoveAt(0);
+        //        MoveStack.Index--;
+        //        numberofdeletes--;
+        //    }
+        //}
+
+        //private void cancelAll_Click(object sender, RoutedEventArgs e)
+        //{
+        //    MoveFolders.Pause();
+        //    int index = MoveStack.Count - 1;
+        //    int wIndex = FolderPane.WorkedFolders.Count - 1;
+        //    while(index != MoveStack.Index)
+        //    {
+        //        var m = MoveStack[index];
+        //        if(m.NotDone == Visibility.Visible)
+        //        {
+        //            MoveFolders.removeFromMoveQueue(m.FullName);
+        //            MoveStack.RemoveAt(index);
+        //            FolderPane.WorkedFolders.RemoveAt(wIndex);
+        //            index--;
+        //            wIndex--;          
+        //        }
+        //    }
+        //    MoveFolders.Resume();
+        //    FolderPane.RefreshFolders();
+        //}
+
+        //private void cancelItem_Click(object sender, RoutedEventArgs e)
+        //{
+        //    Button b = sender as Button;
+        //    MoveItem toCancel = b.CommandParameter as MoveItem;
+        //    MoveFolders.Pause();
+        //    MoveFolders.removeFromMoveQueue(toCancel.FullName);
+        //    MoveStack.Remove(toCancel);
+        //    for(int i = 0; i < FolderPane.WorkedFolders.Count; i++)
+        //    {
+        //        if(FolderPane.WorkedFolders[i].DirInfo.FullName == toCancel.FullName)
+        //        {
+        //            FolderPane.WorkedFolders.RemoveAt(i);
+        //        }
+        //    }            
+        //    MoveFolders.Resume();
+        //    FolderPane.RefreshFolders();
+        //}
 
         private void OnClosing(object sender, CancelEventArgs cancelEventArgs)
         {
@@ -284,9 +292,8 @@ namespace StorageTool
                 w.TestForValidProfileEvent += new TestForValidProfileEventHandler(testValidInput);
                 w.Closing += W_Closing;
 
-                w.Show();
-            }
-            
+                w.ShowDialog();                
+            }            
         }
 
         private void W_Closing(object sender, CancelEventArgs e)

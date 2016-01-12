@@ -14,13 +14,13 @@ namespace StorageTool.FolderView
     public class FolderStash : INotifyPropertyChanged
     {
         public Profile Profile { get; set; } = new Profile();
-        private ObservableCollection<FolderInfo> foldersLeft = new ObservableCollection<FolderInfo>();
-        private ObservableCollection<FolderInfo> foldersRight = new ObservableCollection<FolderInfo>();
-        private ObservableCollection<FolderInfo> foldersUnlinked = new ObservableCollection<FolderInfo>();
+        private ObservableCollection<FolderViewModel> foldersLeft = new ObservableCollection<FolderViewModel>();
+        private ObservableCollection<FolderViewModel> foldersRight = new ObservableCollection<FolderViewModel>();
+        private ObservableCollection<FolderViewModel> foldersUnlinked = new ObservableCollection<FolderViewModel>();
         private ObservableCollection<string> duplicateFolders = new ObservableCollection<string>();
 
         #region Constructor/Destructor
-        public FolderStash(Profile prof, ObservableCollection<FolderInfo> fLeft, ObservableCollection<FolderInfo> fRight, ObservableCollection<FolderInfo> fUnlinked)
+        public FolderStash(Profile prof, ObservableCollection<FolderViewModel> fLeft, ObservableCollection<FolderViewModel> fRight, ObservableCollection<FolderViewModel> fUnlinked)
         {
             Profile = prof;
             FoldersLeft = fLeft;
@@ -42,15 +42,15 @@ namespace StorageTool.FolderView
         // replace with event/command
         public async void RefreshSizes()
         {
-            foreach (FolderInfo dir in foldersLeft)
+            foreach (FolderViewModel dir in foldersLeft)
             {
                 if (dir.DirSize == 0) await Task.Factory.StartNew(() => DirectorySize.DirSizeAsync(dir.DirInfo).ContinueWith(task => dir.DirSize = task.Result).ConfigureAwait(false));
             }
-            foreach (FolderInfo dir in foldersRight)
+            foreach (FolderViewModel dir in foldersRight)
             {
                 if (dir.DirSize == 0) await Task.Factory.StartNew(() => DirectorySize.DirSizeAsync(dir.DirInfo).ContinueWith(task => dir.DirSize = task.Result).ConfigureAwait(false));
             }
-            foreach (FolderInfo dir in foldersUnlinked)
+            foreach (FolderViewModel dir in foldersUnlinked)
             {
                 if (dir.DirSize == 0) await Task.Factory.StartNew(() => DirectorySize.DirSizeAsync(dir.DirInfo).ContinueWith(task => dir.DirSize = task.Result).ConfigureAwait(false));
             }
@@ -69,7 +69,7 @@ namespace StorageTool.FolderView
             }
         }
 
-        public ObservableCollection<FolderInfo> FoldersLeft
+        public ObservableCollection<FolderViewModel> FoldersLeft
         {
             get { return this.foldersLeft; }
             set
@@ -78,7 +78,7 @@ namespace StorageTool.FolderView
                 this.OnPropertyChanged("FoldersLeft");
             }
         }
-        public ObservableCollection<FolderInfo> FoldersRight
+        public ObservableCollection<FolderViewModel> FoldersRight
         {
             get { return this.foldersRight; }
             set
@@ -87,7 +87,7 @@ namespace StorageTool.FolderView
                 this.OnPropertyChanged("FoldersRight");
             }
         }
-        public ObservableCollection<FolderInfo> FoldersUnlinked
+        public ObservableCollection<FolderViewModel> FoldersUnlinked
         {
             get { return this.foldersUnlinked; }
             set

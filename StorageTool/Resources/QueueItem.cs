@@ -57,25 +57,27 @@ public class SpecialQueue<T>
     public int Count { get { return list.Count; } }
 }
 
-public class QueueItem
-{
-    public DirectoryInfo Source { get; set; }
-    public DirectoryInfo Target { get; set; }
-    public TaskMode Mode { get; set; }
-    public QueueItem(TaskMode m, Profile prof)
+    public class Assignment
     {
-        Mode = m;
-        if (m == TaskMode.STORE)
+        public DirectoryInfo Source { get; set; }
+        public DirectoryInfo Target { get; set; }
+        public TaskMode Mode { get; set; }
+        public Assignment() { }
+        public Assignment(TaskMode m, Profile prof)
         {
-            Source = prof.GameFolder;
-            Target = prof.StorageFolder;
-        }
-        if (m == TaskMode.RESTORE || m == TaskMode.RELINK)
-        {
-            Source = prof.StorageFolder;
-            Target = prof.GameFolder;
-        }
+            Mode = m;
+            if (m == TaskMode.STORE)
+            {
+                Source = prof.GameFolder;
+                Target = prof.StorageFolder;
+            }
+            if (m == TaskMode.RESTORE || m == TaskMode.RELINK)
+            {
+                Source = prof.StorageFolder;
+                Target = prof.GameFolder;
+            }
 
+        }
     }
-}
+
 }

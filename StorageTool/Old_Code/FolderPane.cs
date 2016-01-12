@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace StorageTool
 {
-    public delegate void NotifyFileSystemChangesEventHandler();
+    
 
     public delegate void NotifyRefreshSizeEventHandler();
 
@@ -26,11 +26,11 @@ namespace StorageTool
 
         private FolderStash activePane;
 
-        private ObservableCollection<FolderInfo> workedFolders = new ObservableCollection<FolderInfo>();
+        private ObservableCollection<FolderViewModel> workedFolders = new ObservableCollection<FolderViewModel>();
 
-        private FolderInfo selectedFolderLeft = null;
-        private FolderInfo selectedFolderRight = null;
-        private FolderInfo selectedFolderReLink = null;
+        private FolderViewModel selectedFolderLeft = null;
+        private FolderViewModel selectedFolderRight = null;
+        private FolderViewModel selectedFolderReLink = null;
 
         private string locationLeftFullName = null;
         private string locationRightFullName = null;
@@ -116,7 +116,7 @@ namespace StorageTool
                         if (!pane.FoldersLeft.Any(f => f.DirInfo.FullName == g))
                         {
                             DirectoryInfo tmp = new DirectoryInfo(g);
-                            if (!WorkedFolders.Any(h => h.DirInfo.Name == tmp.Name)) pane.FoldersLeft.Add(new FolderInfo(tmp));
+                            if (!WorkedFolders.Any(h => h.DirInfo.Name == tmp.Name)) pane.FoldersLeft.Add(new FolderViewModel(tmp));
                         }
 
                     }
@@ -125,7 +125,7 @@ namespace StorageTool
                         if (!pane.FoldersRight.Any(f => f.DirInfo.FullName == g))
                         {
                             DirectoryInfo tmp = new DirectoryInfo(g);
-                            if (!WorkedFolders.Any(h => h.DirInfo.Name == tmp.Name)) pane.FoldersRight.Add(new FolderInfo(tmp));
+                            if (!WorkedFolders.Any(h => h.DirInfo.Name == tmp.Name)) pane.FoldersRight.Add(new FolderViewModel(tmp));
                         }
                     }
                     foreach (string g in analyzeFolders.UnlinkedFolders)
@@ -133,13 +133,15 @@ namespace StorageTool
                         if (!pane.FoldersUnlinked.Any(f => f.DirInfo.FullName == g))
                         {
                             DirectoryInfo tmp = new DirectoryInfo(g);
-                            if (!WorkedFolders.Any(h => h.DirInfo.Name == tmp.Name)) pane.FoldersUnlinked.Add(new FolderInfo(tmp));
+                            if (!WorkedFolders.Any(h => h.DirInfo.Name == tmp.Name)) pane.FoldersUnlinked.Add(new FolderViewModel(tmp));
                         }
                     }
 
-                    foreach (FolderInfo g in pane.FoldersLeft.Reverse()) if (!analyzeFolders.StorableFolders.Any(f => f == g.DirInfo.FullName)) pane.FoldersLeft.Remove(g);
-                    foreach (FolderInfo g in pane.FoldersRight.Reverse()) if (!analyzeFolders.LinkedFolders.Any(f => f == g.DirInfo.FullName)) pane.FoldersRight.Remove(g);
-                    foreach (FolderInfo g in pane.FoldersUnlinked.Reverse()) if (!analyzeFolders.UnlinkedFolders.Any(f => f == g.DirInfo.FullName)) pane.FoldersUnlinked.Remove(g);
+                    foreach (FolderViewModel g in pane.FoldersLeft.Reverse()) if (!analyzeFolders.StorableFolders.Any(f => f == g.DirInfo.FullName)) pane.FoldersLeft.Remove(g);
+                    foreach (FolderViewModel g in pane.FoldersRight.Reverse()) if (!analyzeFolders.LinkedFolders.Any(f => f == g.DirInfo.FullName)) pane.FoldersRight.Remove(g);
+                    foreach (FolderViewModel g in pane.FoldersUnlinked.Reverse()) if (!analyzeFolders.UnlinkedFolders.Any(f => f == g.DirInfo.FullName)) pane.FoldersUnlinked.Remove(g);
+
+
                     }
                 if (ActivePane != null)
                 {
@@ -199,7 +201,7 @@ namespace StorageTool
             }
         }
 
-        public FolderInfo SelectedFolderLeft
+        public FolderViewModel SelectedFolderLeft
         {
             get { return this.selectedFolderLeft; }
             set
@@ -209,7 +211,7 @@ namespace StorageTool
             }
         }
 
-        public FolderInfo SelectedFolderRight
+        public FolderViewModel SelectedFolderRight
         {
             get { return this.selectedFolderRight; }
             set
@@ -219,7 +221,7 @@ namespace StorageTool
             }
         }
 
-        public FolderInfo SelectedFolderReLink
+        public FolderViewModel SelectedFolderReLink
         {
             get { return this.selectedFolderReLink; }
             set
@@ -268,7 +270,7 @@ namespace StorageTool
             }
         }
 
-        public ObservableCollection<FolderInfo> WorkedFolders
+        public ObservableCollection<FolderViewModel> WorkedFolders
         {
             get { return this.workedFolders; }
             set
