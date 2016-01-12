@@ -1,4 +1,8 @@
 # StorageTool
+
+Get the release files here: 
+https://github.com/nhrjr/StorageTool/releases (64-bit version only)
+
 This is a tool to store generic folders in different folders by creating ntfs junctions at the original location and moving the specified folder to the new location.
 You can define multiple profiles for different location-pairs you want to use.
 Very handy to stash your Steamgames on a different harddrive. ;) (Or Origin/GoG/Generic)
