@@ -22,12 +22,16 @@
         </Grid.RowDefinitions>
 
         <!--PROFILE SELECTOR-->
-        <!--<ComboBox x:Name="profileBox" ItemsSource="{Binding Profiles}" DisplayMemberPath="ProfileName" SelectionChanged="profileBox_SelectionChanged" SelectedIndex="{Binding Profiles.ActiveProfileIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="227" Height="22"/>-->
-        <!--<Button x:Name="removeProfile"  Content="Remove selected profile" HorizontalAlignment="Left" Margin="242,10,0,0" VerticalAlignment="Top" Width="137" Height="22"/>-->
-        <!--<TextBlock x:Name="gameFolderName" Padding="5,1,1,0" Margin="115,37,0,0" TextWrapping="Wrap" Text="{Binding FolderPane.LocationLeftFullName}" VerticalAlignment="Top" Height="20" HorizontalAlignment="Left" Width="213"/>-->
-        <!--<TextBlock x:Name="storageFolderName" Padding="5,1,1,0" Margin="115,62,0,0" TextWrapping="Wrap" Text="{Binding FolderPane.LocationRightFullName}" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Width="213"/>-->
-        <!--<Button x:Name="Desc_GameFolder" HorizontalAlignment="Left" Margin="10,37,0,0" Content="Source Folder:" Width="100" Height="20" VerticalAlignment="Top"/>-->
-        <!--<Button x:Name="Desc_StorageFolder" HorizontalAlignment="Left" Margin="10,62,0,0" Content="Storage Folder:" Width="100" Height="20" VerticalAlignment="Top"/>-->
+        <ComboBox x:Name="profileBox" ItemsSource="{Binding ProfileViewModel.Profiles}" SelectedItem="{Binding ProfileViewModel.ActiveProfile}" DisplayMemberPath="ProfileName" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="227" Height="22"/>
+        <Button x:Name="removeProfile"  Content="Remove selected profile" HorizontalAlignment="Left" Margin="242,10,0,0" VerticalAlignment="Top" Width="137" Height="22"/>
+        <Button x:Name="openProfileInputDialogue" Content="Add new profile" HorizontalAlignment="Left" Margin="384,10,0,0" VerticalAlignment="Top" Width="135" Height="22"/>
+
+        <Button x:Name="Desc_StorageFolder" Command="{Binding OpenExplorerCommand}" CommandParameter="{Binding ProfileViewModel.ActiveProfile.StorageFolder.FullName}" HorizontalAlignment="Left" Padding="5,1,1,0" Margin="323,64,0,0" Content="Open" Width="46" Height="20" VerticalAlignment="Top"/>
+        <Button x:Name="Desc_GameFolder" Command="{Binding OpenExplorerCommand}" CommandParameter="{Binding ProfileViewModel.ActiveProfile.GameFolder.FullName}" HorizontalAlignment="Left" Padding="5,1,1,0" Content="Open" Width="46" Height="20" VerticalAlignment="Top" Margin="323,39,0,0"/>
+        <TextBox x:Name="gameFolderName" Padding="5,1,1,0" TextWrapping="Wrap" Text="{Binding ProfileViewModel.ActiveProfile.GameFolder.FullName, Mode=OneWay}" IsReadOnly="True" VerticalAlignment="Top" Height="20" HorizontalAlignment="Left" Width="213" Margin="105,39,0,0"/>
+        <TextBox x:Name="storageFolderName" Padding="5,1,1,0" TextWrapping="Wrap" Text="{Binding ProfileViewModel.ActiveProfile.StorageFolder.FullName, Mode=OneWay}" IsReadOnly="True" VerticalAlignment="Top" Height="20" HorizontalAlignment="Left" Width="213" Margin="105,64,0,0"/>
+        <TextBlock x:Name="label_SourceFolder" HorizontalAlignment="Left" Padding="5,1,1,0" Height="20" Margin="10,39,0,0" TextWrapping="Wrap" Text="Source Folder:" VerticalAlignment="Top" Width="90"/>
+        <TextBlock x:Name="label_StorageFolder" HorizontalAlignment="Left" Padding="5,1,1,0" Margin="10,64,0,0" TextWrapping="Wrap" Text="Storage Folder:" VerticalAlignment="Top" Height="20" Width="90"/>
 
         <!--PROFILE INPUT-->
         <!--<Button x:Name="addProfile" Click="addProfile_Click" Content="Add profile" Margin="0,62,77,0" VerticalAlignment="Top" RenderTransformOrigin="1.311,0.826" Height="20" HorizontalAlignment="Right" Width="84"/>
@@ -40,7 +44,7 @@
         <!--FOLDERPANE-->
         <TabControl x:Name="tabControl" Margin="10" Grid.Row="1">
             <TabItem Header="Source">
-                <ListView x:Name="listView" ItemsSource="{Binding Source.Folders}" ButtonBase.Click="sortLocations_Click" Margin="0,0,-0,-0">
+                <ListView x:Name="listView" ItemsSource="{Binding ActiveDisplayViewModel.Source.Folders}" ButtonBase.Click="sortLocations_Click" Margin="0,0,-0,-0">
                     <ListView.View>
                         <GridView>
                             <GridViewColumn Width="300" DisplayMemberBinding="{Binding DirInfo.Name}">
@@ -66,7 +70,7 @@
                 </ListView>
             </TabItem>
             <TabItem Header="Storage">
-                <ListView x:Name="dirListRight" ItemsSource="{Binding Stored.Folders}" GridViewColumnHeader.Click="sortLocations_Click" Margin="0,0,0,0" Grid.Column="1" Grid.Row="1">
+                <ListView x:Name="dirListRight" ItemsSource="{Binding ActiveDisplayViewModel.Stored.Folders}" GridViewColumnHeader.Click="sortLocations_Click" Margin="0,0,0,0" Grid.Column="1" Grid.Row="1">
                     <ListView.View>
                         <GridView>
                             <GridViewColumn  DisplayMemberBinding="{Binding DirInfo.Name}" Width="300">
@@ -95,8 +99,8 @@
                     </ListView.View>
                 </ListView>
             </TabItem>
-            <TabItem Header="Unlinked" Visibility="{Binding ShowUnlinkedFolders, Converter={StaticResource BoolToVis}}" >
-                <ListView x:Name="relinkList" ItemsSource="{Binding Unlinked.Folders}" GridViewColumnHeader.Click="sortLocations_Click" Grid.Column="1" Margin="0,0,0,0" Grid.Row="2">
+            <TabItem Header="Unlinked" Visibility="{Binding ActiveDisplayViewModel.ShowUnlinkedFolders, Converter={StaticResource BoolToVis}}" >
+                <ListView x:Name="relinkList" ItemsSource="{Binding ActiveDisplayViewModel.Unlinked.Folders}" GridViewColumnHeader.Click="sortLocations_Click" Grid.Column="1" Margin="0,0,0,0" Grid.Row="2">
                     <ListView.View>
                         <GridView>
                             <GridViewColumn  DisplayMemberBinding="{Binding DirInfo.Name}" Width="300">
@@ -125,8 +129,8 @@
                     </ListView.View>
                 </ListView>
             </TabItem>
-            <TabItem Header="Duplicate" Visibility="{Binding ShowDuplicateFolders, Converter={StaticResource BoolToVis}}">
-                <ListView x:Name="dupFolders" ItemsSource="{Binding DuplicateFolders}" Margin="0,0,0,0">
+            <TabItem Header="Duplicate" Visibility="{Binding ActiveDisplayViewModel.ShowDuplicateFolders, Converter={StaticResource BoolToVis}}">
+                <ListView x:Name="dupFolders" ItemsSource="{Binding ActiveDisplayViewModel.DuplicateFolders}" Margin="0,0,0,0">
                     <ListView.View>
                         <GridView>
                             <GridViewColumn  DisplayMemberBinding="{Binding}" Width="250">
@@ -144,9 +148,10 @@
         <!--<TextBlock x:Name="currentCopiedFile" Margin="10,20,263,0" Grid.Row="2" TextWrapping="Wrap" Text="{Binding Messages.CurrentFile}" VerticalAlignment="Top" Background="White" Height="20"/>-->
         <!--<Button x:Name="pauseQueue" Command="{Binding PauseAllCommand}" Content="Pause All" HorizontalAlignment="Right" Margin="0,20,93,0" Grid.Row="2" Width="75" Height="20" VerticalAlignment="Top"/>-->
         <!--<Button x:Name="cancelAll" Command="{Binding CancelAllCommand}" Content="Cancel All" Margin="0,20,13,0" Grid.Row="2" HorizontalAlignment="Right" Width="75" Height="20" VerticalAlignment="Top"/>-->
-        <Button x:Name="refresh" Content="Refresh" Command="{Binding RefreshCommand}" Margin="0,0,13,0" Grid.Row="1" VerticalAlignment="Top" Height="20" HorizontalAlignment="Right" Width="60"/>
+        <Button x:Name="refresh" Content="Refresh" Command="{Binding ActiveDisplayViewModel.RefreshCommand}" Margin="0,0,13,0" Grid.Row="1" VerticalAlignment="Top" Height="20" HorizontalAlignment="Right" Width="60"/>
         <!--<Button x:Name="deleteHistory" Content="Clear History" Margin="0,20,173,0" Grid.Row="2" VerticalAlignment="Top" HorizontalAlignment="Right" Width="85" Height="20"/>-->
-        <ListView x:Name="Move_Queue" ItemsSource="{Binding Assigned.Folders}" Margin="10,45,10,10" Grid.Row="2">
+        
+        <ListView x:Name="Move_Queue" ItemsSource="{Binding Assigned}" Margin="10,45,10,10" Grid.Row="2">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment"
@@ -202,9 +207,9 @@
                                         <Style TargetType="ToggleButton">
                                             <Setter Property="Content" Value="Pause"/>
                                             <Style.Triggers>
-                                            <Trigger Property="IsChecked" Value="true">
-                                                <Setter Property="Content" Value="Resume"></Setter>                                                
-                                            </Trigger>
+                                                <Trigger Property="IsChecked" Value="true">
+                                                    <Setter Property="Content" Value="Resume"></Setter>
+                                                </Trigger>
                                             </Style.Triggers>
                                         </Style>
                                     </ToggleButton.Style>
@@ -222,7 +227,8 @@
                 </GridView>
             </ListView.View>
         </ListView>
-        <Button x:Name="openProfileInputDialogue" Click="openProfileInputDialogue_Click" Content="Add new profile" HorizontalAlignment="Left" Margin="384,10,0,0" VerticalAlignment="Top" Width="135" Height="22"/>
+
+
 
     </Grid>
 </Window>

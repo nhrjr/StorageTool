@@ -18,10 +18,6 @@ using System.Windows.Shapes;
 using Monitor.Core.Utilities;
 using System.Diagnostics;
 
-using StorageTool.FolderView;
-
-
-
 namespace StorageTool
 {
     public enum State { FINISHED_QUEUE, FINISHED_ITEM, STARTED_QUEUE };
@@ -32,19 +28,19 @@ namespace StorageTool
     
     public partial class MainWindow : Window
     {
-        private bool isNotRefreshing = true;
-        private bool isMovingFolders = false;
-        private bool isShowingProfileInput = false;
+        //private bool isNotRefreshing = true;
+        //private bool isMovingFolders = false;
+        //private bool isShowingProfileInput = false;
         //private Profile activeProfile = null;
-        private MoveFolders MoveFolders;
+        //private MoveFolders MoveFolders;
         private GridViewColumnHeader listViewSortCol = null;
         private SortAdorner listViewSortAdorner = null;        
 
 
-        public Log Messages { get; set; } = new Log();
-        public FolderPane FolderPane { get; set; }
-        public MovePane MoveStack { get; set; } = new MovePane();
-        public ProfileCollection Profiles { get; set; }
+        //public Log Messages { get; set; } = new Log();
+        //public FolderPane FolderPane { get; set; }
+        //public MovePane MoveStack { get; set; } = new MovePane();
+        //public ProfileViewModel Profiles { get; set; }
         //public ProfileInput ProfileInput{ get; set; } = new ProfileInput();
 
 
@@ -55,7 +51,8 @@ namespace StorageTool
         {
             InitializeComponent();
             Closing += OnClosing;
-            mainWindowViewModel = new MainWindowViewModel(new Profile("TestFolders", @"C:\FolderGames", @"C:\FolderStorage"));
+            mainWindowViewModel = new MainWindowViewModel();
+            
 
             //var state = new Progress<State>(fu =>
             //{
@@ -271,7 +268,7 @@ namespace StorageTool
 
         private void OnClosing(object sender, CancelEventArgs cancelEventArgs)
         {
-            if (isMovingFolders)
+            if (false)
             {
                 if (MessageBox.Show(this, "StorageTool is still copying,\n are you sure you wish to close?\n This will leave the current folders in a broken state.", "Close StorageTool", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
                 {
@@ -280,45 +277,45 @@ namespace StorageTool
             }            
         }
 
-        private void openProfileInputDialogue_Click(object sender, RoutedEventArgs e)
-        {
-            if (!isShowingProfileInput)
-            {
-                isShowingProfileInput = true;
-                var w = new ProfileInputWindow();
-                w.Left = this.Left + this.Width;
-                w.Top = this.Top + 10;
+        //private void openProfileInputDialogue_Click(object sender, RoutedEventArgs e)
+        //{
+        //    if (!isShowingProfileInput)
+        //    {
+        //        isShowingProfileInput = true;
+        //        var w = new ProfileInputWindow();
+        //        w.Left = this.Left + this.Width;
+        //        w.Top = this.Top + 10;
 
-                w.TestForValidProfileEvent += new TestForValidProfileEventHandler(testValidInput);
-                w.Closing += W_Closing;
+        //        w.TestForValidProfileEvent += new TestForValidProfileEventHandler(testValidInput);
+        //        w.Closing += W_Closing;
 
-                w.ShowDialog();                
-            }            
-        }
+        //        w.ShowDialog();                
+        //    }            
+        //}
 
-        private void W_Closing(object sender, CancelEventArgs e)
-        {
-            isShowingProfileInput = false;
-        }
+        //private void W_Closing(object sender, CancelEventArgs e)
+        //{
+        //    isShowingProfileInput = false;
+        //}
 
-        private bool testValidInput(Profile input)
-        {
-            if (input != null)
-            {
-                if (FolderPane.Stash.Exists(item => item.Profile.ProfileName == input.ProfileName))
-                {
-                    input.ProfileName = "A profile with that name already exists.";
-                }
-                else
-                {
-                    Profiles.Add(input);
-                    Properties.Settings.Default.Config.Profiles = Profiles.GetProfileBase();
-                    isShowingProfileInput = false;
-                    return true;
-                }
-            }
-            return false;
-        }
+        //private bool testValidInput(Profile input)
+        //{
+        //    if (input != null)
+        //    {
+        //        if (FolderPane.Stash.Exists(item => item.Profile.ProfileName == input.ProfileName))
+        //        {
+        //            input.ProfileName = "A profile with that name already exists.";
+        //        }
+        //        else
+        //        {
+        //            Profiles.Add(input);
+        //            Properties.Settings.Default.Config.Profiles = Profiles.GetProfileBase();
+        //            isShowingProfileInput = false;
+        //            return true;
+        //        }
+        //    }
+        //    return false;
+        //}
 
         private void Window_MouseDown_Main(object sender, MouseButtonEventArgs e)
         {

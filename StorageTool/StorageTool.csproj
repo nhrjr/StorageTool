@@ -134,15 +134,16 @@
     </ApplicationDefinition>
     <Compile Include="MainWindow\Folder.cs" />
     <Compile Include="MainWindow\FolderManager.cs" />
+    <Compile Include="MainWindow\MainWindowViewModel.cs" />
     <Compile Include="Old_Code\FolderStash.cs" />
     <Compile Include="ProfileInputWindow.xaml.cs">
       <DependentUpon>ProfileInputWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ProfileView\ProfileCollection.cs" />
+    <Compile Include="ProfileView\ProfileViewModel.cs" />
     <Compile Include="Resources\QueueItem.cs" />
     <Compile Include="Resources\AppCommands.cs" />
     <Compile Include="Resources\Config.cs" />
-    <Compile Include="MainWindow\MainWindowViewModel.cs" />
+    <Compile Include="MainWindow\ListDisplayViewModel.cs" />
     <Compile Include="Resources\FolderWatcher.cs" />
     <Compile Include="Old_Code\MoveStack.cs" />
     <Compile Include="ProfileView\ProfileInput.cs" />

@@ -14,8 +14,9 @@ namespace StorageTool.Resources
 {
     public static class MoveHelper
     {
-        public static void LinkStorageToSource(Assignment prof)
+        public static bool LinkStorageToSource(Assignment prof)
         {
+            bool returnStatus = true;
             try
             {
                 string sourceDir = prof.Source.FullName;
@@ -24,16 +25,23 @@ namespace StorageTool.Resources
             }
             catch (IOException ioexp)
             {
+                returnStatus = false;
             }
+            return returnStatus;
         }
 
-        public static void MoveSourceToStorage(Assignment prof, IProgress<long> sizeFromHell, object _lock, CancellationToken ct)
+        public static bool MoveSourceToStorage(Assignment prof, IProgress<long> sizeFromHell, object _lock, CancellationToken ct)
         {
             string sourceDir = prof.Source.FullName;
             string targetDir = prof.Target.FullName;// + @"\" + prof.Source.Name;
+            bool returnStatus = true;
             try
             {
-                CopyFolders(prof, sizeFromHell, _lock, ct);
+                returnStatus = CopyFolders(prof, sizeFromHell, _lock, ct);
+                if (returnStatus == false)
+                {
+                    return returnStatus;
+                }
                 DirectoryInfo deletableDirInfo = prof.Source;
                 deletableDirInfo.Delete(true);
                 JunctionPoint.Create(@sourceDir, @targetDir, false);
@@ -52,14 +60,15 @@ namespace StorageTool.Resources
             {
                 //MessageBox.Show(unauth.Message);
             }
+            return returnStatus;
 
         }
 
-        public static void MoveStorageToSource(Assignment prof, IProgress<long> sizeFromHell, object _lock, CancellationToken ct)
+        public static bool MoveStorageToSource(Assignment prof, IProgress<long> sizeFromHell, object _lock, CancellationToken ct)
         {
             string sourceDir = prof.Source.FullName;
             string targetDir = prof.Target.FullName;// + @"\" + prof.Source.Name;
-
+            bool returnStatus = true;
             try
             {
                 /// find a junction, which has a different name, than the folder to be moved
@@ -80,20 +89,21 @@ namespace StorageTool.Resources
                     renamedJunction = pairsOfJaT.FirstOrDefault(str => str.Item2 == prof.Source.Name).Item1;
                 if (renamedJunction != null)
                 {
-                    renamedJunction = prof.Target.FullName + @"\" + renamedJunction;
+                    renamedJunction = prof.Target.Parent + @"\" + renamedJunction;
                 }
 
                 if (JunctionPoint.Exists(@targetDir))
                 {
                     JunctionPoint.Delete(@targetDir);
-                    CopyFolders(prof, sizeFromHell, _lock, ct);
-                    DirectoryInfo deletableDirInfo = prof.Source;
-                    deletableDirInfo.Delete(true);
+                    returnStatus = CopyFolders(prof, sizeFromHell, _lock, ct);
                 }
                 else if (JunctionPoint.Exists(@renamedJunction))
                 {
                     JunctionPoint.Delete(@renamedJunction);
-                    CopyFolders(prof, sizeFromHell, _lock, ct);
+                    returnStatus = CopyFolders(prof, sizeFromHell, _lock, ct);
+                }
+                if(returnStatus == true)
+                {
                     DirectoryInfo deletableDirInfo = prof.Source;
                     deletableDirInfo.Delete(true);
                 }
@@ -107,9 +117,10 @@ namespace StorageTool.Resources
             catch (ArgumentNullException tada)
             {
             }
+            return returnStatus;
         }
 
-        public static void CopyFolders(Assignment item, IProgress<long> sizeFromHell, object _lock, CancellationToken ct)
+        public static bool CopyFolders(Assignment item, IProgress<long> sizeFromHell, object _lock, CancellationToken ct)
         {
             //string targetDir = item.Target.FullName;// + @"\" + item.Source.Name;
             Directory.CreateDirectory(item.Target.FullName);
@@ -121,7 +132,7 @@ namespace StorageTool.Resources
             {
                 if (ct.IsCancellationRequested)
                 {
-                    break;
+                    return false;
                 }
                 string dirPath = dirInfo.FullName;
                 string outputPath = dirPath.Replace(item.Source.FullName, item.Target.FullName);
@@ -131,10 +142,11 @@ namespace StorageTool.Resources
                 {
                     if (ct.IsCancellationRequested)
                     {
-                        break;
+                        return false;
                     }
 
-                    lock (_lock)                    
+                    lock (_lock)
+                        sizeFromHell.Report(file.Length/2);
                     using (FileStream SourceStream = file.OpenRead())
                     {
                         using (FileStream DestinationStream = File.Create(outputPath + @"\" + file.Name))
@@ -142,10 +154,11 @@ namespace StorageTool.Resources
                             SourceStream.CopyTo(DestinationStream);
                         }
                     }
-                    sizeFromHell.Report(file.Length);
+                    sizeFromHell.Report(file.Length/2);
 
                 }
             }
+            return true;
         }
     }
 }

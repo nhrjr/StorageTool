@@ -36,7 +36,7 @@ namespace StorageTool
     {
         private object _lock = new object();
         private bool _paused = false;
-        private bool _canceled = false;
+        //private bool _canceled = false;
         private FolderModel _folderModel = new FolderModel();
         private string _sizeString;
         private string _processedBitsString;
@@ -174,24 +174,24 @@ namespace StorageTool
 
             _cts = new CancellationTokenSource();
             CancellationToken _ct = _cts.Token;
-
-            _task = Task.Factory.StartNew(() => TransferFolders(sizeFromHell, _lock, _ct), _cts.Token);
+            bool returnStatus = true;
+            _task = Task.Factory.StartNew(() => TransferFolders(returnStatus,sizeFromHell, _lock, _ct), _cts.Token);
             try
             {
-                await _task.ContinueWith((task) => UpdateYourself());
+                await _task.ContinueWith((task) => UpdateYourself(returnStatus));
             }
             catch (AggregateException ex) { }
             finally
             {
                 _cts.Dispose();
-                _canceled = false;
+                //_canceled = false;
             }
             
         }
 
-        private void UpdateYourself()
+        private void UpdateYourself(bool returnStatus)
         {
-            if (!_canceled)
+            if (returnStatus)
             {
                 string targetDir = Ass.Target.FullName;
                 DirInfo = new DirectoryInfo(targetDir);
@@ -227,31 +227,30 @@ namespace StorageTool
 
         private void CancelTask()
         {
-            if (!_canceled)
+            if (Status == TaskStatus.Running)
             {
-                _canceled = true;
                 _cts.Cancel();
             }
             
             
         }
 
-        private void TransferFolders(IProgress<long> sizeFromHell, object _lock, CancellationToken ct)
+        private void TransferFolders(bool returnStatus, IProgress<long> sizeFromHell, object _lock, CancellationToken ct)
         {
-                Status = TaskStatus.Running;
-                switch (Ass.Mode)
-                {
-                    case TaskMode.STORE:
-                        MoveHelper.MoveSourceToStorage(_ass, sizeFromHell, _lock, ct);
-                        break;
-                    case TaskMode.RESTORE:
-                        MoveHelper.MoveStorageToSource(_ass, sizeFromHell, _lock, ct);
-                        break;
-                    case TaskMode.RELINK:
-                        MoveHelper.LinkStorageToSource(_ass);
-                        Progress = 100;
-                        break;
-                }
+            Status = TaskStatus.Running;
+            switch (Ass.Mode)
+            {
+                case TaskMode.STORE:
+                    returnStatus = MoveHelper.MoveSourceToStorage(_ass, sizeFromHell, _lock, ct);
+                    break;
+                case TaskMode.RESTORE:
+                    returnStatus = MoveHelper.MoveStorageToSource(_ass, sizeFromHell, _lock, ct);
+                    break;
+                case TaskMode.RELINK:
+                    returnStatus = MoveHelper.LinkStorageToSource(_ass);
+                    Progress = 100;
+                    break;
+            }
         }
 
 

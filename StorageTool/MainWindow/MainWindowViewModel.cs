@@ -17,7 +17,6 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Monitor.Core.Utilities;
 using System.Diagnostics;
-using System.Windows.Data;
 
 using StorageTool.Resources;
 
@@ -25,227 +24,100 @@ namespace StorageTool
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {
-        private bool _showUnlinkedFolders = false;
-        private bool _showDuplicateFolders = false;
-        private bool _isRefreshing = false;
-        public FolderManagerViewModel Source { get; set; }
-        public FolderManagerViewModel Stored { get; set; }
-        public FolderManagerViewModel Unlinked { get; set; }
-        public FolderManagerViewModel Assigned { get; set; }
-        public ObservableCollection<string> DuplicateFolders { get; set; }
-        public Profile ActiveProfile { get; set; }
-    
-        private AnalyzeFolders analyzeFolders = new AnalyzeFolders();
-        private FolderWatcher folderWatcher = new FolderWatcher();
+        public FolderListDisplayViewModel _activeDisplayViewModel;
+        public List<FolderListDisplayViewModel> _displayViewModels = new List<FolderListDisplayViewModel>();
+        public ProfileViewModel _profileViewModel = new ProfileViewModel();
+        public CompositeCollection _assigned = new CompositeCollection();
 
-        //RelayCommand _pauseAllCommand;
-        //private bool _allPaused = false;
+        public MainWindowViewModel()
+        {
+            //Profiles = new ProfileCollection(Properties.Settings.Default.Config.Profiles);
+            ProfileViewModel.SetActiveProfileEvent += SetActiveDisplay;            
+            ProfileViewModel.Add(new Profile("TestCases1", @"C:\TestCases\case1_games", @"C:\TestCases\case1_storage"));
+            ProfileViewModel.Add(new Profile("TestCases2", @"C:\TestCases\case2_games", @"C:\TestCases\case2_storage"));
+            SetDisplayViewModels();
+            SetActiveDisplay();
 
-        //public ICommand PauseAllCommand
-        //{
-        //    get
-        //    {
-        //        if (_pauseAllCommand == null)
-        //        {
-        //            _pauseAllCommand = new RelayCommand(param =>
-        //            {
-        //                if (_allPaused == false)
-        //                {
-        //                    _allPaused = true;
-        //                    foreach (FolderViewModel f in Assigned.Folders)
-        //                    {
-        //                        f.TogglePause(setPauseAll: true);
-        //                    }
-        //                }
-        //                else {
-        //                    foreach (FolderViewModel f in Assigned.Folders)
-        //                    {
-        //                        f.TogglePause(setPauseAll: false);
-        //                    }
-        //                    _allPaused = false;
-        //                }
-        //            }, param => true);
-        //        }
-        //        return _pauseAllCommand;
-        //    }
-        //}
+        }
 
-        RelayCommand _refreshCommand;
-        public ICommand RefreshCommand
+        private void SetDisplayViewModels()
+        {
+            foreach(Profile p in ProfileViewModel.Profiles)
+            {
+                DisplayViewModels.Add(new FolderListDisplayViewModel(p));
+            }
+            foreach(FolderListDisplayViewModel f in DisplayViewModels)
+            {
+                CollectionContainer tmp = new CollectionContainer();
+                tmp.Collection = f.Assigned.Folders;
+                Assigned.Add(tmp);
+            }
+        }
+        
+
+        private void SetActiveDisplay()
+        {
+            ActiveDisplayViewModel = DisplayViewModels.FirstOrDefault(f =>f.ActiveProfile.ProfileName == ProfileViewModel.ActiveProfile.ProfileName);
+        }
+
+        RelayCommand _openExplorerCommand;
+        public ICommand OpenExplorerCommand
         {
             get
             {
-                if (_refreshCommand == null)
+                if (_openExplorerCommand == null)
                 {
-                    _refreshCommand = new RelayCommand(param =>
+                    _openExplorerCommand = new RelayCommand(param =>
                     {
-                        RefreshFolders();
-                        RefreshSizes();
-                    }, param => !_isRefreshing);
+                        string path = param as string;
+                        if(path != null)
+                        Process.Start(path);
+                    }, param => true);
                 }
-                return _refreshCommand;
+                return _openExplorerCommand;
             }
         }
 
-
-
-
-        public MainWindowViewModel(Profile p)
+        public FolderListDisplayViewModel ActiveDisplayViewModel
         {
-            ActiveProfile = p;
-    
-            Source = new FolderManagerViewModel(p.GameFolder);
-            Stored = new FolderManagerViewModel(p.StorageFolder);
-            Unlinked = new FolderManagerViewModel(p.StorageFolder);
-            Assigned = new FolderManagerViewModel();
-            DuplicateFolders = new ObservableCollection<string>();
-            
-            
-            Source.StartedTaskEvent += TransferSourceToAssigned;
-            Stored.StartedTaskEvent += TransferStoredToAssigned;
-            Unlinked.StartedTaskEvent += TransferUnlinkedToAssigned;
-            Assigned.StartedTaskEvent += AddToPersistenQueue;
-            Assigned.CompletedTaskEvent += TransferFolderFromAssigned;
-    
-            RefreshFolders();
-            folderWatcher.NotifyFileSystemChangesEvent += OnFileSystemChanged;
-            folderWatcher.NotifyFileSizeChangesEvent += OnFileSizeChanged;
-            folderWatcher.StartFileSystemWatcher(ActiveProfile.GameFolder.FullName);
-            folderWatcher.StartFileSystemWatcher(ActiveProfile.StorageFolder.FullName);
-        }
-
-        public void OnDelete()
-        {
-            folderWatcher.NotifyFileSystemChangesEvent -= OnFileSystemChanged;
-            folderWatcher.NotifyFileSizeChangesEvent -= OnFileSizeChanged;
-            folderWatcher.StopFileSystemWatcher(ActiveProfile.GameFolder.FullName);
-            folderWatcher.StopFileSystemWatcher(ActiveProfile.StorageFolder.FullName);
-        }
-
-        private void OnFileSystemChanged()
-        {
-            RefreshFolders();
-        }
-
-        private void OnFileSizeChanged()
-        {
-            RefreshSizes();
-        }
-
-        public void AddToPersistenQueue(FolderViewModel sender) { }
-    
-        public void TransferSourceToAssigned(FolderViewModel sender)
-        {
-            Assigned.AddFolder(Source.RemoveFolderAndGet(sender), TaskStatus.Running);
-        }
-        public void TransferStoredToAssigned(FolderViewModel sender)
-        {
-            Assigned.AddFolder(Stored.RemoveFolderAndGet(sender), TaskStatus.Running);
-        }
-        public void TransferUnlinkedToAssigned(FolderViewModel sender)
-        {
-            Assigned.AddFolder(Unlinked.RemoveFolderAndGet(sender), TaskStatus.Running);
-        }
-        public void TransferFolderFromAssigned(FolderViewModel sender)
-        {
-            switch (sender.Ass.Mode)
-            {
-                case TaskMode.STORE:
-                    Stored.AddFolder(Assigned.RemoveFolderAndGet(sender),ActiveProfile.GameFolder,TaskMode.RESTORE, TaskStatus.Inactive);
-                    break;
-                case TaskMode.RESTORE:
-                    Source.AddFolder(Assigned.RemoveFolderAndGet(sender),ActiveProfile.StorageFolder,TaskMode.STORE, TaskStatus.Inactive);
-                    break;
-                case TaskMode.RELINK:
-                    Stored.AddFolder(Assigned.RemoveFolderAndGet(sender), ActiveProfile.GameFolder, TaskMode.RESTORE, TaskStatus.Inactive);
-                    break;
-            }
-        }
-
-        private void RefreshSizes()
-        {
-            if (_isRefreshing == true)
-            {
-                return;
-            }
-            foreach (FolderViewModel f in Source.Folders) { f.DirSize = null; f.GetSize(); }
-            foreach (FolderViewModel f in Stored.Folders) { f.DirSize = null; f.GetSize(); }
-            foreach (FolderViewModel f in Unlinked.Folders) { f.DirSize = null; f.GetSize(); }
-        }
-    
-    
-        private void RefreshFolders()
-        {
-            if (_isRefreshing == true)
-                return;
-            try
-            {
-                _isRefreshing = true;
-    
-                analyzeFolders.GetFolderStructure(ActiveProfile);
-                DuplicateFolders = new ObservableCollection<string>(analyzeFolders.DuplicateFolders);
-    
-                foreach (string g in analyzeFolders.StorableFolders)
-                {
-                    if (!Source.Folders.Any(f => f.DirInfo.FullName == g))
-                    {
-                        DirectoryInfo tmp = new DirectoryInfo(g);
-                        if (!Assigned.Folders.Any(h => h.DirInfo.Name == tmp.Name)) Source.AddFolder(new FolderViewModel(tmp),ActiveProfile.StorageFolder,TaskMode.STORE, TaskStatus.Inactive);
-                    }
-    
-                }
-                foreach (string g in analyzeFolders.LinkedFolders)
-                {
-                    if (!Stored.Folders.Any(f => f.DirInfo.FullName == g))
-                    {
-                        DirectoryInfo tmp = new DirectoryInfo(g);
-                        if (!Assigned.Folders.Any(h => h.DirInfo.Name == tmp.Name)) Stored.AddFolder(new FolderViewModel(tmp), ActiveProfile.GameFolder, TaskMode.RESTORE, TaskStatus.Inactive);
-                    }
-                }
-                foreach (string g in analyzeFolders.UnlinkedFolders)
-                {
-                    if (!Unlinked.Folders.Any(f => f.DirInfo.FullName == g))
-                    {
-                        DirectoryInfo tmp = new DirectoryInfo(g);
-                        if (!Assigned.Folders.Any(h => h.DirInfo.Name == tmp.Name)) Unlinked.AddFolder(new FolderViewModel(tmp), ActiveProfile.GameFolder, TaskMode.RELINK, TaskStatus.Inactive);
-                    }
-                }
-    
-                foreach (FolderViewModel g in Source.Folders.Reverse()) if (!analyzeFolders.StorableFolders.Any(f => f == g.DirInfo.FullName)) Source.RemoveFolder(g);
-                foreach (FolderViewModel g in Stored.Folders.Reverse()) if (!analyzeFolders.LinkedFolders.Any(f => f == g.DirInfo.FullName)) Stored.RemoveFolder(g);
-                foreach (FolderViewModel g in Unlinked.Folders.Reverse()) if (!analyzeFolders.UnlinkedFolders.Any(f => f == g.DirInfo.FullName)) Unlinked.RemoveFolder(g);
-
-                ShowUnlinkedFolders = (Unlinked.Folders.Count > 0) ? true : false;
-                ShowDuplicateFolders = (DuplicateFolders.Count > 0) ? true : false;
-            }
-            catch (IOException e)
-            {
-            }
-            finally
-            {
-                _isRefreshing = false;
-            }
-        }
-
-        public bool ShowDuplicateFolders
-        {
-            get { return _showDuplicateFolders; }
+            get { return _activeDisplayViewModel; }
             set
             {
-                _showDuplicateFolders = value;
-                OnPropertyChanged(nameof(ShowDuplicateFolders));
+                _activeDisplayViewModel = value;
+                OnPropertyChanged(nameof(ActiveDisplayViewModel));
             }
         }
 
-        public bool ShowUnlinkedFolders
+        public CompositeCollection Assigned
         {
-            get { return _showUnlinkedFolders; }
+            get { return _assigned; }
             set
             {
-                _showUnlinkedFolders = value;
-                OnPropertyChanged(nameof(ShowUnlinkedFolders)); 
+                _assigned = value;
+                OnPropertyChanged(nameof(Assigned));
             }
         }
+
+        public List<FolderListDisplayViewModel> DisplayViewModels
+        {
+            get { return _displayViewModels; }
+            set
+            {
+                _displayViewModels = value;
+                OnPropertyChanged(nameof(DisplayViewModels));
+            }
+        }
+
+        public ProfileViewModel ProfileViewModel
+        {
+            get { return _profileViewModel; }
+            set
+            {
+                _profileViewModel = value;
+                OnPropertyChanged(nameof(ProfileViewModel));
+            }
+        }
+    
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -255,11 +127,6 @@ namespace StorageTool
                 this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
         }
     }
-
-
-
-   
-
 
 
 }
