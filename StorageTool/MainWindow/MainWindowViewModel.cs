@@ -24,8 +24,8 @@ namespace StorageTool
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {
-        public FolderListDisplayViewModel _activeDisplayViewModel;
-        public List<FolderListDisplayViewModel> _displayViewModels = new List<FolderListDisplayViewModel>();
+        public FolderManagerViewModel _activeDisplayViewModel;
+        public List<FolderManagerViewModel> _displayViewModels = new List<FolderManagerViewModel>();
         public ProfileViewModel _profileViewModel = new ProfileViewModel();
         public CompositeCollection _assigned = new CompositeCollection();
 
@@ -37,20 +37,19 @@ namespace StorageTool
             ProfileViewModel.Add(new Profile("TestCases2", @"C:\TestCases\case2_games", @"C:\TestCases\case2_storage"));
             SetDisplayViewModels();
             SetActiveDisplay();
-
         }
 
         private void SetDisplayViewModels()
         {
             foreach(Profile p in ProfileViewModel.Profiles)
             {
-                DisplayViewModels.Add(new FolderListDisplayViewModel(p));
+                DisplayViewModels.Add(new FolderManagerViewModel(p));
             }
-            foreach(FolderListDisplayViewModel f in DisplayViewModels)
+            foreach(FolderManagerViewModel f in DisplayViewModels)
             {
-                CollectionContainer tmp = new CollectionContainer();
-                tmp.Collection = f.Assigned.Folders;
-                Assigned.Add(tmp);
+                CollectionContainer cc = new CollectionContainer();
+                cc.Collection = f.Assigned.View;
+                this.Assigned.Add(cc);
             }
         }
         
@@ -78,7 +77,7 @@ namespace StorageTool
             }
         }
 
-        public FolderListDisplayViewModel ActiveDisplayViewModel
+        public FolderManagerViewModel ActiveDisplayViewModel
         {
             get { return _activeDisplayViewModel; }
             set
@@ -98,7 +97,7 @@ namespace StorageTool
             }
         }
 
-        public List<FolderListDisplayViewModel> DisplayViewModels
+        public List<FolderManagerViewModel> DisplayViewModels
         {
             get { return _displayViewModels; }
             set

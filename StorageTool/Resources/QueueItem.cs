@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel;
 
 namespace StorageTool { 
 
@@ -57,12 +58,19 @@ public class SpecialQueue<T>
     public int Count { get { return list.Count; } }
 }
 
-    public class Assignment
+    public class Assignment : INotifyPropertyChanged
     {
-        public DirectoryInfo Source { get; set; }
-        public DirectoryInfo Target { get; set; }
-        public TaskMode Mode { get; set; }
+        private DirectoryInfo _source;
+        private DirectoryInfo _target;
+        private TaskMode _mode;
+
         public Assignment() { }
+        public Assignment(TaskMode m, DirectoryInfo source, DirectoryInfo target)
+        {
+            this.Mode = m;
+            this.Source = source;
+            this.Target = target;
+        }
         public Assignment(TaskMode m, Profile prof)
         {
             Mode = m;
@@ -77,6 +85,49 @@ public class SpecialQueue<T>
                 Target = prof.GameFolder;
             }
 
+        }
+        public void SwitchTargets()
+        {
+            Assignment tmp = new Assignment(this.Mode, this.Source, this.Target);
+            this.Mode = tmp.Mode;
+            this.Source = tmp.Target;
+            this.Target = tmp.Source;            
+        }
+
+        public DirectoryInfo Source
+        {
+            get{ return _source; }
+            set
+            {
+                this._source = value;
+                OnPropertyChanged(nameof(Source));
+            }
+        }
+        public DirectoryInfo Target
+        {
+            get { return _target; }
+            set
+            {
+                this._target = value;
+                OnPropertyChanged(nameof(Target));
+            }
+        }
+        public TaskMode Mode
+        {
+            get { return _mode; }
+            set
+            {
+                this._mode = value;
+                OnPropertyChanged(nameof(Mode));
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public void OnPropertyChanged(string propName)
+        {
+            if (this.PropertyChanged != null)
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
         }
     }
 

@@ -134,6 +134,7 @@
     </ApplicationDefinition>
     <Compile Include="MainWindow\Folder.cs" />
     <Compile Include="MainWindow\FolderManager.cs" />
+    <Compile Include="MainWindow\FolderManagerViewModel.cs" />
     <Compile Include="MainWindow\MainWindowViewModel.cs" />
     <Compile Include="Old_Code\FolderStash.cs" />
     <Compile Include="ProfileInputWindow.xaml.cs">

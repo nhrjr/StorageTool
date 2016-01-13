@@ -44,7 +44,7 @@
         <!--FOLDERPANE-->
         <TabControl x:Name="tabControl" Margin="10" Grid.Row="1">
             <TabItem Header="Source">
-                <ListView x:Name="listView" ItemsSource="{Binding ActiveDisplayViewModel.Source.Folders}" ButtonBase.Click="sortLocations_Click" Margin="0,0,-0,-0">
+                <ListView x:Name="sourceList" ItemsSource="{Binding ActiveDisplayViewModel.Source.View}" ButtonBase.Click="sortLocations_Click" Margin="0,0,-0,-0">
                     <ListView.View>
                         <GridView>
                             <GridViewColumn Width="300" DisplayMemberBinding="{Binding DirInfo.Name}">
@@ -70,7 +70,7 @@
                 </ListView>
             </TabItem>
             <TabItem Header="Storage">
-                <ListView x:Name="dirListRight" ItemsSource="{Binding ActiveDisplayViewModel.Stored.Folders}" GridViewColumnHeader.Click="sortLocations_Click" Margin="0,0,0,0" Grid.Column="1" Grid.Row="1">
+                <ListView x:Name="storageList" ItemsSource="{Binding ActiveDisplayViewModel.Stored.View}" GridViewColumnHeader.Click="sortLocations_Click" Margin="0,0,0,0" Grid.Column="1" Grid.Row="1">
                     <ListView.View>
                         <GridView>
                             <GridViewColumn  DisplayMemberBinding="{Binding DirInfo.Name}" Width="300">
@@ -100,7 +100,7 @@
                 </ListView>
             </TabItem>
             <TabItem Header="Unlinked" Visibility="{Binding ActiveDisplayViewModel.ShowUnlinkedFolders, Converter={StaticResource BoolToVis}}" >
-                <ListView x:Name="relinkList" ItemsSource="{Binding ActiveDisplayViewModel.Unlinked.Folders}" GridViewColumnHeader.Click="sortLocations_Click" Grid.Column="1" Margin="0,0,0,0" Grid.Row="2">
+                <ListView x:Name="unlinkedList" ItemsSource="{Binding ActiveDisplayViewModel.Unlinked.View}" GridViewColumnHeader.Click="sortLocations_Click" Grid.Column="1" Margin="0,0,0,0" Grid.Row="2">
                     <ListView.View>
                         <GridView>
                             <GridViewColumn  DisplayMemberBinding="{Binding DirInfo.Name}" Width="300">
@@ -130,7 +130,7 @@
                 </ListView>
             </TabItem>
             <TabItem Header="Duplicate" Visibility="{Binding ActiveDisplayViewModel.ShowDuplicateFolders, Converter={StaticResource BoolToVis}}">
-                <ListView x:Name="dupFolders" ItemsSource="{Binding ActiveDisplayViewModel.DuplicateFolders}" Margin="0,0,0,0">
+                <ListView x:Name="duplicateList" ItemsSource="{Binding ActiveDisplayViewModel.DuplicateFolders}" Margin="0,0,0,0">
                     <ListView.View>
                         <GridView>
                             <GridViewColumn  DisplayMemberBinding="{Binding}" Width="250">
@@ -142,6 +142,45 @@
                     </ListView.View>
                 </ListView>
             </TabItem>
+
+            <TabItem Header="All">
+                <ListView x:Name="allList" ItemsSource="{Binding ActiveDisplayViewModel.FolderManager.Folders}" ButtonBase.Click="sortLocations_Click" Margin="0,0,-0,-0">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Width="Auto" DisplayMemberBinding="{Binding DirInfo.FullName}">
+                                <GridViewColumnHeader Tag="DirInfo.Name" Content="Name"/>
+                            </GridViewColumn>
+                            <GridViewColumn Width="Auto" DisplayMemberBinding="{Binding Status}">
+                                <GridViewColumnHeader Tag="DirInfo.Name" Content="Status"/>
+                            </GridViewColumn>
+                            <GridViewColumn Width="Auto" DisplayMemberBinding="{Binding Mapping}">
+                                <GridViewColumnHeader Tag="DirInfo.Name" Content="Mapping"/>
+                            </GridViewColumn>
+                            <GridViewColumn Width="Auto" DisplayMemberBinding="{Binding Ass.Mode}">
+                                <GridViewColumnHeader Tag="DirInfo.Name" Content="Mode"/>
+                            </GridViewColumn>
+                            <GridViewColumn Width="Auto" DisplayMemberBinding="{Binding ReturnStatus}">
+                                <GridViewColumnHeader Tag="DirInfo.Name" Content="ReturnStatus"/>
+                            </GridViewColumn>
+                            <GridViewColumn Width="Auto" DisplayMemberBinding="{Binding Ass.Source.FullName}">
+                                <GridViewColumnHeader Tag="DirInfo.Name" Content="Assignment Source"/>
+                            </GridViewColumn>
+                            <GridViewColumn Width="Auto" DisplayMemberBinding="{Binding Ass.Target.FullName}">
+                                <GridViewColumnHeader Tag="DirInfo.Name" Content="Assignment Target"/>
+                            </GridViewColumn>
+                            <GridViewColumn  Width="Auto">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock HorizontalAlignment="Right" Text="{Binding SizeString}" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                                <GridViewColumnHeader Tag="DirSize" Content="Size"/>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </TabItem>
+            
         </TabControl>
 
         <!--MOVEPANE-->
@@ -152,15 +191,14 @@
         <!--<Button x:Name="deleteHistory" Content="Clear History" Margin="0,20,173,0" Grid.Row="2" VerticalAlignment="Top" HorizontalAlignment="Right" Width="85" Height="20"/>-->
         
         <ListView x:Name="Move_Queue" ItemsSource="{Binding Assigned}" Margin="10,45,10,10" Grid.Row="2">
-            <ListView.ItemContainerStyle>
+            <!--<ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
-                    <Setter Property="HorizontalContentAlignment"
-                Value="Stretch" />
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                 </Style>
-            </ListView.ItemContainerStyle>
+            </ListView.ItemContainerStyle>-->
             <ListView.View>
                 <GridView>
-                    <!--<GridViewColumn Width="40" Header="Action" DisplayMemberBinding="{Binding Action}"/>-->
+                    
                     <GridViewColumn Width="150" Header="Name" >
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
@@ -172,6 +210,7 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
+                    
                     <GridViewColumn Width="80" Header="Status" DisplayMemberBinding="{Binding Status}"/>
                     <GridViewColumn Width="100"  Header="Progress">
                         <GridViewColumn.CellTemplate>
@@ -184,14 +223,7 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <!--<GridViewColumn Width="80" Header="Copied Bytes">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <TextBlock HorizontalAlignment="Right" Text="{Binding ProcString}" >
-                                </TextBlock>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>-->
+
                     <GridViewColumn Width="80"  Header="Size">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
@@ -199,17 +231,20 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
+                    
                     <GridViewColumn Width="60">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <ToggleButton Name="CancelButton" Command="{Binding PauseCommand}">
                                     <ToggleButton.Style>
-                                        <Style TargetType="ToggleButton">
-                                            <Setter Property="Content" Value="Pause"/>
+                                        <Style TargetType="ToggleButton">                                        
                                             <Style.Triggers>
-                                                <Trigger Property="IsChecked" Value="true">
+                                                <DataTrigger Binding="{Binding Paused}" Value="False">
+                                                    <Setter Property="Content" Value="Pause"></Setter>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Paused}" Value="True">
                                                     <Setter Property="Content" Value="Resume"></Setter>
-                                                </Trigger>
+                                                </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
                                     </ToggleButton.Style>
@@ -217,6 +252,7 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
+                    
                     <GridViewColumn Width="60">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>

@@ -28,19 +28,28 @@ namespace StorageTool
         Inactive,
         Running,
         Completed,
-        Cancelled,
-        Error
+        Cancelled
+        //Error
+    }
+
+    public enum Mapping
+    {
+        Source,
+        Stored,
+        Unlinked        
     }
 
     public class FolderViewModel : INotifyPropertyChanged
     {
         private object _lock = new object();
         private bool _paused = false;
-        //private bool _canceled = false;
+        private bool? _returnStatus = null;
+        private bool _canceled = false;
         private FolderModel _folderModel = new FolderModel();
         private string _sizeString;
         private string _processedBitsString;
         private TaskStatus _status;
+        private Mapping _mapping;
         private Task _task;
         private CancellationTokenSource _cts;
         private Assignment _ass = new Assignment();
@@ -85,25 +94,25 @@ namespace StorageTool
         {
             if(setPauseAll == null)
             {
-                if (_paused == false)
+                if (Paused == false)
                 {
                     System.Threading.Monitor.Enter(_lock);
-                    _paused = true;
+                    Paused = true;
                 }
                 else
                 {
-                    _paused = false;
+                    Paused = false;
                     System.Threading.Monitor.Exit(_lock);
                 }
             }
             if(setPauseAll == true)
             {
                 System.Threading.Monitor.Enter(_lock);
-                _paused = true;
+                Paused = true;
             }
             if(setPauseAll == false)
             {
-                _paused = false;
+                Paused = false;
                 System.Threading.Monitor.Exit(_lock);
             }
             
@@ -172,6 +181,7 @@ namespace StorageTool
                 Progress = (int)(100 * ProcessedBits / DirSize);
             });
 
+            this.Status = TaskStatus.Running;
             _cts = new CancellationTokenSource();
             CancellationToken _ct = _cts.Token;
             bool returnStatus = true;
@@ -184,51 +194,51 @@ namespace StorageTool
             finally
             {
                 _cts.Dispose();
-                //_canceled = false;
+                _canceled = false;
+                this.Status = TaskStatus.Inactive;
             }
             
         }
 
         private void UpdateYourself(bool returnStatus)
         {
+            ReturnStatus = returnStatus;
             if (returnStatus)
             {
                 string targetDir = Ass.Target.FullName;
                 DirInfo = new DirectoryInfo(targetDir);
                 Progress = 0;
                 ProcessedBits = 0;
+                if (Ass.Mode == TaskMode.STORE) { Mapping = Mapping.Stored; Ass.Mode = TaskMode.RESTORE; Ass.SwitchTargets(); }
+                else if(Ass.Mode == TaskMode.RESTORE) { Mapping = Mapping.Source; Ass.Mode = TaskMode.STORE; Ass.SwitchTargets(); }
+                else if(Ass.Mode == TaskMode.RELINK) { Mapping = Mapping.Stored; Ass.Mode = TaskMode.RESTORE; }
                 Status = TaskStatus.Completed;
             }
             else
-            {
+            {                
                 Status = TaskStatus.Cancelled;
-                CleanUpCanceled();
+                string targetDir = Ass.Target.FullName;
+                DirectoryInfo deletableDirInfo = new DirectoryInfo(targetDir);
+                deletableDirInfo.Delete(true);
+                Progress = 0;
+                ProcessedBits = 0;
+                if (Ass.Mode == TaskMode.RESTORE)
+                {
+                    MoveHelper.LinkStorageToSource(Ass);
+                }
+                else if (Ass.Mode == TaskMode.STORE)
+                {
+                    if (_canceled == false) { Mapping = Mapping.Unlinked; Ass.Mode = TaskMode.RELINK; }
+                }                
+                Status = TaskStatus.Completed;
             }
-        }
-
-        private void CleanUpCanceled()
-        {
-            string targetDir = Ass.Target.FullName;
-            DirectoryInfo deletableDirInfo = new DirectoryInfo(targetDir);
-            deletableDirInfo.Delete(true);
-            Progress = 0;
-            ProcessedBits = 0;
-            if(Ass.Mode == TaskMode.RESTORE)
-            {
-                MoveHelper.LinkStorageToSource(Ass);
-                Ass.Mode = TaskMode.STORE;
-            }
-            if(Ass.Mode == TaskMode.STORE)
-            {
-                Ass.Mode = TaskMode.RESTORE;
-            }
-            Status = TaskStatus.Completed;
         }
 
         private void CancelTask()
         {
             if (Status == TaskStatus.Running)
             {
+                _canceled = true;
                 _cts.Cancel();
             }
             
@@ -237,7 +247,7 @@ namespace StorageTool
 
         private void TransferFolders(bool returnStatus, IProgress<long> sizeFromHell, object _lock, CancellationToken ct)
         {
-            Status = TaskStatus.Running;
+            //Status = TaskStatus.Running;
             switch (Ass.Mode)
             {
                 case TaskMode.STORE:
@@ -303,6 +313,16 @@ namespace StorageTool
             }
         }
 
+        public Mapping Mapping
+        {
+            get { return _mapping; }
+            set
+            {
+                _mapping = value;
+                OnPropertyChanged(nameof(Mapping));
+            }
+        }
+
         public string SizeString
         {
             get
@@ -326,6 +346,32 @@ namespace StorageTool
             {
                 _progress = value;
                 OnPropertyChanged(nameof(Progress));
+            }
+        }
+
+        public bool? ReturnStatus
+        {
+            get
+            {
+                return _returnStatus;
+            }
+            set
+            {
+                _returnStatus = value;
+                OnPropertyChanged(nameof(ReturnStatus));
+            }
+        }
+
+        public bool Paused
+        {
+            get
+            {
+                return _paused;
+            }
+            private set
+            {
+                _paused = value;
+                OnPropertyChanged(nameof(Paused));
             }
         }
 
