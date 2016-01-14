@@ -136,7 +136,6 @@
     <Compile Include="MainWindow\FolderManager.cs" />
     <Compile Include="MainWindow\FolderManagerViewModel.cs" />
     <Compile Include="MainWindow\MainWindowViewModel.cs" />
-    <Compile Include="Old_Code\FolderStash.cs" />
     <Compile Include="ProfileInputWindow.xaml.cs">
       <DependentUpon>ProfileInputWindow.xaml</DependentUpon>
     </Compile>
@@ -144,10 +143,8 @@
     <Compile Include="Resources\QueueItem.cs" />
     <Compile Include="Resources\AppCommands.cs" />
     <Compile Include="Resources\Config.cs" />
-    <Compile Include="Old_Code\ListDisplayViewModel.cs" />
     <Compile Include="Resources\FolderWatcher.cs" />
-    <Compile Include="Old_Code\MoveStack.cs" />
-    <Compile Include="ProfileView\ProfileInput.cs" />
+    <Compile Include="ProfileView\ProfileInputViewModel.cs" />
     <Compile Include="Resources\SortAdorner.cs" />
     <Compile Include="ProfileInputUC.xaml.cs">
       <DependentUpon>ProfileInputUC.xaml</DependentUpon>
@@ -162,12 +159,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Resources\AnalyzeFolders.cs" />
-    <Compile Include="Old_Code\MoveFolders.cs" />
     <Compile Include="ProfileView\Profile.cs" />
     <Compile Include="Resources\DirectorySize.cs" />
     <Compile Include="Resources\Ext.cs" />
     <Compile Include="Resources\JunctionPoint.cs" />
-    <Compile Include="Old_Code\FolderPane.cs" />
     <Compile Include="Resources\Log.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -225,9 +220,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="FolderView\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

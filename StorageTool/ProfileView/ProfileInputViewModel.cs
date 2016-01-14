@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace StorageTool
 {
-    public class ProfileInput : INotifyPropertyChanged
+    public class ProfileInputViewModel : INotifyPropertyChanged
     {
         private DirectoryInfo _leftFolder;
         private DirectoryInfo _rightFolder;

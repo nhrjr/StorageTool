@@ -5,17 +5,22 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
+
+using StorageTool.Resources;
 
 namespace StorageTool
 {
     public delegate void SetActiveProfileEventHandler();
-    public class ProfileViewModel
-    {
+    public delegate void RemoveActiveProfileEventHandler(Profile prof);
 
+    public class ProfileViewModel : INotifyPropertyChanged
+    {
         private ObservableCollection<Profile> _profiles = new ObservableCollection<Profile>();
         private Profile _activeProfile;
 
         public event SetActiveProfileEventHandler SetActiveProfileEvent;
+        public event RemoveActiveProfileEventHandler RemoveActiveProfileEvent;
 
         public ProfileViewModel() { }
         public ProfileViewModel(List<ProfileBase> input)
@@ -43,18 +48,45 @@ namespace StorageTool
             return var;
         }
 
+
+        RelayCommand _removeSelectedCommand;
+        public ICommand RemoveSelectedCommand
+        {
+            get
+            {
+                if (_removeSelectedCommand == null)
+                {
+                    _removeSelectedCommand = new RelayCommand(param =>
+                    {
+                        RemoveActive();
+                        SetDefaultActive();
+                    }, param => true);
+                }
+                return _removeSelectedCommand;
+            }
+        }
+
         public void Add(Profile prof)
         {
             Profiles.Add(prof);
             this.ActiveProfile = prof;
-        }       
-
-        //public int ActiveProfileIndex { get; set; }
-        public void Remove()
+        }
+        
+        public void SetDefaultActive()
         {
-            //int index = ActiveProfileIndex;
-            //ActiveProfileIndex = 0;
-            //this.RemoveAt(index);
+            if(Profiles.Count > 0)
+            {
+                this.ActiveProfile = Profiles[0];
+            }
+        }      
+  
+
+        public void RemoveActive()
+        {
+            if (RemoveActiveProfileEvent != null)
+            {
+                RemoveActiveProfileEvent(ActiveProfile);
+            }
             Profiles.Remove(ActiveProfile);
         }
 
@@ -74,12 +106,11 @@ namespace StorageTool
             set
             {
                 _activeProfile = value;
+                OnPropertyChanged(nameof(ActiveProfile));
                 if (SetActiveProfileEvent != null)
                 {
                     SetActiveProfileEvent();
-                    OnPropertyChanged(nameof(ActiveProfile));
-                }
-
+                }               
             }
         }
 

@@ -33,7 +33,7 @@ namespace StorageTool
 
         public FolderManager FolderManager { get; set; }
         public ObservableCollection<string> DuplicateFolders { get; set; }
-        public Profile ActiveProfile { get; set; }
+        public Profile Profile { get; set; }
 
         private AnalyzeFolders analyzeFolders = new AnalyzeFolders();
         private FolderWatcher folderWatcher = new FolderWatcher();
@@ -81,7 +81,7 @@ namespace StorageTool
 
         public FolderManagerViewModel(Profile p)
         {
-            ActiveProfile = p;
+            Profile = p;
 
             FolderManager = new FolderManager();
             DuplicateFolders = new ObservableCollection<string>();
@@ -103,8 +103,8 @@ namespace StorageTool
             //FolderManager.ModelPropertyChangedEvent += RefreshFolders;
             folderWatcher.NotifyFileSystemChangesEvent += OnFileSystemChanged;
             folderWatcher.NotifyFileSizeChangesEvent += OnFileSizeChanged;
-            folderWatcher.StartFileSystemWatcher(ActiveProfile.GameFolder.FullName);
-            folderWatcher.StartFileSystemWatcher(ActiveProfile.StorageFolder.FullName);
+            folderWatcher.StartFileSystemWatcher(Profile.GameFolder.FullName);
+            folderWatcher.StartFileSystemWatcher(Profile.StorageFolder.FullName);
         }
 
         public void SourceFilter(object sender, FilterEventArgs e)
@@ -140,8 +140,8 @@ namespace StorageTool
             //FolderManager.ModelPropertyChangedEvent -= RefreshFolders;
             folderWatcher.NotifyFileSystemChangesEvent -= OnFileSystemChanged;
             folderWatcher.NotifyFileSizeChangesEvent -= OnFileSizeChanged;
-            folderWatcher.StopFileSystemWatcher(ActiveProfile.GameFolder.FullName);
-            folderWatcher.StopFileSystemWatcher(ActiveProfile.StorageFolder.FullName);
+            folderWatcher.StopFileSystemWatcher(Profile.GameFolder.FullName);
+            folderWatcher.StopFileSystemWatcher(Profile.StorageFolder.FullName);
         }
 
         private void OnFileSystemChanged()
@@ -179,7 +179,7 @@ namespace StorageTool
             {
                 _isRefreshingFolders = true;
 
-                analyzeFolders.GetFolderStructure(ActiveProfile);
+                analyzeFolders.GetFolderStructure(Profile);
                 DuplicateFolders = new ObservableCollection<string>(analyzeFolders.DuplicateFolders);
 
                 foreach (string g in analyzeFolders.StorableFolders)
@@ -187,7 +187,7 @@ namespace StorageTool
                     if (!FolderManager.Folders.Any(f => f.DirInfo.FullName == g))
                     {
                         DirectoryInfo tmp = new DirectoryInfo(g);
-                        FolderManager.AddFolder(new FolderViewModel(tmp), ActiveProfile.StorageFolder, TaskMode.STORE, TaskStatus.Inactive, Mapping.Source);
+                        FolderManager.AddFolder(new FolderViewModel(tmp), Profile.StorageFolder, TaskMode.STORE, TaskStatus.Inactive, Mapping.Source);
                     }
 
                 }
@@ -196,7 +196,7 @@ namespace StorageTool
                     if (!FolderManager.Folders.Any(f => f.DirInfo.FullName == g))
                     {
                         DirectoryInfo tmp = new DirectoryInfo(g);
-                        FolderManager.AddFolder(new FolderViewModel(tmp), ActiveProfile.GameFolder, TaskMode.RESTORE, TaskStatus.Inactive, Mapping.Stored);
+                        FolderManager.AddFolder(new FolderViewModel(tmp), Profile.GameFolder, TaskMode.RESTORE, TaskStatus.Inactive, Mapping.Stored);
                     }
                 }
                 foreach (string g in analyzeFolders.UnlinkedFolders)
@@ -204,7 +204,7 @@ namespace StorageTool
                     if (!FolderManager.Folders.Any(f => f.DirInfo.FullName == g))
                     {
                         DirectoryInfo tmp = new DirectoryInfo(g);
-                        FolderManager.AddFolder(new FolderViewModel(tmp), ActiveProfile.GameFolder, TaskMode.RELINK, TaskStatus.Inactive, Mapping.Unlinked);
+                        FolderManager.AddFolder(new FolderViewModel(tmp), Profile.GameFolder, TaskMode.RELINK, TaskStatus.Inactive, Mapping.Unlinked);
                     }
                 }
 

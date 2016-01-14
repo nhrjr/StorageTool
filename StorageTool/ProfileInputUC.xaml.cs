@@ -20,7 +20,7 @@ namespace StorageTool
     public partial class ProfileInputUC : UserControl
     {
         public event addProfileReturnPressEventHandler addProfileReturnPressEvent;
-        public ProfileInput ProfileInput { get; set; } = new ProfileInput();
+        public ProfileInputViewModel ProfileInput { get; set; } = new ProfileInputViewModel();
         public Profile input = null;
         public ProfileInputUC()
         {
@@ -58,7 +58,8 @@ namespace StorageTool
             {
                 return returnKey ?? (returnKey = new ActionCommand(() =>
                 {
-                    addProfileReturnPressEvent();
+                    if(addProfileReturnPressEvent != null)
+                        addProfileReturnPressEvent();
                 }));
             }
         }

@@ -7,6 +7,7 @@
         mc:Ignorable="d"
         WindowStyle="None"
         MouseDown="Window_MouseDown_ProfileInput"
+        WindowStartupLocation="CenterOwner"
         Title="Add Profile" Height="160" Width="341.553">
     <Grid Margin="0,0,2,0">
         <local:ProfileInputUC x:Name="this_prof_input" Margin="11,10,21,37"></local:ProfileInputUC>

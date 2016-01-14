@@ -32,7 +32,8 @@ namespace StorageTool
         public MainWindowViewModel()
         {
             //Profiles = new ProfileCollection(Properties.Settings.Default.Config.Profiles);
-            ProfileViewModel.SetActiveProfileEvent += SetActiveDisplay;            
+            ProfileViewModel.SetActiveProfileEvent += SetActiveDisplay;
+            ProfileViewModel.RemoveActiveProfileEvent += RemoveActiveDisplay;          
             ProfileViewModel.Add(new Profile("TestCases1", @"C:\TestCases\case1_games", @"C:\TestCases\case1_storage"));
             ProfileViewModel.Add(new Profile("TestCases2", @"C:\TestCases\case2_games", @"C:\TestCases\case2_storage"));
             SetDisplayViewModels();
@@ -56,7 +57,61 @@ namespace StorageTool
 
         private void SetActiveDisplay()
         {
-            ActiveDisplayViewModel = DisplayViewModels.FirstOrDefault(f =>f.ActiveProfile.ProfileName == ProfileViewModel.ActiveProfile.ProfileName);
+            if (ProfileViewModel.ActiveProfile != null)
+                ActiveDisplayViewModel = DisplayViewModels.FirstOrDefault(f => f.Profile.ProfileName == ProfileViewModel.ActiveProfile.ProfileName);
+            else
+                ActiveDisplayViewModel = null;
+        }
+
+        private void RemoveActiveDisplay(Profile prof)
+        {
+            DisplayViewModels.RemoveAll(f => f.Profile.ProfileName == prof.ProfileName);
+        }
+
+        RelayCommand _openProfileInputDialogCommand;
+        public ICommand OpenProfileInputDialogCommand
+        {
+            get
+            {
+                if (_openProfileInputDialogCommand == null)
+                {
+                    _openProfileInputDialogCommand = new RelayCommand(param =>
+                    {
+                        //Window mainWindow = Application.Current.MainWindow;
+                        var w = new ProfileInputWindow();
+                        w.Owner = Application.Current.MainWindow;
+
+                        w.TestForValidProfileEvent += new TestForValidProfileEventHandler(AddValidProfile);
+                        //w.Closing += W_Closing;
+                        w.ShowDialog();   
+                    }, param => true);
+                }
+                return _openProfileInputDialogCommand;
+            }
+        }
+
+        private bool AddValidProfile(Profile input)
+        {
+            if (input != null)
+            {
+                if (ProfileViewModel.Profiles.Any(item => item.ProfileName == input.ProfileName))
+                {
+                    input.ProfileName = "A profile with that name already exists.";
+                }
+                else
+                {
+                    
+                    FolderManagerViewModel fm = new FolderManagerViewModel(input);
+                    DisplayViewModels.Add(fm);
+                    CollectionContainer cc = new CollectionContainer();
+                    cc.Collection = fm.Assigned;
+                    this.Assigned.Add(cc);
+                    ProfileViewModel.Add(input);
+                    //Properties.Settings.Default.Config.Profiles = ProfileViewModel.GetProfileBase();
+                    return true;
+                }
+            }
+            return false;
         }
 
         RelayCommand _openExplorerCommand;

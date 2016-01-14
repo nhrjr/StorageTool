@@ -23,8 +23,8 @@
 
         <!--PROFILE SELECTOR-->
         <ComboBox x:Name="profileBox" ItemsSource="{Binding ProfileViewModel.Profiles}" SelectedItem="{Binding ProfileViewModel.ActiveProfile}" DisplayMemberPath="ProfileName" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="227" Height="22"/>
-        <Button x:Name="removeProfile"  Content="Remove selected profile" HorizontalAlignment="Left" Margin="242,10,0,0" VerticalAlignment="Top" Width="137" Height="22"/>
-        <Button x:Name="openProfileInputDialogue" Content="Add new profile" HorizontalAlignment="Left" Margin="384,10,0,0" VerticalAlignment="Top" Width="135" Height="22"/>
+        <Button x:Name="removeProfile"  Content="Remove selected profile" Command="{Binding ProfileViewModel.RemoveSelectedCommand}" HorizontalAlignment="Left" Margin="242,10,0,0" VerticalAlignment="Top" Width="137" Height="22"/>
+        <Button x:Name="openProfileInputDialogue" Content="Add new profile" Command="{Binding OpenProfileInputDialogCommand}" HorizontalAlignment="Left" Margin="384,10,0,0" VerticalAlignment="Top" Width="135" Height="22"/>
 
         <Button x:Name="Desc_StorageFolder" Command="{Binding OpenExplorerCommand}" CommandParameter="{Binding ProfileViewModel.ActiveProfile.StorageFolder.FullName}" HorizontalAlignment="Left" Padding="5,1,1,0" Margin="323,64,0,0" Content="Open" Width="46" Height="20" VerticalAlignment="Top"/>
         <Button x:Name="Desc_GameFolder" Command="{Binding OpenExplorerCommand}" CommandParameter="{Binding ProfileViewModel.ActiveProfile.GameFolder.FullName}" HorizontalAlignment="Left" Padding="5,1,1,0" Content="Open" Width="46" Height="20" VerticalAlignment="Top" Margin="323,39,0,0"/>
