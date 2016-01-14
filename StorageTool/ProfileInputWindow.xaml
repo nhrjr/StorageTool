@@ -8,7 +8,7 @@
         WindowStyle="None"
         MouseDown="Window_MouseDown_ProfileInput"
         WindowStartupLocation="CenterOwner"
-        Title="Add Profile" Height="160" Width="341.553">
+        Title="Add Profile" Height="160" Width="340" MinHeight="160" MaxHeight="160" MinWidth="340" MaxWidth="340">
     <Grid Margin="0,0,2,0">
         <local:ProfileInputUC x:Name="this_prof_input" Margin="11,10,21,37"></local:ProfileInputUC>
         <Button x:Name="addProfileButton" Click="addProfile_Click" Content="Add profile" Margin="0,115,170,0" VerticalAlignment="Top" RenderTransformOrigin="1.311,0.826" Height="20" HorizontalAlignment="Right" Width="84"/>

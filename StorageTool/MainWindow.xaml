@@ -6,7 +6,12 @@
         xmlns:local="clr-namespace:StorageTool"
         mc:Ignorable="d"
         MouseDown="Window_MouseDown_Main"
-        Title="StorageTool" Height="700" Width="599" Background="White">
+        Title="StorageTool"
+        Height="700"
+        Width="600"
+        MinHeight="700"
+        MinWidth="600"
+        Background="White">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <Style TargetType="ListViewItem">
