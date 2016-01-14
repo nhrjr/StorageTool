@@ -8,6 +8,7 @@ using System.IO;
 using System.ComponentModel;
 using System.Windows.Controls;
 using System.Collections.ObjectModel;
+using System.Collections;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -28,6 +29,7 @@ namespace StorageTool
         private bool _showDuplicateFolders = false;
         private bool _isRefreshingFolders = false;
         private bool _isRefreshingSizes = false;
+        private ListSortDirection _lastDirection = ListSortDirection.Ascending;
 
         public FolderManager FolderManager { get; set; }
         public ObservableCollection<string> DuplicateFolders { get; set; }
@@ -40,38 +42,6 @@ namespace StorageTool
         private CollectionViewSource _stored { get; set; } = new CollectionViewSource();
         private CollectionViewSource _unlinked { get; set; } = new CollectionViewSource();
         private CollectionViewSource _assigned { get; set; } = new CollectionViewSource();
-
-        //RelayCommand _pauseAllCommand;
-        //private bool _allPaused = false;
-
-        //public ICommand PauseAllCommand
-        //{
-        //    get
-        //    {
-        //        if (_pauseAllCommand == null)
-        //        {
-        //            _pauseAllCommand = new RelayCommand(param =>
-        //            {
-        //                if (_allPaused == false)
-        //                {
-        //                    _allPaused = true;
-        //                    foreach (FolderViewModel f in Assigned.Folders)
-        //                    {
-        //                        f.TogglePause(setPauseAll: true);
-        //                    }
-        //                }
-        //                else {
-        //                    foreach (FolderViewModel f in Assigned.Folders)
-        //                    {
-        //                        f.TogglePause(setPauseAll: false);
-        //                    }
-        //                    _allPaused = false;
-        //                }
-        //            }, param => true);
-        //        }
-        //        return _pauseAllCommand;
-        //    }
-        //}
 
         RelayCommand _refreshCommand;
         public ICommand RefreshCommand
@@ -88,10 +58,26 @@ namespace StorageTool
                 }
                 return _refreshCommand;
             }
+        }        
+
+        RelayCommand _headerClickCommand;
+        public ICommand HeaderClickCommand
+        {
+            get
+            {
+                if (_headerClickCommand == null)
+                {
+                    _headerClickCommand = new RelayCommand(param =>
+                    {
+                        _lastDirection = _lastDirection == ListSortDirection.Ascending ? ListSortDirection.Descending : ListSortDirection.Ascending;
+                        GridViewColumnHeader g = param as GridViewColumnHeader;
+                        Source.CustomSort = new FolderSorter(g.Content.ToString(),_lastDirection);
+                        Source.Refresh();                      
+                    }, param => true);
+                }
+                return _headerClickCommand;
+            }
         }
-
-
-
 
         public FolderManagerViewModel(Profile p)
         {
@@ -100,17 +86,17 @@ namespace StorageTool
             FolderManager = new FolderManager();
             DuplicateFolders = new ObservableCollection<string>();
 
-            this.Source.Source = this.FolderManager.Folders;
-            this.Source.Filter += SourceFilter;
+            this._source.Source = this.FolderManager.Folders;
+            this._source.Filter += SourceFilter;
 
-            this.Stored.Source = this.FolderManager.Folders;
-            this.Stored.Filter += StoredFilter;
+            this._stored.Source = this.FolderManager.Folders;
+            this._stored.Filter += StoredFilter;
 
-            this.Unlinked.Source = this.FolderManager.Folders;
-            this.Unlinked.Filter += UnlinkedFilter;
+            this._unlinked.Source = this.FolderManager.Folders;
+            this._unlinked.Filter += UnlinkedFilter;
 
-            this.Assigned.Source = this.FolderManager.Folders;
-            this.Assigned.Filter += AssignedFilter;
+            this._assigned.Source = this.FolderManager.Folders;
+            this._assigned.Filter += AssignedFilter;
 
             RefreshFolders();
             FolderManager.ModelPropertyChangedEvent += RefreshCollectionViewSources;
@@ -125,56 +111,27 @@ namespace StorageTool
         {
             FolderViewModel f = e.Item as FolderViewModel;
 
-            if (f.Mapping == Mapping.Source && f.Status == TaskStatus.Inactive)
-            {
-                e.Accepted = true;
-            }
-            else
-            {
-                e.Accepted = false;
-            }
+            e.Accepted = (f.Mapping == Mapping.Source && f.Status == TaskStatus.Inactive);
         }
 
         public void StoredFilter(object sender, FilterEventArgs e)
         {
             FolderViewModel f = e.Item as FolderViewModel;
-
-            if (f.Mapping == Mapping.Stored && f.Status == TaskStatus.Inactive)
-            {
-                e.Accepted = true;
-            }
-            else
-            {
-                e.Accepted = false;
-            }
+            e.Accepted = (f.Mapping == Mapping.Stored && f.Status == TaskStatus.Inactive);
         }
 
         public void UnlinkedFilter(object sender, FilterEventArgs e)
         {
             FolderViewModel f = e.Item as FolderViewModel;
+            e.Accepted = (f.Mapping == Mapping.Unlinked && f.Status == TaskStatus.Inactive);
 
-            if (f.Mapping == Mapping.Unlinked && f.Status == TaskStatus.Inactive)
-            {
-                e.Accepted = true;
-            }
-            else
-            {
-                e.Accepted = false;
-            }
         }
 
         public void AssignedFilter(object sender, FilterEventArgs e)
         {
             FolderViewModel f = e.Item as FolderViewModel;
+            e.Accepted = (f.Status != TaskStatus.Inactive);
 
-            if (f.Status != TaskStatus.Inactive)
-            {
-                e.Accepted = true;
-            }
-            else
-            {
-                e.Accepted = false;
-            }
         }
 
         public void OnDelete()
@@ -199,10 +156,10 @@ namespace StorageTool
 
         private void RefreshCollectionViewSources()
         {
-            this.Source.View.Refresh();
-            this.Stored.View.Refresh();
-            this.Unlinked.View.Refresh();
-            this.Assigned.View.Refresh();
+            this.Source.Refresh();
+            this.Stored.Refresh();
+            this.Unlinked.Refresh();
+            this.Assigned.Refresh();
         }
 
         private void RefreshSizes()
@@ -213,7 +170,6 @@ namespace StorageTool
             }
             foreach (FolderViewModel f in FolderManager.Folders) { f.DirSize = null; f.GetSize(); }
         }
-
 
         private void RefreshFolders()
         {
@@ -269,7 +225,7 @@ namespace StorageTool
                     }
                 }
                 
-                ShowUnlinkedFolders = (Unlinked.View.Cast<object>().Count() > 0) ? true : false;
+                ShowUnlinkedFolders = (Unlinked.Cast<object>().Count() > 0) ? true : false;
                 ShowDuplicateFolders = (DuplicateFolders.Count > 0) ? true : false;
             }
             catch (IOException e)
@@ -301,44 +257,24 @@ namespace StorageTool
             }
         }
 
-        public CollectionViewSource Source
+        public ListCollectionView Source
         {
-            get { return _source; }
-            set
-            {
-                _source = value;
-                OnPropertyChanged(nameof(Source));
-            }
+            get { return (ListCollectionView)_source.View; }
         }
 
-        public CollectionViewSource Stored
+        public ListCollectionView Stored
         {
-            get { return _stored; }
-            set
-            {
-                _stored = value;
-                OnPropertyChanged(nameof(Stored));
-            }
+            get { return (ListCollectionView)_stored.View; }
         }
 
-        public CollectionViewSource Unlinked
+        public ListCollectionView Unlinked
         {
-            get { return _unlinked; }
-            set
-            {
-                _unlinked = value;
-                OnPropertyChanged(nameof(Unlinked));
-            }
+            get { return (ListCollectionView)_unlinked.View; }
         }
 
-        public CollectionViewSource Assigned
+        public ListCollectionView Assigned
         {
-            get { return _assigned; }
-            set
-            {
-                _assigned = value;
-                OnPropertyChanged(nameof(Assigned));
-            }
+            get { return (ListCollectionView)_assigned.View; }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -349,12 +285,5 @@ namespace StorageTool
                 this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
         }
     }
-
-
-
-
-
-
-
 }
 

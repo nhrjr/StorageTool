@@ -144,7 +144,7 @@
     <Compile Include="Resources\QueueItem.cs" />
     <Compile Include="Resources\AppCommands.cs" />
     <Compile Include="Resources\Config.cs" />
-    <Compile Include="MainWindow\ListDisplayViewModel.cs" />
+    <Compile Include="Old_Code\ListDisplayViewModel.cs" />
     <Compile Include="Resources\FolderWatcher.cs" />
     <Compile Include="Old_Code\MoveStack.cs" />
     <Compile Include="ProfileView\ProfileInput.cs" />

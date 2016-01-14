@@ -33,8 +33,8 @@ namespace StorageTool
         //private bool isShowingProfileInput = false;
         //private Profile activeProfile = null;
         //private MoveFolders MoveFolders;
-        private GridViewColumnHeader listViewSortCol = null;
-        private SortAdorner listViewSortAdorner = null;        
+        //private GridViewColumnHeader listViewSortCol = null;
+        //private SortAdorner listViewSortAdorner = null;        
 
 
         //public Log Messages { get; set; } = new Log();
@@ -44,14 +44,14 @@ namespace StorageTool
         //public ProfileInput ProfileInput{ get; set; } = new ProfileInput();
 
 
-        public MainWindowViewModel mainWindowViewModel;
+       // public MainWindowViewModel mainWindowViewModel;
         
 
         public MainWindow()
         {
             InitializeComponent();
             Closing += OnClosing;
-            mainWindowViewModel = new MainWindowViewModel();
+            //mainWindowViewModel = new MainWindowViewModel();
             
 
             //var state = new Progress<State>(fu =>
@@ -66,32 +66,32 @@ namespace StorageTool
             //Profiles = new ProfileCollection(Properties.Settings.Default.Config.Profiles);         
             //Profiles = new ProfileCollection();
             //FolderPane = new FolderPane(Profiles);
-            this.DataContext = mainWindowViewModel; 
+            this.DataContext = new MainWindowViewModel();
         }
 
-        private void sortLocations_Click(object sender, RoutedEventArgs e)
-        {
-            ListView listView_local = sender as ListView;
-            GridViewColumnHeader column = e.OriginalSource as GridViewColumnHeader;
-            if (column != null && column.Tag != null)
-            {
-                string sortBy = column.Tag.ToString();
-                if (listViewSortCol != null)
-                {
-                    AdornerLayer.GetAdornerLayer(listViewSortCol).Remove(listViewSortAdorner);
-                    listView_local.Items.SortDescriptions.Clear();
-                }
+        //private void sortLocations_Click(object sender, RoutedEventArgs e)
+        //{
+        //    ListView listView_local = sender as ListView;
+        //    GridViewColumnHeader column = e.OriginalSource as GridViewColumnHeader;
+        //    if (column != null && column.Tag != null)
+        //    {
+        //        string sortBy = column.Tag.ToString();
+        //        if (listViewSortCol != null)
+        //        {
+        //            AdornerLayer.GetAdornerLayer(listViewSortCol).Remove(listViewSortAdorner);
+        //            listView_local.Items.SortDescriptions.Clear();
+        //        }
 
-                ListSortDirection newDir = ListSortDirection.Ascending;
-                if (listViewSortCol == column && listViewSortAdorner.Direction == newDir)
-                    newDir = ListSortDirection.Descending;
+        //        ListSortDirection newDir = ListSortDirection.Ascending;
+        //        if (listViewSortCol == column && listViewSortAdorner.Direction == newDir)
+        //            newDir = ListSortDirection.Descending;
 
-                listViewSortCol = column;
-                listViewSortAdorner = new SortAdorner(listViewSortCol, newDir);
-                AdornerLayer.GetAdornerLayer(listViewSortCol).Add(listViewSortAdorner);
-                listView_local.Items.SortDescriptions.Add(new SortDescription(sortBy, newDir));
-            }
-        }
+        //        listViewSortCol = column;
+        //        listViewSortAdorner = new SortAdorner(listViewSortCol, newDir);
+        //        AdornerLayer.GetAdornerLayer(listViewSortCol).Add(listViewSortAdorner);
+        //        listView_local.Items.SortDescriptions.Add(new SortDescription(sortBy, newDir));
+        //    }
+        //}
 
         //private void profileBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         //{

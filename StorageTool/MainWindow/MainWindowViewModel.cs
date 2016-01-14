@@ -36,7 +36,7 @@ namespace StorageTool
             ProfileViewModel.Add(new Profile("TestCases1", @"C:\TestCases\case1_games", @"C:\TestCases\case1_storage"));
             ProfileViewModel.Add(new Profile("TestCases2", @"C:\TestCases\case2_games", @"C:\TestCases\case2_storage"));
             SetDisplayViewModels();
-            SetActiveDisplay();
+            SetActiveDisplay();            
         }
 
         private void SetDisplayViewModels()
@@ -48,7 +48,7 @@ namespace StorageTool
             foreach(FolderManagerViewModel f in DisplayViewModels)
             {
                 CollectionContainer cc = new CollectionContainer();
-                cc.Collection = f.Assigned.View;
+                cc.Collection = f.Assigned;
                 this.Assigned.Add(cc);
             }
         }
@@ -126,6 +126,4 @@ namespace StorageTool
                 this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
         }
     }
-
-
 }

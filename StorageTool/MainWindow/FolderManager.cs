@@ -22,25 +22,15 @@ using StorageTool.Resources;
 
 namespace StorageTool
 {
-    //public delegate void StartedTaskEventHandler(FolderViewModel folder);
-    //public delegate void CompletedTaskEventHandler(FolderViewModel folder);
-
     public delegate void ModelPropertyChangedEventHandler();
 
     public class FolderManager
     {
-
         public static object _lock = new object();
-        //public event StartedTaskEventHandler StartedTaskEvent;
-        //public event CompletedTaskEventHandler CompletedTaskEvent;
         public event ModelPropertyChangedEventHandler ModelPropertyChangedEvent;
 
-        public DirectoryInfo ParentFolder { get; set; }
+        public DirectoryInfo ParentFolder { get; set; } = null;
         public ObservableCollection<FolderViewModel> Folders { get; set; } = new ObservableCollection<FolderViewModel>();
-
-
-        //BindingOperations.EnableCollectionSynchronization(Folders, _lock);
-
 
         public FolderManager(DirectoryInfo parentFolder)
         {
@@ -48,11 +38,8 @@ namespace StorageTool
             BindingOperations.EnableCollectionSynchronization(Folders, _lock);
         }
 
-
-
         public FolderManager()
         {
-            ParentFolder = null;
             BindingOperations.EnableCollectionSynchronization(Folders, _lock);
         }
 
@@ -60,7 +47,6 @@ namespace StorageTool
         public void AddFolder(FolderViewModel folder, TaskStatus status)
         {
             folder.PropertyChanged += FolderPropertyChanged;
-            //folder.Ass.Source = folder.DirInfo;
             folder.Status = status;
             Folders.Add(folder);
         }
@@ -77,53 +63,19 @@ namespace StorageTool
             Folders.Add(folder);
         }
 
+        public void RemoveFolder(FolderViewModel folder)
+        {
+            folder.PropertyChanged -= FolderPropertyChanged;
+            Folders.Remove(folder);
+        }
+
         void FolderPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "Status" || e.PropertyName == "Mapping")
             {
                 if(ModelPropertyChangedEvent != null)
                     App.Current.Dispatcher.BeginInvoke(new Action(() => { ModelPropertyChangedEvent(); }));
-                
-                //var folder = (FolderViewModel)sender;
-                //if (folder.Status == TaskStatus.Completed)
-                //{
-                //    if(CompletedTaskEvent != null)
-                //        CompletedTaskEvent(folder);
-                //    //RemoveFolder(folder);// ??? automatically remove file from list on completion??
-                //}
-                //if (folder.Status == TaskStatus.Running)
-                //{
-                //    if(StartedTaskEvent != null)
-                //        StartedTaskEvent(folder);
-                //}
             }
         }
-
-        //public FolderViewModel RemoveFolderAndGet(FolderViewModel folder)
-        //{
-        //    //if (folder.Status == TaskStatus.Running)
-        //    //{
-        //    //    folder.CancelTask();
-        //    //}
-        //    //unbind event
-        //    folder.PropertyChanged -= FolderPropertyChanged;
-        //    Folders.Remove(folder);
-        //    return folder;
-        //}
-
-        public void RemoveFolder(FolderViewModel folder)
-        {
-            //folder.Status = TaskStatus.Inactive;
-            folder.PropertyChanged -= FolderPropertyChanged;
-            Folders.Remove(folder);
-        }
-
-        //public event PropertyChangedEventHandler PropertyChanged;
-
-        //public void OnPropertyChanged(string propName)
-        //{
-        //    if (this.PropertyChanged != null)
-        //        this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
-        //}
     }
 }

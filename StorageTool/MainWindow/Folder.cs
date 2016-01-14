@@ -9,6 +9,7 @@ using System.IO;
 using System.ComponentModel;
 using System.Windows.Controls;
 using System.Collections.ObjectModel;
+using System.Collections;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -158,18 +159,13 @@ namespace StorageTool
         {
             Status = TaskStatus.Inactive;
             DirInfo = new DirectoryInfo(path);
-            DirSize = null;
             GetSize();
         }
 
         public FolderViewModel(DirectoryInfo dir)
         {
-            //Ass.Target = target;
-            //Ass.Mode = mode;
-            //Ass.Source = dir;
             Status = TaskStatus.Inactive;
             DirInfo = dir;
-            DirSize = null;
             GetSize();
         }
 
@@ -262,8 +258,6 @@ namespace StorageTool
                     break;
             }
         }
-
-
 
         public async void GetSize()
         {
@@ -427,6 +421,52 @@ namespace StorageTool
     {
         public DirectoryInfo DirInfo { get; set; } = null;
         public long? DirSize { get; set; } = null;
+    }
+
+    public class FolderSorter : IComparer
+    {
+
+        private ListSortDirection _direction;
+        private string _property;
+        public FolderSorter(string property, ListSortDirection direction)
+        {
+            _direction = direction;
+            _property = property;
+        }
+        public int Compare(object x, object y)
+        {
+            FolderViewModel folderX = x as FolderViewModel;
+            FolderViewModel folderY = y as FolderViewModel;
+            if (_property == "Name")
+                return CompareName(_direction, folderX, folderY);
+            if (_property == "Size")
+                return CompareSize(_direction, folderX, folderY);
+            return 0;
+        }
+
+        public static int CompareName(ListSortDirection direction, FolderViewModel folderX, FolderViewModel folderY)
+        {
+            if (direction == ListSortDirection.Ascending)
+                return folderX.DirInfo.Name.CompareTo(folderY.DirInfo.Name);
+            else
+                return folderY.DirInfo.Name.CompareTo(folderX.DirInfo.Name);
+        }
+
+        public static int CompareSize(ListSortDirection direction, FolderViewModel folderX, FolderViewModel folderY)
+        {
+            long XSize = 0;
+            long YSize = 0;
+            if (folderX.DirSize != null && folderY.DirSize != null)
+            {
+                XSize = (long)folderX.DirSize;
+                YSize = (long)folderY.DirSize;
+            }
+
+            if (direction == ListSortDirection.Ascending)
+                return XSize.CompareTo(YSize);
+            else
+                return YSize.CompareTo(XSize);
+        }
     }
 
 }
