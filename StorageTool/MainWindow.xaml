@@ -21,15 +21,15 @@
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="100"/>
+            <RowDefinition Height="98"/>
             <RowDefinition/>
-            <RowDefinition Height="190"/>
+            <RowDefinition Height="180"/>
         </Grid.RowDefinitions>
 
         <!--PROFILE SELECTOR-->
-        <ComboBox x:Name="profileBox" ItemsSource="{Binding ProfileViewModel.Profiles}" SelectedItem="{Binding ProfileViewModel.ActiveProfile}" DisplayMemberPath="ProfileName" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="227" Height="22"/>
-        <Button x:Name="removeProfile"  Content="Remove selected profile" Command="{Binding ProfileViewModel.RemoveSelectedCommand}" HorizontalAlignment="Left" Margin="242,10,0,0" VerticalAlignment="Top" Width="137" Height="22"/>
-        <Button x:Name="openProfileInputDialogue" Content="Add new profile" Command="{Binding OpenProfileInputDialogCommand}" HorizontalAlignment="Left" Margin="384,10,0,0" VerticalAlignment="Top" Width="135" Height="22"/>
+        <!--<ComboBox x:Name="profileBox" ItemsSource="{Binding ProfileViewModel.Profiles}" SelectedItem="{Binding ProfileViewModel.ActiveProfile}" DisplayMemberPath="ProfileName" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="227" Height="22"/>-->
+        <Button x:Name="removeProfile"  Content="Remove selected profile" Command="{Binding ProfileViewModel.RemoveSelectedCommand}" HorizontalAlignment="Left" Margin="232,10,0,0" VerticalAlignment="Top" Width="137" Height="22"/>
+        <Button x:Name="openProfileInputDialogue" Content="Add new profile" Command="{Binding OpenProfileInputDialogCommand}" HorizontalAlignment="Left" Margin="105,10,0,0" VerticalAlignment="Top" Width="122" Height="22"/>
 
         <Button x:Name="Desc_StorageFolder" Command="{Binding OpenExplorerCommand}" CommandParameter="{Binding ProfileViewModel.ActiveProfile.StorageFolder.FullName}" HorizontalAlignment="Left" Padding="5,1,1,0" Margin="323,64,0,0" Content="Open" Width="46" Height="20" VerticalAlignment="Top"/>
         <Button x:Name="Desc_GameFolder" Command="{Binding OpenExplorerCommand}" CommandParameter="{Binding ProfileViewModel.ActiveProfile.GameFolder.FullName}" HorizontalAlignment="Left" Padding="5,1,1,0" Content="Open" Width="46" Height="20" VerticalAlignment="Top" Margin="323,39,0,0"/>
@@ -38,159 +38,53 @@
         <TextBlock x:Name="label_SourceFolder" HorizontalAlignment="Left" Padding="5,1,1,0" Height="20" Margin="10,39,0,0" TextWrapping="Wrap" Text="Source Folder:" VerticalAlignment="Top" Width="90"/>
         <TextBlock x:Name="label_StorageFolder" HorizontalAlignment="Left" Padding="5,1,1,0" Margin="10,64,0,0" TextWrapping="Wrap" Text="Storage Folder:" VerticalAlignment="Top" Height="20" Width="90"/>
 
-        <!--FOLDERPANE-->
-        <TabControl x:Name="tabControl" Margin="10" Grid.Row="1">
-            <TabItem Header="Source">                
-                <ListView x:Name="sourceList" ItemsSource="{Binding ActiveDisplayViewModel.Source}" Margin="0,0,-0,-0">
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn Width="300" DisplayMemberBinding="{Binding DirInfo.Name}">
-                                <GridViewColumnHeader Tag="DirInfo.Name" Command="{Binding ActiveDisplayViewModel.HeaderClickCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Content="Name"/>
-                            </GridViewColumn>
-                            <GridViewColumn  Width="100">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBlock HorizontalAlignment="Right" Text="{Binding SizeString}" />
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                                <GridViewColumnHeader Tag="DirSize" Command="{Binding ActiveDisplayViewModel.HeaderClickCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Content="Size"/>
-                            </GridViewColumn>
-                            <GridViewColumn Width="60">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Button Content="Store" Command="{Binding StoreCommand}" CommandParameter="{Binding}"/>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-                        </GridView>
-                    </ListView.View>
-                </ListView>
-            </TabItem>
-            
-            <TabItem Header="Storage">
-                <ListView x:Name="storageList" ItemsSource="{Binding ActiveDisplayViewModel.Stored}" Margin="0,0,0,0" Grid.Column="1" Grid.Row="1">
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn  DisplayMemberBinding="{Binding DirInfo.Name}" Width="300">
-                                <GridViewColumn.Header>
-                                    <GridViewColumnHeader Tag="DirInfo.Name" >Name</GridViewColumnHeader>
-                                </GridViewColumn.Header>
-                            </GridViewColumn>
-                            <GridViewColumn Width="100">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBlock HorizontalAlignment="Right" Text="{Binding SizeString}" />
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                                <GridViewColumn.Header>
-                                    <GridViewColumnHeader Tag="DirSize">Size</GridViewColumnHeader>
-                                </GridViewColumn.Header>
-                            </GridViewColumn>
-                            <GridViewColumn Width="60">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Button Content="Restore" Command="{Binding StoreCommand}"  CommandParameter="{Binding}"/>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-                        </GridView>
-                    </ListView.View>
-                </ListView>
-            </TabItem>
-            
-            <TabItem Header="Unlinked" Visibility="{Binding ActiveDisplayViewModel.ShowUnlinkedFolders, Converter={StaticResource BoolToVis}}" >
-                <ListView x:Name="unlinkedList" ItemsSource="{Binding ActiveDisplayViewModel.Unlinked}" Grid.Column="1" Margin="0,0,0,0" Grid.Row="2">
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn  DisplayMemberBinding="{Binding DirInfo.Name}" Width="300">
-                                <GridViewColumn.Header>
-                                    <GridViewColumnHeader Tag="DirInfo.Name">Name</GridViewColumnHeader>
-                                </GridViewColumn.Header>
-                            </GridViewColumn>
-                            <GridViewColumn Width="100">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBlock HorizontalAlignment="Right" Text="{Binding SizeString}" />
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                                <GridViewColumn.Header>
-                                    <GridViewColumnHeader Tag="DirSize">Size</GridViewColumnHeader>
-                                </GridViewColumn.Header>
-                            </GridViewColumn>
-                            <GridViewColumn Width="60">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Button Content="Link" Command="{Binding LinkCommand}" CommandParameter="{Binding}"/>
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                            </GridViewColumn>
-                        </GridView>
-                    </ListView.View>
-                </ListView>
-            </TabItem>
-            
-            <TabItem Header="Duplicate" Visibility="{Binding ActiveDisplayViewModel.ShowDuplicateFolders, Converter={StaticResource BoolToVis}}">
-                <ListView x:Name="duplicateList" ItemsSource="{Binding ActiveDisplayViewModel.DuplicateFolders}" Margin="0,0,0,0">
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn  DisplayMemberBinding="{Binding}" Width="250">
-                                <GridViewColumn.Header>
-                                    <GridViewColumnHeader>Duplicate Folders</GridViewColumnHeader>
-                                </GridViewColumn.Header>
-                            </GridViewColumn>
-                        </GridView>
-                    </ListView.View>
-                </ListView>
-            </TabItem>
-
-            <TabItem Header="All">
-                <ListView x:Name="allList" ItemsSource="{Binding ActiveDisplayViewModel.FolderManager.Folders}" Margin="0,0,-0,-0">
-                    <ListView.View>
-                        <GridView>
-                            <GridViewColumn Width="Auto" DisplayMemberBinding="{Binding DirInfo.FullName}">
-                                <GridViewColumnHeader Tag="DirInfo.Name" Content="Name"/>
-                            </GridViewColumn>
-                            <GridViewColumn Width="Auto" DisplayMemberBinding="{Binding Status}">
-                                <GridViewColumnHeader Tag="DirInfo.Name" Content="Status"/>
-                            </GridViewColumn>
-                            <GridViewColumn Width="Auto" DisplayMemberBinding="{Binding Mapping}">
-                                <GridViewColumnHeader Tag="DirInfo.Name" Content="Mapping"/>
-                            </GridViewColumn>
-                            <GridViewColumn Width="Auto" DisplayMemberBinding="{Binding Ass.Mode}">
-                                <GridViewColumnHeader Tag="DirInfo.Name" Content="Mode"/>
-                            </GridViewColumn>
-                            <GridViewColumn Width="Auto" DisplayMemberBinding="{Binding ReturnStatus}">
-                                <GridViewColumnHeader Tag="DirInfo.Name" Content="ReturnStatus"/>
-                            </GridViewColumn>
-                            <GridViewColumn Width="Auto" DisplayMemberBinding="{Binding Ass.Source.FullName}">
-                                <GridViewColumnHeader Tag="DirInfo.Name" Content="Assignment Source"/>
-                            </GridViewColumn>
-                            <GridViewColumn Width="Auto" DisplayMemberBinding="{Binding Ass.Target.FullName}">
-                                <GridViewColumnHeader Tag="DirInfo.Name" Content="Assignment Target"/>
-                            </GridViewColumn>
-                            <GridViewColumn  Width="Auto">
-                                <GridViewColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBlock HorizontalAlignment="Right" Text="{Binding SizeString}" />
-                                    </DataTemplate>
-                                </GridViewColumn.CellTemplate>
-                                <GridViewColumnHeader Tag="DirSize" Content="Size"/>
-                            </GridViewColumn>
-                        </GridView>
-                    </ListView.View>
-                </ListView>
-            </TabItem>
-            
+        <TabControl Grid.Row="1" ItemsSource="{Binding DisplayViewModels}" SelectedValue="{Binding ProfileViewModel.ActiveProfile, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Profile" Margin="7">
+            <!--<TabControl.Resources>
+                <Style TargetType="TabItem">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="TabItem">
+                                <Grid Name="Panel">
+                                    <ContentPresenter x:Name="ContentSite"
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Center"
+                                        ContentSource="Header"
+                                        Margin="10,2"/>
+                                </Grid>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter TargetName="Panel" Property="Background" Value="LightSkyBlue" />
+                                    </Trigger>
+                                    <Trigger Property="IsSelected" Value="False">
+                                        <Setter TargetName="Panel" Property="Background" Value="White" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </TabControl.Resources>-->
+            <TabControl.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Profile.ProfileName}"/>
+                </DataTemplate>
+            </TabControl.ItemTemplate>
+            <TabControl.ContentTemplate>
+                <DataTemplate>
+                    <local:FolderManagerView DataContext="{Binding}" VerticalAlignment="Stretch"/>
+                </DataTemplate>
+            </TabControl.ContentTemplate>
         </TabControl>
+
 
         <!--MOVEPANE-->
         <!--<TextBlock x:Name="currentCopiedFile" Margin="10,20,263,0" Grid.Row="2" TextWrapping="Wrap" Text="{Binding Messages.CurrentFile}" VerticalAlignment="Top" Background="White" Height="20"/>-->
         <!--<Button x:Name="pauseQueue" Command="{Binding PauseAllCommand}" Content="Pause All" HorizontalAlignment="Right" Margin="0,20,93,0" Grid.Row="2" Width="75" Height="20" VerticalAlignment="Top"/>-->
         <!--<Button x:Name="cancelAll" Command="{Binding CancelAllCommand}" Content="Cancel All" Margin="0,20,13,0" Grid.Row="2" HorizontalAlignment="Right" Width="75" Height="20" VerticalAlignment="Top"/>-->
-        <Button x:Name="refresh" Content="Refresh" Command="{Binding ActiveDisplayViewModel.RefreshCommand}" Margin="0,0,13,0" Grid.Row="1" VerticalAlignment="Top" Height="20" HorizontalAlignment="Right" Width="60"/>
+        <Button x:Name="refresh" Content="Refresh" Command="{Binding ActiveDisplayViewModel.RefreshCommand}" Margin="0,63,10,0" VerticalAlignment="Top" Height="20" HorizontalAlignment="Right" Width="60"/>
         <!--<Button x:Name="deleteHistory" Content="Clear History" Margin="0,20,173,0" Grid.Row="2" VerticalAlignment="Top" HorizontalAlignment="Right" Width="85" Height="20"/>-->
-        
-        <ListView x:Name="Move_Queue" ItemsSource="{Binding Assigned}" Margin="10,45,10,10" Grid.Row="2">
+
+        <ListView x:Name="Move_Queue" ItemsSource="{Binding Assigned}" Margin="7" Grid.Row="2">
             <!--<ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -198,7 +92,7 @@
             </ListView.ItemContainerStyle>-->
             <ListView.View>
                 <GridView>
-                    
+
                     <GridViewColumn Width="150" Header="Name" >
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
@@ -210,9 +104,9 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    
+
                     <GridViewColumn Width="80" Header="Status" DisplayMemberBinding="{Binding Status}"/>
-                    
+
                     <GridViewColumn Width="100"  Header="Progress">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
@@ -232,13 +126,13 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    
+
                     <GridViewColumn Width="60">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <ToggleButton Name="CancelButton" Command="{Binding PauseCommand}">
                                     <ToggleButton.Style>
-                                        <Style TargetType="ToggleButton">                                        
+                                        <Style TargetType="ToggleButton">
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding Paused}" Value="False">
                                                     <Setter Property="Content" Value="Pause"/>
@@ -253,7 +147,7 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    
+
                     <GridViewColumn Width="60">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
@@ -261,7 +155,7 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    
+
                 </GridView>
             </ListView.View>
         </ListView>

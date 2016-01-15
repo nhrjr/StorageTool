@@ -71,8 +71,22 @@ namespace StorageTool
                     {
                         _lastDirection = _lastDirection == ListSortDirection.Ascending ? ListSortDirection.Descending : ListSortDirection.Ascending;
                         GridViewColumnHeader g = param as GridViewColumnHeader;
-                        Source.CustomSort = new FolderSorter(g.Content.ToString(),_lastDirection);
-                        Source.Refresh();                      
+                        if(g.Tag.ToString() == "Source")
+                        {
+                            Source.CustomSort = new FolderSorter(g.Content.ToString(), _lastDirection);
+                            Source.Refresh();
+                        }
+                        if (g.Tag.ToString() == "Stored")
+                        {
+                            Stored.CustomSort = new FolderSorter(g.Content.ToString(), _lastDirection);
+                            Stored.Refresh();
+                        }
+                        if (g.Tag.ToString() == "Unlinked")
+                        {
+                            Unlinked.CustomSort = new FolderSorter(g.Content.ToString(), _lastDirection);
+                            Unlinked.Refresh();
+                        }
+
                     }, param => true);
                 }
                 return _headerClickCommand;

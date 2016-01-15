@@ -132,11 +132,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="MainWindow\Folder.cs" />
-    <Compile Include="MainWindow\FolderManager.cs" />
-    <Compile Include="MainWindow\FolderManagerViewModel.cs" />
+    <Compile Include="FolderManager\FolderManagerView.xaml.cs">
+      <DependentUpon>FolderManagerView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FolderManager\Folder.cs" />
+    <Compile Include="FolderManager\FolderManager.cs" />
+    <Compile Include="FolderManager\FolderManagerViewModel.cs" />
     <Compile Include="MainWindow\MainWindowViewModel.cs" />
-    <Compile Include="ProfileInputWindow.xaml.cs">
+    <Compile Include="ProfileView\ProfileInputWindow.xaml.cs">
       <DependentUpon>ProfileInputWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ProfileView\ProfileViewModel.cs" />
@@ -147,6 +150,10 @@
     <Compile Include="ProfileView\ProfileInputViewModel.cs" />
     <Compile Include="Resources\SortAdorner.cs" />
     <Compile Include="Resources\MoveHelper.cs" />
+    <Page Include="FolderManager\FolderManagerView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -165,7 +172,7 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="ProfileInputWindow.xaml">
+    <Page Include="ProfileView\ProfileInputWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -24,58 +24,44 @@ namespace StorageTool
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {
-        public FolderManagerViewModel _activeDisplayViewModel;
-        public List<FolderManagerViewModel> _displayViewModels = new List<FolderManagerViewModel>();
+        //public FolderManagerViewModel _activeDisplayViewModel;
+        public ObservableCollection<FolderManagerViewModel> _displayViewModels = new ObservableCollection<FolderManagerViewModel>();
         public ProfileViewModel _profileViewModel = new ProfileViewModel();
         public CompositeCollection _assigned = new CompositeCollection();
 
         public MainWindowViewModel()
         {
             //Profiles = new ProfileCollection(Properties.Settings.Default.Config.Profiles);
-            ProfileViewModel.SetActiveProfileEvent += SetActiveDisplay;
-            ProfileViewModel.RemoveActiveProfileEvent += RemoveActiveDisplay;          
+            ProfileViewModel.SetActiveProfileEvent += SetDisplayViewModels;
+            ProfileViewModel.RemoveActiveProfileEvent += SetDisplayViewModels;          
             ProfileViewModel.Add(new Profile("TestCases1", @"C:\TestCases\case1_games", @"C:\TestCases\case1_storage"));
             ProfileViewModel.Add(new Profile("TestCases2", @"C:\TestCases\case2_games", @"C:\TestCases\case2_storage"));
             SetDisplayViewModels();
-            SetActiveDisplay();            
+            //SetActiveDisplay();            
         }
 
         private void SetDisplayViewModels()
         {
             foreach(Profile p in ProfileViewModel.Profiles)
             {
-                DisplayViewModels.Add(new FolderManagerViewModel(p));
-            }
-            foreach(FolderManagerViewModel f in DisplayViewModels)
-            {
-                CollectionContainer cc = new CollectionContainer();
-                cc.Collection = f.Assigned;
-                this.Assigned.Add(cc);
-            }
-        }
-        
-
-        private void SetActiveDisplay()
-        {
-            if (ProfileViewModel.ActiveProfile != null)
-            {
-                if(!DisplayViewModels.Any(item => item.Profile.ProfileName == ProfileViewModel.ActiveProfile.ProfileName))
+                if (!DisplayViewModels.Any(item => item.Profile.ProfileName == p.ProfileName))
                 {
-                    DisplayViewModels.Add(new FolderManagerViewModel(ProfileViewModel.ActiveProfile));
+                    FolderManagerViewModel var = new FolderManagerViewModel(p);
+                    DisplayViewModels.Add(var);
+                    CollectionContainer cc = new CollectionContainer();
+                    cc.Collection = var.Assigned;
+                    this.Assigned.Add(cc);
                 }
-                ActiveDisplayViewModel = DisplayViewModels.FirstOrDefault(f => f.Profile.ProfileName == ProfileViewModel.ActiveProfile.ProfileName);
             }
-            else
+            foreach(FolderManagerViewModel f in DisplayViewModels.Reverse())
             {
-                ActiveDisplayViewModel = null;
+                if(!ProfileViewModel.Profiles.Any(item => item.ProfileName == f.Profile.ProfileName))
+                {
+                    DisplayViewModels.Remove(f);
+                }
             }
-                
-        }
 
-        private void RemoveActiveDisplay(Profile prof)
-        {
-            DisplayViewModels.RemoveAll(f => f.Profile.ProfileName == prof.ProfileName);
-        }
+        }     
 
         RelayCommand _openProfileInputDialogCommand;
         public ICommand OpenProfileInputDialogCommand
@@ -115,16 +101,6 @@ namespace StorageTool
             }
         }
 
-        public FolderManagerViewModel ActiveDisplayViewModel
-        {
-            get { return _activeDisplayViewModel; }
-            set
-            {
-                _activeDisplayViewModel = value;
-                OnPropertyChanged(nameof(ActiveDisplayViewModel));
-            }
-        }
-
         public CompositeCollection Assigned
         {
             get { return _assigned; }
@@ -135,7 +111,7 @@ namespace StorageTool
             }
         }
 
-        public List<FolderManagerViewModel> DisplayViewModels
+        public ObservableCollection<FolderManagerViewModel> DisplayViewModels
         {
             get { return _displayViewModels; }
             set

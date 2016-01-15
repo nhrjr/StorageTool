@@ -40,7 +40,7 @@ namespace StorageTool
         Unlinked        
     }
 
-    public class FolderViewModel : INotifyPropertyChanged
+public class FolderViewModel : INotifyPropertyChanged
     {
         private object _lock = new object();
         private bool _paused = false;
@@ -468,6 +468,9 @@ namespace StorageTool
                 return YSize.CompareTo(XSize);
         }
     }
+
+
+
 
 }
 

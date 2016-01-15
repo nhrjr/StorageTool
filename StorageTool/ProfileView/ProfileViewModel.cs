@@ -12,7 +12,7 @@ using StorageTool.Resources;
 namespace StorageTool
 {
     public delegate void SetActiveProfileEventHandler();
-    public delegate void RemoveActiveProfileEventHandler(Profile prof);
+    public delegate void RemoveActiveProfileEventHandler();
 
     public class ProfileViewModel : INotifyPropertyChanged
     {
@@ -93,7 +93,7 @@ namespace StorageTool
         {
             if (RemoveActiveProfileEvent != null)
             {
-                RemoveActiveProfileEvent(ActiveProfile);
+                RemoveActiveProfileEvent();
             }
             Profiles.Remove(ActiveProfile);
         }
