@@ -9,10 +9,11 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </UserControl.Resources>
+
     <!--FOLDERPANE-->
-    <TabControl x:Name="tabControl" Grid.Row="1">
+    <TabControl x:Name="tabControl" Grid.Row="1" Padding="0" BorderThickness="0" Margin="0">
         
-        <!--<TabControl.Resources>
+        <TabControl.Resources>
             <Style TargetType="TabItem">
                 <Setter Property="Template">
                     <Setter.Value>
@@ -20,8 +21,9 @@
                             <Grid Name="Panel">
                                 <ContentPresenter x:Name="ContentSite"
                                         VerticalAlignment="Center"
-                                        HorizontalAlignment="Center"
+                                        HorizontalAlignment="Center"                                        
                                         ContentSource="Header"
+                                        MinWidth="60"
                                         Margin="10,2"/>
                             </Grid>
                             <ControlTemplate.Triggers>
@@ -36,10 +38,10 @@
                     </Setter.Value>
                 </Setter>
             </Style>
-        </TabControl.Resources>-->
+        </TabControl.Resources>
 
         <TabItem Header="Source">
-            <ListView x:Name="sourceList" ItemsSource="{Binding Source}" Margin="0,0,-0,-0" BorderThickness="0">
+            <ListView x:Name="sourceList" ItemsSource="{Binding Source}" Margin="0,0,-0,-0">
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Width="300" DisplayMemberBinding="{Binding DirInfo.Name}">
@@ -66,7 +68,7 @@
         </TabItem>
 
         <TabItem Header="Storage">
-            <ListView x:Name="storageList" ItemsSource="{Binding Stored}" Margin="0,0,0,0" BorderThickness="0">
+            <ListView x:Name="storageList" ItemsSource="{Binding Stored}" Margin="0,0,0,0">
                 <ListView.View>
                     <GridView>
                         <GridViewColumn  DisplayMemberBinding="{Binding DirInfo.Name}" Width="300">
@@ -97,7 +99,7 @@
         </TabItem>
 
         <TabItem Header="Unlinked" Visibility="{Binding ShowUnlinkedFolders, Converter={StaticResource BoolToVis}}" >
-            <ListView x:Name="unlinkedList" ItemsSource="{Binding Unlinked}" Grid.Column="1" BorderThickness="0">
+            <ListView x:Name="unlinkedList" ItemsSource="{Binding Unlinked}" Grid.Column="1">
                 <ListView.View>
                     <GridView>
                         <GridViewColumn  DisplayMemberBinding="{Binding DirInfo.Name}" Width="300">
@@ -128,7 +130,7 @@
         </TabItem>
 
         <TabItem Header="Duplicate" Visibility="{Binding ShowDuplicateFolders, Converter={StaticResource BoolToVis}}">
-            <ListView x:Name="duplicateList" ItemsSource="{Binding DuplicateFolders}" Margin="0,0,0,0" BorderThickness="0">
+            <ListView x:Name="duplicateList" ItemsSource="{Binding DuplicateFolders}" Margin="0,0,0,0">
                 <ListView.View>
                     <GridView>
                         <GridViewColumn  DisplayMemberBinding="{Binding}" Width="250">
@@ -141,7 +143,8 @@
             </ListView>
         </TabItem>
 
-        <TabItem Header="All">
+        <!--DEBUGVIEW-->
+        <!--<TabItem Header="All">
             <ListView x:Name="allList" ItemsSource="{Binding FolderManager.Folders}" Margin="0,0,-0,-0" BorderThickness="0">
                 <ListView.View>
                     <GridView>
@@ -177,7 +180,7 @@
                     </GridView>
                 </ListView.View>
             </ListView>
-        </TabItem>
+        </TabItem>-->
     </TabControl>
 
 </UserControl>
