@@ -18,25 +18,29 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="TabItem">
-                            <Grid Name="Panel">
+                            <Grid Name="Panel" Margin="2,2,2,2">
                                 <ContentPresenter x:Name="ContentSite"
                                         VerticalAlignment="Center"
                                         HorizontalAlignment="Center"                                        
                                         ContentSource="Header"
-                                        MinWidth="60"
                                         Margin="10,2"/>
                             </Grid>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsSelected" Value="True">
-                                    <Setter TargetName="Panel" Property="Background" Value="LightSkyBlue" />
+                                    <Setter TargetName="ContentSite" Property="TextBlock.FontWeight" Value="Bold" />
+                                    <Setter TargetName="Panel" Property="Background" Value="LightGray" />
                                 </Trigger>
                                 <Trigger Property="IsSelected" Value="False">
+                                    <Setter TargetName="ContentSite" Property="TextBlock.FontWeight" Value="Regular" />
                                     <Setter TargetName="Panel" Property="Background" Value="White" />
                                 </Trigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>
+            </Style>
+            <Style TargetType="{x:Type TabPanel}">
+                <Setter Property="HorizontalAlignment" Value="Center" />
             </Style>
         </TabControl.Resources>
 

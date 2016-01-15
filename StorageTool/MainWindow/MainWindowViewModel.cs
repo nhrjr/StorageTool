@@ -28,9 +28,11 @@ namespace StorageTool
         public ObservableCollection<FolderManagerViewModel> _displayViewModels = new ObservableCollection<FolderManagerViewModel>();
         public ProfileViewModel _profileViewModel = new ProfileViewModel();
         public CompositeCollection _assigned = new CompositeCollection();
+        private ProfileManagerViewModel _profileManagerViewModel;
 
         public MainWindowViewModel()
         {
+            _profileManagerViewModel = new ProfileManagerViewModel(_profileViewModel);
             //Profiles = new ProfileCollection(Properties.Settings.Default.Config.Profiles);
             ProfileViewModel.SetActiveProfileEvent += SetDisplayViewModels;
             ProfileViewModel.RemoveActiveProfileEvent += SetDisplayViewModels;          
@@ -63,23 +65,7 @@ namespace StorageTool
 
         }     
 
-        RelayCommand _openProfileInputDialogCommand;
-        public ICommand OpenProfileInputDialogCommand
-        {
-            get
-            {
-                if (_openProfileInputDialogCommand == null)
-                {
-                    _openProfileInputDialogCommand = new RelayCommand(param =>
-                    {
-                        var w = new ProfileInputWindow(_profileViewModel);
-                        w.Owner = Application.Current.MainWindow;
-                        w.ShowDialog();   
-                    }, param => true);
-                }
-                return _openProfileInputDialogCommand;
-            }
-        }
+  
 
 
 
@@ -130,7 +116,17 @@ namespace StorageTool
                 OnPropertyChanged(nameof(ProfileViewModel));
             }
         }
-    
+
+        public ProfileManagerViewModel ProfileManagerViewModel
+        {
+            get { return _profileManagerViewModel; }
+            set
+            {
+                _profileManagerViewModel = value;
+                OnPropertyChanged(nameof(ProfileManagerViewModel));
+            }
+        }
+
 
         public event PropertyChangedEventHandler PropertyChanged;
 

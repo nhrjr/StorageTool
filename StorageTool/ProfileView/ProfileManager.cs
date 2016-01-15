@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Windows;
 
 using StorageTool.Resources;
 
@@ -18,6 +19,7 @@ namespace StorageTool
     {
         private ObservableCollection<Profile> _profiles = new ObservableCollection<Profile>();
         private Profile _activeProfile;
+        //private Visibility _showManageProfileView = Visibility.Collapsed;
 
         public event SetActiveProfileEventHandler SetActiveProfileEvent;
         public event RemoveActiveProfileEventHandler RemoveActiveProfileEvent;
@@ -48,23 +50,45 @@ namespace StorageTool
             return var;
         }
 
+        //RelayCommand _openProfileInputDialogCommand;
+        //public ICommand OpenProfileInputDialogCommand
+        //{
+        //    get
+        //    {
+        //        if (_openProfileInputDialogCommand == null)
+        //        {
+        //            _openProfileInputDialogCommand = new RelayCommand(param =>
+        //            {
+        //                var w = new ProfileInputWindow(this);
+        //                w.Owner = Application.Current.MainWindow;
+        //                w.ShowDialog();
+        //            }, param => true);
+        //        }
+        //        return _openProfileInputDialogCommand;
+        //    }
+        //}
 
-        RelayCommand _removeSelectedCommand;
-        public ICommand RemoveSelectedCommand
-        {
-            get
-            {
-                if (_removeSelectedCommand == null)
-                {
-                    _removeSelectedCommand = new RelayCommand(param =>
-                    {
-                        RemoveActive();
-                        SetDefaultActive();
-                    }, param => true);
-                }
-                return _removeSelectedCommand;
-            }
-        }
+
+
+
+        //RelayCommand _manageProfilesCommand;
+        //public ICommand ManageProfilesCommand
+        //{
+        //    get
+        //    {
+        //        if (_manageProfilesCommand == null)
+        //        {
+        //            _manageProfilesCommand = new RelayCommand(param =>
+        //            {
+        //                if(ShowManageProfileView == Visibility.Collapsed)
+        //                    ShowManageProfileView = Visibility.Visible;
+        //                else
+        //                    ShowManageProfileView = Visibility.Collapsed;
+        //            }, param => true);
+        //        }
+        //        return _manageProfilesCommand;
+        //    }
+        //}
 
         public bool Add(Profile input)
         {
@@ -121,6 +145,16 @@ namespace StorageTool
                 }               
             }
         }
+
+        //public Visibility ShowManageProfileView
+        //{
+        //    get { return _showManageProfileView; }
+        //    set
+        //    {
+        //        _showManageProfileView = value;
+        //        OnPropertyChanged(nameof(ShowManageProfileView));
+        //    }
+        //}
 
         public event PropertyChangedEventHandler PropertyChanged;
 

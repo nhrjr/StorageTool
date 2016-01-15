@@ -14,7 +14,7 @@ using StorageTool.Resources;
 namespace StorageTool
 {
 
-        public class ProfileInputViewModel : INotifyPropertyChanged
+        public class ProfileManagerViewModel : INotifyPropertyChanged
     {
 
 
@@ -26,7 +26,7 @@ namespace StorageTool
 
         private ProfileViewModel _profileViewModel;        
 
-        public ProfileInputViewModel(ProfileViewModel profileViewModel)
+        public ProfileManagerViewModel(ProfileViewModel profileViewModel)
         {
             _profileViewModel = profileViewModel;
         }
@@ -65,10 +65,7 @@ namespace StorageTool
                     _returnKey = new RelayCommand(param =>
                     {
                         bool var = _profileViewModel.Add(new Profile(_profileName,_sourceInput,_storageInput));
-                        Window thisWindow = param as Window;
-                        if (var && thisWindow != null)
-                            thisWindow.Close();
-                        else
+                        if (!var)
                             _profileName = "This name exists already. Please retry";
                     }, param => true);
                 }
@@ -76,22 +73,55 @@ namespace StorageTool
             }
         }
 
-        RelayCommand _cancelCommand;
-        public ICommand CancelCommand
+        RelayCommand _removeSelectedCommand;
+        public ICommand RemoveSelectedCommand
         {
             get
             {
-                if (_cancelCommand == null)
+                if (_removeSelectedCommand == null)
                 {
-                    _cancelCommand = new RelayCommand(param =>
+                    _removeSelectedCommand = new RelayCommand(param =>
                     {
-                        Window thisWindow = param as Window;
-                        thisWindow.Close();
+                        _profileViewModel.RemoveActive();
+                        _profileViewModel.SetDefaultActive();
                     }, param => true);
                 }
-                return _cancelCommand;
+                return _removeSelectedCommand;
             }
         }
+
+        RelayCommand _editSelectedCommand;
+        public ICommand EditSelectedCommand
+        {
+            get
+            {
+                if (_editSelectedCommand == null)
+                {
+                    _editSelectedCommand = new RelayCommand(param =>
+                    {
+
+                    }, param => true);
+                }
+                return _editSelectedCommand;
+            }
+        }
+
+        //RelayCommand _cancelCommand;
+        //public ICommand CancelCommand
+        //{
+        //    get
+        //    {
+        //        if (_cancelCommand == null)
+        //        {
+        //            _cancelCommand = new RelayCommand(param =>
+        //            {
+        //                Window thisWindow = param as Window;
+        //                thisWindow.Close();
+        //            }, param => true);
+        //        }
+        //        return _cancelCommand;
+        //    }
+        //}
 
         public void Clear()
         {

@@ -139,15 +139,15 @@
     <Compile Include="FolderManager\FolderManager.cs" />
     <Compile Include="FolderManager\FolderManagerViewModel.cs" />
     <Compile Include="MainWindow\MainWindowViewModel.cs" />
-    <Compile Include="ProfileView\ProfileInputWindow.xaml.cs">
-      <DependentUpon>ProfileInputWindow.xaml</DependentUpon>
+    <Compile Include="ProfileView\ProfileManageView.xaml.cs">
+      <DependentUpon>ProfileManageView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ProfileView\ProfileViewModel.cs" />
+    <Compile Include="ProfileView\ProfileManager.cs" />
     <Compile Include="Resources\QueueItem.cs" />
     <Compile Include="Resources\AppCommands.cs" />
     <Compile Include="Resources\Config.cs" />
     <Compile Include="Resources\FolderWatcher.cs" />
-    <Compile Include="ProfileView\ProfileInputViewModel.cs" />
+    <Compile Include="ProfileView\ProfileManagerViewModel.cs" />
     <Compile Include="Resources\SortAdorner.cs" />
     <Compile Include="Resources\MoveHelper.cs" />
     <Page Include="FolderManager\FolderManagerView.xaml">
@@ -172,7 +172,7 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="ProfileView\ProfileInputWindow.xaml">
+    <Page Include="ProfileView\ProfileManageView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
