@@ -66,12 +66,20 @@ namespace StorageTool
             }
         }
 
-        public void Add(Profile prof)
+        public bool Add(Profile input)
         {
-            Profiles.Add(prof);
-            this.ActiveProfile = prof;
+            if (input != null)
+            {
+                if (!Profiles.Any(item => item.ProfileName == input.ProfileName))
+                {
+                    Profiles.Add(input);
+                    ActiveProfile = input;
+                    return true;
+                }
+            }
+            return false;
         }
-        
+
         public void SetDefaultActive()
         {
             if(Profiles.Count > 0)

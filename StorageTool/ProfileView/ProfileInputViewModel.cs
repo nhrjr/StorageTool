@@ -7,17 +7,91 @@ using System.Windows;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
+
+using StorageTool.Resources;
 
 namespace StorageTool
 {
-    public class ProfileInputViewModel : INotifyPropertyChanged
-    {
-        private DirectoryInfo _leftFolder;
-        private DirectoryInfo _rightFolder;
 
-        private string _leftInput = "Select your source folder.";
-        private string _rightInput = "Select your storage folder.";
-        private string _profileName = "ProfileName";
+        public class ProfileInputViewModel : INotifyPropertyChanged
+    {
+
+
+        //public Profile input = null;
+
+        private string _sourceInput = "Select your source folder.";
+        private string _storageInput = "Select your storage folder.";
+        private string _profileName = "Enter your profile name here.";
+
+        private ProfileViewModel _profileViewModel;        
+
+        public ProfileInputViewModel(ProfileViewModel profileViewModel)
+        {
+            _profileViewModel = profileViewModel;
+        }
+
+        RelayCommand _pickFolderCommand;
+        public ICommand PickFolderCommand
+        {
+            get
+            {
+                if (_pickFolderCommand== null)
+                {
+                    _pickFolderCommand = new RelayCommand(param =>
+                    {
+                        var dialog = new System.Windows.Forms.FolderBrowserDialog();
+                        System.Windows.Forms.DialogResult result = dialog.ShowDialog();
+                        if (result == System.Windows.Forms.DialogResult.OK)
+                        {
+                            if(param as string == "Source")
+                                LeftInput = dialog.SelectedPath;
+                            if (param as string == "Storage")
+                                RightInput = dialog.SelectedPath;
+                        }
+                    }, param => true);
+                }
+                return _pickFolderCommand;
+            }
+        }
+
+        RelayCommand _returnKey;
+        public ICommand ReturnKey
+        {
+            get
+            {
+                if (_returnKey == null)
+                {
+                    _returnKey = new RelayCommand(param =>
+                    {
+                        bool var = _profileViewModel.Add(new Profile(_profileName,_sourceInput,_storageInput));
+                        Window thisWindow = param as Window;
+                        if (var && thisWindow != null)
+                            thisWindow.Close();
+                        else
+                            _profileName = "This name exists already. Please retry";
+                    }, param => true);
+                }
+                return _returnKey;
+            }
+        }
+
+        RelayCommand _cancelCommand;
+        public ICommand CancelCommand
+        {
+            get
+            {
+                if (_cancelCommand == null)
+                {
+                    _cancelCommand = new RelayCommand(param =>
+                    {
+                        Window thisWindow = param as Window;
+                        thisWindow.Close();
+                    }, param => true);
+                }
+                return _cancelCommand;
+            }
+        }
 
         public void Clear()
         {
@@ -26,25 +100,11 @@ namespace StorageTool
             ProfileName = "ProfileName";
         }
 
-        public void SetName(string name)
-        {
-            _profileName = name;
-        }
-        public void AddRight(DirectoryInfo dir)
-        {
-            _rightFolder = dir;
-            this.RightInput = dir.FullName;
-        }
-        public void AddLeft(DirectoryInfo dir)
-        {
-            _leftFolder = dir;
-            this.LeftInput = dir.FullName;
-        }
         public Profile GetProfile()
         {
-            if (_leftFolder != null && _rightFolder != null)
+            if (_sourceInput != null && _storageInput != null && _profileName != null)
             {
-                return new Profile(_profileName, _leftFolder, _rightFolder);
+                return new Profile(_profileName, _sourceInput, _storageInput);
             }
             else
             {
@@ -54,38 +114,27 @@ namespace StorageTool
 
         public string LeftInput
         {
-            get
-            {
-                return _leftInput;
-            }
+            get { return _sourceInput; }
             set
             {
-                _leftInput = value;
-                _leftFolder = new DirectoryInfo(_leftInput);
+                _sourceInput = value;
                 OnPropertyChanged("LeftInput");
             }
         }
 
         public string RightInput
         {
-            get
-            {
-                return _rightInput;
-            }
+            get { return _storageInput; }
             set
             {
-                _rightInput = value;
-                _rightFolder = new DirectoryInfo(_rightInput);
+                _storageInput = value;
                 OnPropertyChanged("RightInput");
             }
         }
 
         public string ProfileName
         {
-            get
-            {
-                return _profileName;
-            }
+            get { return _profileName; }
             set
             {
                 _profileName = value;

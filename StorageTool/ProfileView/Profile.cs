@@ -73,15 +73,6 @@ namespace StorageTool
                 OnPropertyChanged("StorageFolder");
             }
         }
-        //public int ProfileIndex
-        //{
-        //    get { return profileIndex; }
-        //    set
-        //    {
-        //        this.profileIndex = value;
-        //        this.OnPropertyChanged("ProfileIndex");
-        //    }
-        //}
 
         public event PropertyChangedEventHandler PropertyChanged;
 

@@ -58,9 +58,18 @@ namespace StorageTool
         private void SetActiveDisplay()
         {
             if (ProfileViewModel.ActiveProfile != null)
+            {
+                if(!DisplayViewModels.Any(item => item.Profile.ProfileName == ProfileViewModel.ActiveProfile.ProfileName))
+                {
+                    DisplayViewModels.Add(new FolderManagerViewModel(ProfileViewModel.ActiveProfile));
+                }
                 ActiveDisplayViewModel = DisplayViewModels.FirstOrDefault(f => f.Profile.ProfileName == ProfileViewModel.ActiveProfile.ProfileName);
+            }
             else
+            {
                 ActiveDisplayViewModel = null;
+            }
+                
         }
 
         private void RemoveActiveDisplay(Profile prof)
@@ -77,12 +86,8 @@ namespace StorageTool
                 {
                     _openProfileInputDialogCommand = new RelayCommand(param =>
                     {
-                        //Window mainWindow = Application.Current.MainWindow;
-                        var w = new ProfileInputWindow();
+                        var w = new ProfileInputWindow(_profileViewModel);
                         w.Owner = Application.Current.MainWindow;
-
-                        w.TestForValidProfileEvent += new TestForValidProfileEventHandler(AddValidProfile);
-                        //w.Closing += W_Closing;
                         w.ShowDialog();   
                     }, param => true);
                 }
@@ -90,29 +95,7 @@ namespace StorageTool
             }
         }
 
-        private bool AddValidProfile(Profile input)
-        {
-            if (input != null)
-            {
-                if (ProfileViewModel.Profiles.Any(item => item.ProfileName == input.ProfileName))
-                {
-                    input.ProfileName = "A profile with that name already exists.";
-                }
-                else
-                {
-                    
-                    FolderManagerViewModel fm = new FolderManagerViewModel(input);
-                    DisplayViewModels.Add(fm);
-                    CollectionContainer cc = new CollectionContainer();
-                    cc.Collection = fm.Assigned;
-                    this.Assigned.Add(cc);
-                    ProfileViewModel.Add(input);
-                    //Properties.Settings.Default.Config.Profiles = ProfileViewModel.GetProfileBase();
-                    return true;
-                }
-            }
-            return false;
-        }
+
 
         RelayCommand _openExplorerCommand;
         public ICommand OpenExplorerCommand

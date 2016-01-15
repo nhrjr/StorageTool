@@ -15,50 +15,12 @@ using System.Windows.Shapes;
 
 namespace StorageTool
 {
-    public delegate bool TestForValidProfileEventHandler(Profile input);
-    
-
     public partial class ProfileInputWindow : Window
-    {
-        public Profile input = null;
-
-        public event TestForValidProfileEventHandler TestForValidProfileEvent;
-
-        public ProfileInputWindow()
+    {     
+        public ProfileInputWindow(ProfileViewModel profileViewModel)
         {
             InitializeComponent();
-            this_prof_input.addProfileReturnPressEvent += new addProfileReturnPressEventHandler(addProfile);
-        }
-        private void addProfile_Click(object sender, RoutedEventArgs e)
-        {
-            input = this_prof_input.ProfileInput.GetProfile();
-            if (TestForValidProfileEvent(input))
-            {
-                this.Close();
-            }
-            else
-            {
-                if(input != null)
-                    this_prof_input.ProfileInput.ProfileName = input.ProfileName;
-            }
-        }
-        private void addProfile()
-        {
-            input = this_prof_input.ProfileInput.GetProfile();
-            if (TestForValidProfileEvent(input))
-            {
-                this.Close();
-            }
-            else
-            {
-                if (input != null)
-                    this_prof_input.ProfileInput.ProfileName = input.ProfileName;
-            }
-        }
-
-        private void cancel_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();         
+            this.DataContext = new ProfileInputViewModel(profileViewModel);            
         }
 
         private void Window_MouseDown_ProfileInput(object sender, MouseButtonEventArgs e)

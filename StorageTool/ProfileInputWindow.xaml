@@ -8,18 +8,23 @@
         WindowStyle="None"
         MouseDown="Window_MouseDown_ProfileInput"
         WindowStartupLocation="CenterOwner"
-        Title="Add Profile" Height="160" Width="340" MinHeight="160" MaxHeight="160" MinWidth="340" MaxWidth="340">
-    <Grid Margin="0,0,2,0">
-        <local:ProfileInputUC x:Name="this_prof_input" Margin="11,10,21,37"></local:ProfileInputUC>
-        <Button x:Name="addProfileButton" Click="addProfile_Click" Content="Add profile" Margin="0,115,170,0" VerticalAlignment="Top" RenderTransformOrigin="1.311,0.826" Height="20" HorizontalAlignment="Right" Width="84"/>
-        <Button x:Name="cancelButton" Click="cancel_Click" Content="Cancel" HorizontalAlignment="Left" Margin="170,115,0,0" VerticalAlignment="Top" Width="75"/>
-        <!--<Button x:Name="addProfile" Click="addProfile_Click" Content="Add profile" Margin="0,85,157,0" VerticalAlignment="Top" RenderTransformOrigin="1.311,0.826" Height="20" HorizontalAlignment="Right" Width="84"/>
-        <TextBox x:Name="profileName" Text="{Binding ProfileInput.ProfileName,UpdateSourceTrigger=PropertyChanged}" Margin="0,60,10,0" TextWrapping="Wrap" RenderTransformOrigin="0.459,-0.163" Height="20" VerticalAlignment="Top" HorizontalAlignment="Right" Width="272"/>
-        <Button x:Name="pickFolderLeft" Click="pickFolderLeft_Click" Content="..." Margin="0,10,258,0" VerticalAlignment="Top" Height="20" HorizontalAlignment="Right" Width="24"/>
-        <Button x:Name="pickFolderRight" Click="pickFolderRight_Click" Content="..." Margin="0,35,258,0" HorizontalAlignment="Right" Width="24" Height="20" VerticalAlignment="Top"/>
-        <TextBlock x:Name="inputLeft" Text="{Binding ProfileInput.LeftInput}"  Margin="0,10,10,0" Height="20" VerticalAlignment="Top" Background="#FF9B9B9B" HorizontalAlignment="Right" Width="240"/>
-        <TextBlock x:Name="inputRight" Text="{Binding ProfileInput.RightInput}" Margin="0,35,10,0" Height="20" VerticalAlignment="Top" Background="#FF9B9B9B" HorizontalAlignment="Right" Width="240"/>
-        <Button x:Name="cancel" Click="cancel_Click" Content="Button" HorizontalAlignment="Left" Margin="165,85,0,0" VerticalAlignment="Top" Width="75"/>-->
+        Title="Add Profile" Height="130" Width="340" MinHeight="160" MaxHeight="160" MinWidth="340" MaxWidth="340 ">
+    <Grid>
+        <Button x:Name="addProfileButton" Command="{Binding ReturnKey}" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}" Content="Add profile" Margin="84,122,0,0" RenderTransformOrigin="1.311,0.826" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Width="84"/>
+        <Button x:Name="cancelButton" Command="{Binding CancelCommand}" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}" Content="Cancel" Margin="173,122,0,0" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Width="75"/>
+        <TextBox x:Name="profileName" Padding="5,1,1,0" Text="{Binding ProfileName,UpdateSourceTrigger=PropertyChanged}" Margin="84,97,0,0" TextWrapping="Wrap" RenderTransformOrigin="0.459,-0.163" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Width="209">
+            <TextBox.InputBindings>
+                <KeyBinding Key="Return" Command="{Binding ReturnKey}" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"/>
+            </TextBox.InputBindings>
+        </TextBox>
+        <Button x:Name="pickFolderLeft" Command="{Binding PickFolderCommand}" CommandParameter="Source" Content="..." Margin="0,47,10,0" VerticalAlignment="Top" Height="20" HorizontalAlignment="Right" Width="24"/>
+        <Button x:Name="pickFolderRight" Command="{Binding PickFolderCommand}" CommandParameter="Storage" Content="..." Margin="0,72,10,0" HorizontalAlignment="Right" Width="24" Height="20" VerticalAlignment="Top"/>
+        <TextBox x:Name="inputLeft" Padding="5,1,1,0" Text="{Binding LeftInput, Mode=OneWay}"  Margin="84,47,0,0" Height="20" VerticalAlignment="Top" Background="White" HorizontalAlignment="Left" Width="209"/>
+        <TextBox x:Name="inputRight"  Padding="5,1,1,0" Text="{Binding RightInput, Mode=OneWay}" Margin="84,72,0,0" Height="20" VerticalAlignment="Top" Background="White" HorizontalAlignment="Left" Width="209"/>
+        <TextBlock x:Name="SourceLabel" HorizontalAlignment="Left" Margin="10,47,0,0" TextWrapping="Wrap" Text="Source:" VerticalAlignment="Top" Height="20" Width="69"/>
+        <TextBlock x:Name="StorageLabel" HorizontalAlignment="Left" Margin="10,72,0,0" TextWrapping="Wrap" Text="Storage:" VerticalAlignment="Top" Width="69" Height="20"/>
+        <TextBlock x:Name="ProfileNameLabel" HorizontalAlignment="Left" Margin="10,97,0,0" TextWrapping="Wrap" Text="Profilename:" VerticalAlignment="Top" Height="20" Width="69"/>
+        <Label x:Name="HelpText" Content="Pick your folders and add a unique Name" HorizontalAlignment="Left" Margin="57,10,0,0" VerticalAlignment="Top" Width="236"/>
 
     </Grid>
 </Window>
