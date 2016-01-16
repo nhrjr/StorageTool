@@ -38,6 +38,8 @@ namespace StorageTool
             ProfileViewModel.RemoveActiveProfileEvent += SetDisplayViewModels;          
             ProfileViewModel.Add(new Profile("TestCases1", @"C:\TestCases\case1_games", @"C:\TestCases\case1_storage"));
             ProfileViewModel.Add(new Profile("TestCases2", @"C:\TestCases\case2_games", @"C:\TestCases\case2_storage"));
+            ProfileViewModel.Add(new Profile("Steam", @"C:\Games\Steam\SteamApps\common", @"D:\Games\Steam"));
+            ProfileViewModel.Add(new Profile("Generic", @"C:\Games", @"D:\Games\Generic"));
             SetDisplayViewModels();
             //SetActiveDisplay();            
         }
@@ -63,11 +65,17 @@ namespace StorageTool
                 }
             }
 
-        }     
+        }
 
-  
-
-
+        public int NumberOfOpenMoves()
+        {
+            int var = 0;
+            foreach (FolderManagerViewModel p in DisplayViewModels)
+            {
+                var += p.Assigned.Count;
+            }
+            return var;
+        }
 
         RelayCommand _openExplorerCommand;
         public ICommand OpenExplorerCommand
@@ -78,14 +86,42 @@ namespace StorageTool
                 {
                     _openExplorerCommand = new RelayCommand(param =>
                     {
-                        string path = param as string;
-                        if(path != null)
-                        Process.Start(path);
+                        string comm = param as string;
+                        if (comm != null)
+                        {
+                            if (comm == "Source")
+                                comm = ProfileViewModel.ActiveProfile.GameFolder.FullName;
+                            if (comm == "Storage")
+                                comm = ProfileViewModel.ActiveProfile.StorageFolder.FullName;
+                            Process.Start(comm);
+                        }
                     }, param => true);
                 }
                 return _openExplorerCommand;
             }
         }
+
+        RelayCommand _cancelAllCommand;
+        public ICommand CancelAllCommand
+        {
+            get
+            {
+                if (_cancelAllCommand == null)
+                {
+                    _cancelAllCommand = new RelayCommand(param =>
+                    {
+                        foreach(FolderManagerViewModel f in DisplayViewModels)
+                        {
+                            foreach(FolderViewModel v in f.FolderManager.Folders)
+                                v.CancelCommand.Execute(this);
+                        }
+                    }, param => true);
+                }
+                return _cancelAllCommand;
+            }
+        }
+
+
 
         public CompositeCollection Assigned
         {

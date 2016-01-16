@@ -236,9 +236,7 @@ public class FolderViewModel : INotifyPropertyChanged
             {
                 _canceled = true;
                 _cts.Cancel();
-            }
-            
-            
+            }          
         }
 
         private void TransferFolders(bool returnStatus, IProgress<long> sizeFromHell, object _lock, CancellationToken ct)
@@ -265,7 +263,7 @@ public class FolderViewModel : INotifyPropertyChanged
             {
                 try
                 {
-                    await Task.Run(() => DirectorySize.DirSizeSync(DirInfo)).ContinueWith(task => DirSize = task.Result).ConfigureAwait(false);
+                    await Task.Run(() => DirectorySize.DirSizeIterative(DirInfo)).ContinueWith(task => DirSize = task.Result).ConfigureAwait(false);
                 }
                 catch (IOException ex)
                 {

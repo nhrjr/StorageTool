@@ -26,70 +26,36 @@ namespace StorageTool
     
     public partial class MainWindow : Window
     {
+        MainWindowViewModel mainWindowViewModel = new MainWindowViewModel();
         public MainWindow()
         {
             InitializeComponent();
-            Closing += OnClosing;            
-
-            this.DataContext = new MainWindowViewModel();
+            this.DataContext = mainWindowViewModel;
         }
 
         private void OnClosing(object sender, CancelEventArgs cancelEventArgs)
         {
-            if (false)
+            int var = mainWindowViewModel.NumberOfOpenMoves();
+            if (var > 0)
             {
-                if (MessageBox.Show(this, "StorageTool is still copying,\n are you sure you wish to close?\n This will leave the current folders in a broken state.", "Close StorageTool", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
-                {
+                if (MessageBox.Show(this, "StorageTool is still copying,\n are you sure you wish to close?\n This will cancel all current move operations.", "Close StorageTool", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+                {                    
                     cancelEventArgs.Cancel = true;
                 }
             }            
         }
 
-        //private void openProfileInputDialogue_Click(object sender, RoutedEventArgs e)
-        //{
-        //    if (!isShowingProfileInput)
-        //    {
-        //        isShowingProfileInput = true;
-        //        var w = new ProfileInputWindow();
-        //        w.Left = this.Left + this.Width;
-        //        w.Top = this.Top + 10;
-
-        //        w.TestForValidProfileEvent += new TestForValidProfileEventHandler(testValidInput);
-        //        w.Closing += W_Closing;
-
-        //        w.ShowDialog();                
-        //    }            
-        //}
-
-        //private void W_Closing(object sender, CancelEventArgs e)
-        //{
-        //    isShowingProfileInput = false;
-        //}
-
-        //private bool testValidInput(Profile input)
-        //{
-        //    if (input != null)
-        //    {
-        //        if (FolderPane.Stash.Exists(item => item.Profile.ProfileName == input.ProfileName))
-        //        {
-        //            input.ProfileName = "A profile with that name already exists.";
-        //        }
-        //        else
-        //        {
-        //            Profiles.Add(input);
-        //            Properties.Settings.Default.Config.Profiles = Profiles.GetProfileBase();
-        //            isShowingProfileInput = false;
-        //            return true;
-        //        }
-        //    }
-        //    return false;
-        //}
+        private void OnClosed(object sender, EventArgs e)
+        {
+            mainWindowViewModel.CancelAllCommand.Execute(this);
+        }
 
         private void Window_MouseDown_Main(object sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton == MouseButton.Left)
                 this.DragMove();
         }
+
 
     }
 
