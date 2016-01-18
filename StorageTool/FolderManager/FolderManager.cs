@@ -29,18 +29,47 @@ namespace StorageTool
         public static object _lock = new object();
         public event ModelPropertyChangedEventHandler ModelPropertyChangedEvent;
 
-        public DirectoryInfo ParentFolder { get; set; } = null;
-        public ObservableCollection<FolderViewModel> Folders { get; set; } = new ObservableCollection<FolderViewModel>();
+        private bool _isRefreshingFolders = false;
+        private bool _isRefreshingSizes = false;
 
-        public FolderManager(DirectoryInfo parentFolder)
+        private Profile Profile;
+
+        public ObservableCollection<FolderViewModel> Folders { get; set; } = new ObservableCollection<FolderViewModel>();
+        public ObservableCollection<string> DuplicateFolders { get; set; } = new ObservableCollection<string>();
+
+        private AnalyzeFolders analyzeFolders = new AnalyzeFolders();
+        private FolderWatcher folderWatcher = new FolderWatcher();
+
+
+        public FolderManager(Profile p)
         {
-            ParentFolder = parentFolder;
-            BindingOperations.EnableCollectionSynchronization(Folders, _lock);
+            Profile = p;
+            InitFolderManager();
         }
 
         public FolderManager()
         {
+            InitFolderManager();
+        }
+
+        private void InitFolderManager()
+        {
             BindingOperations.EnableCollectionSynchronization(Folders, _lock);
+
+            folderWatcher.NotifyFileSystemChangesEvent += RefreshFolders;
+            folderWatcher.NotifyFileSizeChangesEvent += RefreshSizes;
+            folderWatcher.StartFileSystemWatcher(Profile.GameFolder.FullName);
+            folderWatcher.StartFileSystemWatcher(Profile.StorageFolder.FullName);
+
+            RefreshFolders();
+        }
+
+        ~FolderManager()
+        {
+            folderWatcher.NotifyFileSystemChangesEvent -= RefreshFolders;
+            folderWatcher.NotifyFileSizeChangesEvent -= RefreshSizes;
+            folderWatcher.StopFileSystemWatcher(Profile.GameFolder.FullName);
+            folderWatcher.StopFileSystemWatcher(Profile.StorageFolder.FullName);
         }
 
 
@@ -67,6 +96,79 @@ namespace StorageTool
         {
             folder.PropertyChanged -= FolderPropertyChanged;
             Folders.Remove(folder);
+        }
+
+        private void RefreshSizes()
+        {
+            if (_isRefreshingSizes == true)
+            {
+                return;
+            }
+            foreach (FolderViewModel f in Folders) { f.DirSize = null; f.GetSize(); }
+        }
+
+        private async void RefreshFolders()
+        {
+            if (_isRefreshingFolders == true)
+                return;
+            try
+            {
+                _isRefreshingFolders = true;
+
+                await Task.Factory.StartNew(() =>
+                {
+
+                    analyzeFolders.GetFolderStructure(Profile);
+                    DuplicateFolders = new ObservableCollection<string>(analyzeFolders.DuplicateFolders);
+
+                    foreach (DirectoryInfo g in analyzeFolders.StorableFolders)
+                    {
+                        if (!Folders.Any(f => f.DirInfo.Name == g.Name))
+                        {
+                            AddFolder(new FolderViewModel(g), Profile.StorageFolder, TaskMode.STORE, TaskStatus.Inactive, Mapping.Source);
+                        }
+
+                    }
+                    foreach (DirectoryInfo g in analyzeFolders.LinkedFolders)
+                    {
+                        if (!Folders.Any(f => f.DirInfo.Name == g.Name))
+                        {
+                            AddFolder(new FolderViewModel(g), Profile.GameFolder, TaskMode.RESTORE, TaskStatus.Inactive, Mapping.Stored);
+                        }
+                    }
+                    foreach (DirectoryInfo g in analyzeFolders.UnlinkedFolders)
+                    {
+                        if (!Folders.Any(f => f.DirInfo.Name == g.Name))
+                        {
+                            AddFolder(new FolderViewModel(g), Profile.GameFolder, TaskMode.RELINK, TaskStatus.Inactive, Mapping.Unlinked);
+                        }
+                    }
+
+                    foreach (FolderViewModel g in Folders.Reverse())
+                    {
+                        if (!analyzeFolders.StorableFolders.Any(f => f.FullName == g.DirInfo.FullName))
+                        {
+                            if (!analyzeFolders.LinkedFolders.Any(f => f.FullName == g.DirInfo.FullName))
+                            {
+                                if (!analyzeFolders.UnlinkedFolders.Any(f => f.FullName == g.DirInfo.FullName))
+                                {
+                                    if (g.Status == TaskStatus.Inactive)
+                                    {
+                                        RemoveFolder(g);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+            catch (IOException e)
+            {
+            }
+            finally
+            {
+                _isRefreshingFolders = false;
+            }
         }
 
         void FolderPropertyChanged(object sender, PropertyChangedEventArgs e)

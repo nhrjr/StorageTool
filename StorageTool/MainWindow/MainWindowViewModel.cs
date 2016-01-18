@@ -37,12 +37,7 @@ namespace StorageTool
 
             _profileManagerViewModel = new ProfileManagerViewModel(_profileViewModel);            
               
-            //ProfileViewModel.Add(new Profile("TestCases1", @"C:\TestCases\case1_games", @"C:\TestCases\case1_storage"));
-            //ProfileViewModel.Add(new Profile("TestCases2", @"C:\TestCases\case2_games", @"C:\TestCases\case2_storage"));
-            //ProfileViewModel.Add(new Profile("Steam", @"C:\Games\Steam\SteamApps\common", @"D:\Games\Steam"));
-            //ProfileViewModel.Add(new Profile("Generic", @"C:\Games", @"D:\Games\Generic"));
             SetDisplayViewModels();
-            //SetActiveDisplay();            
         }
 
         private void SetDisplayViewModels()

@@ -17,7 +17,6 @@ namespace StorageTool
         public class ProfileManagerViewModel : INotifyPropertyChanged
         {
 
-
         private string _sourceInput = Constants.ProfileInputSourceDefault;
         private string _storageInput = Constants.ProfileInputStorageDefault;
         private string _profileName = Constants.ProfileInputNameDefault;

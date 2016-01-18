@@ -51,7 +51,7 @@
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Width="300" DisplayMemberBinding="{Binding DirInfo.Name}">
-                            <GridViewColumnHeader Tag="Source" Command="{Binding HeaderClickCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Content="Name"/>
+                            <GridViewColumnHeader Tag="Source" Command="{Binding SortCustomViewsCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Content="Name"/>
                         </GridViewColumn>
                         <GridViewColumn  Width="100">
                             <GridViewColumn.CellTemplate>
@@ -78,7 +78,7 @@
                 <ListView.View>
                     <GridView>
                         <GridViewColumn  DisplayMemberBinding="{Binding DirInfo.Name}" Width="300">
-                            <GridViewColumnHeader Tag="Stored" Command="{Binding HeaderClickCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Content="Name"/>
+                            <GridViewColumnHeader Tag="Stored" Command="{Binding SortCustomViewsCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Content="Name"/>
                         </GridViewColumn>
                         <GridViewColumn Width="100">
                             <GridViewColumn.CellTemplate>
@@ -86,7 +86,7 @@
                                     <TextBlock HorizontalAlignment="Right" Text="{Binding SizeString}" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
-                            <GridViewColumnHeader Tag="Stored" Command="{Binding HeaderClickCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Content="Size"/>
+                            <GridViewColumnHeader Tag="Stored" Command="{Binding SortCustomViewsCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Content="Size"/>
                         </GridViewColumn>
                         <GridViewColumn Width="60">
                             <GridViewColumn.CellTemplate>
@@ -105,7 +105,7 @@
                 <ListView.View>
                     <GridView>
                         <GridViewColumn  DisplayMemberBinding="{Binding DirInfo.Name}" Width="300">
-                            <GridViewColumnHeader Tag="Unlinked" Command="{Binding HeaderClickCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Content="Name"/>
+                            <GridViewColumnHeader Tag="Unlinked" Command="{Binding SortCustomViewsCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Content="Name"/>
                         </GridViewColumn>
                         <GridViewColumn Width="100">
                             <GridViewColumn.CellTemplate>
@@ -113,7 +113,7 @@
                                     <TextBlock HorizontalAlignment="Right" Text="{Binding SizeString}" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
-                            <GridViewColumnHeader Tag="Unlinked" Command="{Binding HeaderClickCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Content="Size"/>
+                            <GridViewColumnHeader Tag="Unlinked" Command="{Binding SortCustomViewsCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Content="Size"/>
                         </GridViewColumn>
                         <GridViewColumn Width="60">
                             <GridViewColumn.CellTemplate>
@@ -140,7 +140,7 @@
         </TabItem>
 
         <!--DEBUGVIEW-->
-        <TabItem Header="{Binding HeaderNames.All}">
+        <!--<TabItem Header="{Binding HeaderNames.All}">
             <ListView x:Name="allList" ItemsSource="{Binding FolderManager.Folders}"  Style="{DynamicResource ListViewStyle}">
                 <ListView.View>
                     <GridView>
@@ -176,7 +176,7 @@
                     </GridView>
                 </ListView.View>
             </ListView>
-        </TabItem>
+        </TabItem>-->
     </TabControl>
 
 </UserControl>
