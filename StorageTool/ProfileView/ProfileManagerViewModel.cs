@@ -62,8 +62,8 @@ namespace StorageTool
                     _returnKey = new RelayCommand(param =>
                     {
                         bool var = _profileViewModel.Add(new Profile(_profileName,_sourceInput,_storageInput));
-                        if (!var)
-                            _profileName = Constants.ProfileInputNameAlreadyExists;
+                        //if (!var)
+                        //    _profileName = Constants.ProfileInputNameAlreadyExists;
                     }, param => true);
                 }
                 return _returnKey;

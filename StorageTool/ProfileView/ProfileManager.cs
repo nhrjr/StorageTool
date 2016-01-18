@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows;
+using System.IO;
 
 using StorageTool.Resources;
 
@@ -18,7 +19,7 @@ namespace StorageTool
     public class ProfileManager : INotifyPropertyChanged
     {
         private ObservableCollection<Profile> _profiles = new ObservableCollection<Profile>();
-        private Profile _activeProfile;
+        private Profile _activeProfile = new Profile();
         //private Visibility _showManageProfileView = Visibility.Collapsed;
 
         public event SetActiveProfileEventHandler SetActiveProfileEvent;
@@ -96,11 +97,17 @@ namespace StorageTool
             {
                 if (!Profiles.Any(item => item.ProfileName == input.ProfileName))
                 {
-                    Profiles.Add(input);
-                    ActiveProfile = input;
-                    Properties.Settings.Default.Config.Profiles = GetProfileBase();
-                    Properties.Settings.Default.Save();
-                    return true;
+                    var var1 = new DirectoryInfo(input.GameFolder.FullName);
+                    var var2 = new DirectoryInfo(input.StorageFolder.FullName);
+                    if (var1.Exists && var2.Exists)
+                    {
+                        Profiles.Add(input);
+                        ActiveProfile = input;
+                        Properties.Settings.Default.Config.Profiles = GetProfileBase();
+                        Properties.Settings.Default.Save();
+                        return true;
+                    }
+
                 }
             }
             return false;

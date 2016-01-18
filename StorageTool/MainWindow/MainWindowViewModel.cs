@@ -25,13 +25,18 @@ namespace StorageTool
     public class MainWindowViewModel : INotifyPropertyChanged
     {
         public ObservableCollection<FolderManagerViewModel> _displayViewModels = new ObservableCollection<FolderManagerViewModel>();
-        public ProfileManager _profileViewModel;
         public CompositeCollection _assigned = new CompositeCollection();
+
+        private ProfileManager _profileViewModel;        
         private ProfileManagerViewModel _profileManagerViewModel;
 
         public MainWindowViewModel()
         {
-            ProfileViewModel = new ProfileManager(Properties.Settings.Default.Config.Profiles);
+            if (Properties.Settings.Default.Config != null)
+                ProfileViewModel = new ProfileManager(Properties.Settings.Default.Config.Profiles);
+            else
+                ProfileViewModel = new ProfileManager();
+
             ProfileViewModel.SetActiveProfileEvent += SetDisplayViewModels;
             ProfileViewModel.RemoveActiveProfileEvent += SetDisplayViewModels;
 
@@ -60,7 +65,6 @@ namespace StorageTool
                     DisplayViewModels.Remove(f);
                 }
             }
-
         }
 
         public int NumberOfOpenMoves()

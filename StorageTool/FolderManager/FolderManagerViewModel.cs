@@ -92,6 +92,7 @@ namespace StorageTool
             this._assigned.Filter += AssignedFilter;
 
             FolderManager.ModelPropertyChangedEvent += RefreshCollectionViewSources;
+            RefreshCollectionViewSources();
         }
 
         ~FolderManagerViewModel()

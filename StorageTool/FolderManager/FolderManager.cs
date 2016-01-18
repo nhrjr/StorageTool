@@ -107,7 +107,7 @@ namespace StorageTool
             foreach (FolderViewModel f in Folders) { f.DirSize = null; f.GetSize(); }
         }
 
-        private async void RefreshFolders()
+        private void RefreshFolders()
         {
             if (_isRefreshingFolders == true)
                 return;
@@ -115,8 +115,8 @@ namespace StorageTool
             {
                 _isRefreshingFolders = true;
 
-                await Task.Factory.StartNew(() =>
-                {
+                //await Task.Factory.StartNew(() =>
+                //{
 
                     analyzeFolders.GetFolderStructure(Profile);
                     DuplicateFolders = new ObservableCollection<string>(analyzeFolders.DuplicateFolders);
@@ -160,7 +160,7 @@ namespace StorageTool
                             }
                         }
                     }
-                });
+                //});
             }
             catch (IOException e)
             {
