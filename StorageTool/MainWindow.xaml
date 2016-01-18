@@ -11,7 +11,8 @@
         Closed="OnClosed"
         Title="StorageTool"
         SizeToContent="WidthAndHeight"
-        Background="White">
+        Background="White"
+        >
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <Style TargetType="ListViewItem">
@@ -19,46 +20,19 @@
             <Setter Property="VerticalContentAlignment" Value="Stretch" />
         </Style>
     </Window.Resources>
-    <StackPanel>
-        <!--<Grid.RowDefinitions>
-            <RowDefinition Height="219"/>
-            <RowDefinition/>
-            <RowDefinition Height="180"/>
-        </Grid.RowDefinitions>-->
+    <DockPanel Height="694">
 
-        <!--PROFILE SELECTOR-->
-        <!--<ComboBox x:Name="profileBox" ItemsSource="{Binding ProfileViewModel.Profiles}" SelectedItem="{Binding ProfileViewModel.ActiveProfile}" DisplayMemberPath="ProfileName" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="227" Height="22"/>-->
+        <Expander Header="Manage Profiles" Margin="7,7,7,7" DockPanel.Dock="Top">
+            <local:ProfileManageView DataContext="{Binding ProfileManagerViewModel}"/>
+        </Expander>
 
-
-        <!--<Button x:Name="openProfileInputDialogue" Content="Add new profile" Command="{Binding ProfileViewModel.OpenProfileInputDialogCommand}" HorizontalAlignment="Left" Margin="105,10,0,0" VerticalAlignment="Top" Width="122" Height="22"/>-->
-        <!--<Button x:Name="editProfile" Content="Edit selected profile" Command="{Binding ProfileViewModel.EditSelectedCommand}" HorizontalAlignment="Left" Margin="232,10,0,0" VerticalAlignment="Top" Width="137" Height="22"/>-->
-        <!--<Button x:Name="manageProfiles" Command="{Binding ProfileViewModel.ManageProfilesCommand}" Content="Manage Profiles" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="90" Height="22"/>-->
-
-        <!--<Button x:Name="Desc_StorageFolder" Command="{Binding OpenExplorerCommand}" CommandParameter="{Binding ProfileViewModel.ActiveProfile.StorageFolder.FullName}" HorizontalAlignment="Left" Padding="5,1,1,0" Margin="323,64,0,0" Content="Open" Width="46" Height="20" VerticalAlignment="Top"/>
-        <Button x:Name="Desc_GameFolder" Command="{Binding OpenExplorerCommand}" CommandParameter="{Binding ProfileViewModel.ActiveProfile.GameFolder.FullName}" HorizontalAlignment="Left" Padding="5,1,1,0" Content="Open" Width="46" Height="20" VerticalAlignment="Top" Margin="323,39,0,0"/>
-        <TextBox x:Name="gameFolderName" Foreground="Gray" Padding="5,1,1,0" TextWrapping="Wrap" Text="{Binding ProfileViewModel.ActiveProfile.GameFolder.FullName, Mode=OneWay}" IsReadOnly="True" VerticalAlignment="Top" Height="20" HorizontalAlignment="Left" Width="213" Margin="105,39,0,0"/>
-        <TextBox x:Name="storageFolderName" Foreground="Gray" Padding="5,1,1,0" TextWrapping="Wrap" Text="{Binding ProfileViewModel.ActiveProfile.StorageFolder.FullName, Mode=OneWay}" IsReadOnly="True" VerticalAlignment="Top" Height="20" HorizontalAlignment="Left" Width="213" Margin="105,64,0,0"/>
-        <TextBlock x:Name="label_SourceFolder" HorizontalAlignment="Left" Padding="5,1,1,0" Height="20" Margin="10,39,0,0" TextWrapping="Wrap" Text="Source Folder:" VerticalAlignment="Top" Width="90"/>
-        <TextBlock x:Name="label_StorageFolder" HorizontalAlignment="Left" Padding="5,1,1,0" Margin="10,64,0,0" TextWrapping="Wrap" Text="Storage Folder:" VerticalAlignment="Top" Height="20" Width="90"/>-->
-            <Expander Header="Manage Profiles" Margin="7">
-                <local:ProfileManageView DataContext="{Binding ProfileManagerViewModel}"/>
-            </Expander>
-
-
-        <!--<Button x:Name="Desc_StorageFolder" Command="{Binding OpenExplorerCommand}" CommandParameter="{Binding ProfileViewModel.ActiveProfile.StorageFolder.FullName}" HorizontalAlignment="Left" Padding="5,1,1,0" Margin="323,64,0,0" Content="Open" Width="46" Height="20" VerticalAlignment="Top"/>
-        <Button x:Name="Desc_GameFolder" Command="{Binding OpenExplorerCommand}" CommandParameter="{Binding ProfileViewModel.ActiveProfile.GameFolder.FullName}" HorizontalAlignment="Left" Padding="5,1,1,0" Content="Open" Width="46" Height="20" VerticalAlignment="Top" Margin="323,39,0,0"/>
-        <TextBox x:Name="gameFolderName" Foreground="Gray" Padding="5,1,1,0" TextWrapping="Wrap" Text="{Binding ProfileViewModel.ActiveProfile.GameFolder.FullName, Mode=OneWay}" IsReadOnly="True" VerticalAlignment="Top" Height="20" HorizontalAlignment="Left" Width="213" Margin="105,39,0,0"/>
-        <TextBox x:Name="storageFolderName" Foreground="Gray" Padding="5,1,1,0" TextWrapping="Wrap" Text="{Binding ProfileViewModel.ActiveProfile.StorageFolder.FullName, Mode=OneWay}" IsReadOnly="True" VerticalAlignment="Top" Height="20" HorizontalAlignment="Left" Width="213" Margin="105,64,0,0"/>
-        <TextBlock x:Name="label_SourceFolder" HorizontalAlignment="Left" Padding="5,1,1,0" Height="20" Margin="10,39,0,0" TextWrapping="Wrap" Text="Source Folder:" VerticalAlignment="Top" Width="90"/>
-        <TextBlock x:Name="label_StorageFolder" HorizontalAlignment="Left" Padding="5,1,1,0" Margin="10,64,0,0" TextWrapping="Wrap" Text="Storage Folder:" VerticalAlignment="Top" Height="20" Width="90"/>-->
-
-        <TabControl ItemsSource="{Binding DisplayViewModels}" SelectedValue="{Binding ProfileViewModel.ActiveProfile, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Profile" Margin="7" Padding="0" MinWidth="300" MinHeight="500" MaxHeight="500" BorderThickness="0">
+        <TabControl ItemsSource="{Binding DisplayViewModels}" SelectedValue="{Binding ProfileViewModel.ActiveProfile, UpdateSourceTrigger=PropertyChanged}"
+                    SelectedValuePath="Profile" Margin="7,7,7,7" Padding="0" BorderThickness="0" DockPanel.Dock="Top">
             <TabControl.Resources>
                 <Style TargetType="{x:Type TabItem}">
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate TargetType="{x:Type TabItem}">
-                                <!--<Grid x:Name="Panel" Margin="0,0,0,0">-->
                                 <Border x:Name="Panel" CornerRadius="4" BorderThickness="1" Background="{x:Null}" BorderBrush="Black" Margin="10,0,0,5" Tag="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:MainWindow, AncestorLevel=1}, Path=DataContext}">
                                     <ContentPresenter x:Name="ContentSite"
                                         VerticalAlignment="Center"
@@ -74,11 +48,10 @@
                                         </ContextMenu>
                                     </Border.ContextMenu>
                                 </Border>
-                                <!--</Grid>-->
                                 <ControlTemplate.Triggers>
                                         <Trigger Property="IsSelected" Value="True">
                                             <Setter TargetName="Panel" Property="TextBlock.FontWeight" Value="Bold" />
-                                            <Setter TargetName="Panel" Property="Background" Value="#3369E8" />
+                                            <Setter TargetName="Panel" Property="Background" Value="{DynamicResource ForeGroundBlue}" />
                                             <Setter TargetName="Panel" Property="TextBlock.Foreground" Value="White" />
                                         </Trigger>
                                         <Trigger Property="IsSelected" Value="False">
@@ -86,9 +59,6 @@
                                         <Setter TargetName="Panel" Property="Background" Value="LightGray" />
                                         <Setter TargetName="Panel" Property="TextBlock.Foreground" Value="#666666" />
                                         </Trigger>
-                                    <!--<Trigger Property="Border.IsMouseOver" Value="True">
-                                        <Setter TargetName="Panel" Property="Background" Value="LightSkyBlue"/>
-                                    </Trigger>-->
                                 </ControlTemplate.Triggers>
                             </ControlTemplate>
                         </Setter.Value>
@@ -110,15 +80,6 @@
             </TabControl.ContentTemplate>
         </TabControl>
 
-        <local:MovePanel Margin="7"/>
-
-        <!--<Button x:Name="deleteHistory" Content="Clear History" Margin="0,20,173,0" Grid.Row="2" VerticalAlignment="Top" HorizontalAlignment="Right" Width="85" Height="20"/>-->
-
-      
-
-
-
-
-
-    </StackPanel>
+        <local:MovePanel Margin="7,7,7,7" DockPanel.Dock="Bottom"/>
+    </DockPanel>
 </Window>

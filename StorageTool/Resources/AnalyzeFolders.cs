@@ -12,16 +12,16 @@ namespace StorageTool
 {
     public class AnalyzeFolders
     {
-        public List<string> LinkedFolders { get; set; }
-        public List<string> UnlinkedFolders { get; set; }
-        public List<string> StorableFolders { get; set; }
+        public List<DirectoryInfo> LinkedFolders { get; set; }
+        public List<DirectoryInfo> UnlinkedFolders { get; set; }
+        public List<DirectoryInfo> StorableFolders { get; set; }
         public List<string> DuplicateFolders { get; set; }
 
         public AnalyzeFolders()
         {
-            LinkedFolders = new List<string>();
-            UnlinkedFolders = new List<string>();
-            StorableFolders = new List<string>();
+            LinkedFolders = new List<DirectoryInfo>();
+            UnlinkedFolders = new List<DirectoryInfo>();
+            StorableFolders = new List<DirectoryInfo>();
             DuplicateFolders = new List<string>();
         }
 
@@ -50,11 +50,11 @@ namespace StorageTool
 
                     if (isJunction)
                     {
-                        this.LinkedFolders.Add(JunctionPoint.GetTarget(@g.FullName));
+                        this.LinkedFolders.Add(new DirectoryInfo(JunctionPoint.GetTarget(@g.FullName)));
                     }
                     else
                     {
-                        this.StorableFolders.Add(g.FullName);
+                        this.StorableFolders.Add(new DirectoryInfo(g.FullName));
                         _gFolders.Add(g);
                         dGFolders.Add(g.Name);
                     }
@@ -65,20 +65,20 @@ namespace StorageTool
                 }
             }
             List<string> dSFolders = new List<string>();
-            List<DirectoryInfo> tmpList1 = sFolders.Where(n => LinkedFolders.Contains(n.FullName) && !JunctionPoint.Exists(@n.FullName)).ToList();
+            List<DirectoryInfo> tmpList1 = sFolders.Where(n => LinkedFolders.Select(m => m.FullName).Contains(n.FullName) && !JunctionPoint.Exists(@n.FullName)).ToList();
             this.LinkedFolders.Clear();
             foreach (DirectoryInfo d in tmpList1)
             {
-                this.LinkedFolders.Add(d.FullName);
+                this.LinkedFolders.Add(d);
                 _lFolders.Add(d);
                 dSFolders.Add(d.Name);
             }
 
-            List<DirectoryInfo> tmpList = sFolders.Where(n => !LinkedFolders.Contains(n.FullName) && !JunctionPoint.Exists(@n.FullName)).ToList();
+            List<DirectoryInfo> tmpList = sFolders.Where(n => !LinkedFolders.Select(m => m.FullName).Contains(n.FullName) && !JunctionPoint.Exists(@n.FullName)).ToList();
 
             foreach (DirectoryInfo d in tmpList)
             {
-                this.UnlinkedFolders.Add(d.FullName);
+                this.UnlinkedFolders.Add(d);
                 _uFolders.Add(d);
                 dSFolders.Add(d.Name);
             }
@@ -86,9 +86,9 @@ namespace StorageTool
             _gFolders.RemoveAll(n => DuplicateFolders.Contains(n.Name));
             _uFolders.RemoveAll(n => DuplicateFolders.Contains(n.Name));
             _lFolders.RemoveAll(n => DuplicateFolders.Contains(n.Name));
-            this.StorableFolders = _gFolders.Select(n => n.FullName).ToList();
-            this.UnlinkedFolders = _uFolders.Select(n => n.FullName).ToList();
-            this.LinkedFolders = _lFolders.Select(n => n.FullName).ToList();
+            this.StorableFolders = _gFolders;
+            this.UnlinkedFolders = _uFolders;
+            this.LinkedFolders = _lFolders;
         }
     }
 }

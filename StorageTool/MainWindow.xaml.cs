@@ -17,6 +17,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Monitor.Core.Utilities;
 using System.Diagnostics;
+using StorageTool.Resources;
 
 namespace StorageTool
 {
@@ -38,7 +39,7 @@ namespace StorageTool
             int var = mainWindowViewModel.NumberOfOpenMoves();
             if (var > 0)
             {
-                if (MessageBox.Show(this, "StorageTool is still copying,\n are you sure you wish to close?\n This will cancel all current move operations.", "Close StorageTool", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+                if (MessageBox.Show(this, Constants.CloseApplicationErrorString, "Close StorageTool", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
                 {                    
                     cancelEventArgs.Cancel = true;
                 }

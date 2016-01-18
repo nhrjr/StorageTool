@@ -15,18 +15,16 @@ namespace StorageTool
 {
 
         public class ProfileManagerViewModel : INotifyPropertyChanged
-    {
+        {
 
 
-        //public Profile input = null;
+        private string _sourceInput = Constants.ProfileInputSourceDefault;
+        private string _storageInput = Constants.ProfileInputStorageDefault;
+        private string _profileName = Constants.ProfileInputNameDefault;
 
-        private string _sourceInput = "Select your source folder.";
-        private string _storageInput = "Select your storage folder.";
-        private string _profileName = "Enter your profile name here.";
+        private ProfileManager _profileViewModel;        
 
-        private ProfileViewModel _profileViewModel;        
-
-        public ProfileManagerViewModel(ProfileViewModel profileViewModel)
+        public ProfileManagerViewModel(ProfileManager profileViewModel)
         {
             _profileViewModel = profileViewModel;
         }
@@ -66,7 +64,7 @@ namespace StorageTool
                     {
                         bool var = _profileViewModel.Add(new Profile(_profileName,_sourceInput,_storageInput));
                         if (!var)
-                            _profileName = "This name exists already. Please retry";
+                            _profileName = Constants.ProfileInputNameAlreadyExists;
                     }, param => true);
                 }
                 return _returnKey;
@@ -125,9 +123,9 @@ namespace StorageTool
 
         public void Clear()
         {
-            LeftInput = "Select your source folder.";
-            RightInput = "Select your storage folder.";
-            ProfileName = "ProfileName";
+            LeftInput = Constants.ProfileInputSourceDefault;
+            RightInput = Constants.ProfileInputStorageDefault;
+            ProfileName = Constants.ProfileInputNameDefault;
         }
 
         public Profile GetProfile()

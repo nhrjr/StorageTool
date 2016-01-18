@@ -15,7 +15,7 @@ namespace StorageTool
     public delegate void SetActiveProfileEventHandler();
     public delegate void RemoveActiveProfileEventHandler();
 
-    public class ProfileViewModel : INotifyPropertyChanged
+    public class ProfileManager : INotifyPropertyChanged
     {
         private ObservableCollection<Profile> _profiles = new ObservableCollection<Profile>();
         private Profile _activeProfile;
@@ -24,8 +24,8 @@ namespace StorageTool
         public event SetActiveProfileEventHandler SetActiveProfileEvent;
         public event RemoveActiveProfileEventHandler RemoveActiveProfileEvent;
 
-        public ProfileViewModel() { }
-        public ProfileViewModel(List<ProfileBase> input)
+        public ProfileManager() { }
+        public ProfileManager(List<ProfileBase> input)
         {
             Profiles = convertProfileBaseToProfile(input);
         }
@@ -98,6 +98,8 @@ namespace StorageTool
                 {
                     Profiles.Add(input);
                     ActiveProfile = input;
+                    Properties.Settings.Default.Config.Profiles = GetProfileBase();
+                    Properties.Settings.Default.Save();
                     return true;
                 }
             }
@@ -120,6 +122,7 @@ namespace StorageTool
                 RemoveActiveProfileEvent();
             }
             Profiles.Remove(ActiveProfile);
+            Properties.Settings.Default.Save();
         }
 
         public ObservableCollection<Profile> Profiles
@@ -127,7 +130,7 @@ namespace StorageTool
             get { return _profiles; }
             set
             {
-                _profiles = value;
+                _profiles = value;                
                 OnPropertyChanged(nameof(Profiles));
             }
         }

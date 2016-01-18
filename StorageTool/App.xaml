@@ -7,7 +7,9 @@
              Startup="Application_Startup"
              Exit="Application_Exit">
     <Application.Resources>
-            <ResourceDictionary>                
+            <ResourceDictionary>
+            <SolidColorBrush x:Key="ForeGroundBlue" Color="#3369E8"/>
+            <SolidColorBrush x:Key="ForeGroundGray" Color="#666666"/>
             <SolidColorBrush x:Key="ListBorder" Color="Black"/>                
             <Style x:Key="ListViewStyle" TargetType="{x:Type ListView}">
                 <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"/>

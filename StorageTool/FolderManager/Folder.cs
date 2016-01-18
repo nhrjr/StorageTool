@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Schedulers;
 using System.Windows;
 using System.IO;
 using System.ComponentModel;
@@ -19,6 +20,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Monitor.Core.Utilities;
 using System.Diagnostics;
+
 
 using StorageTool.Resources;
 
@@ -56,6 +58,10 @@ public class FolderViewModel : INotifyPropertyChanged
         private Assignment _ass = new Assignment();
         private long _processedBits;
         private int _progress;
+
+        static OrderedTaskScheduler moveTS = new OrderedTaskScheduler();
+        static LimitedConcurrencyLevelTaskScheduler getSizeTS = new LimitedConcurrencyLevelTaskScheduler(Constants.GetSizeConcurrencyLevel);
+        //static IOTaskScheduler getSizeTS = new IOTaskScheduler();
 
         RelayCommand _pauseCommand;
         RelayCommand _cancelCommand;
@@ -181,7 +187,9 @@ public class FolderViewModel : INotifyPropertyChanged
             _cts = new CancellationTokenSource();
             CancellationToken _ct = _cts.Token;
             bool returnStatus = true;
-            _task = Task.Factory.StartNew(() => TransferFolders(returnStatus,sizeFromHell, _lock, _ct), _cts.Token);
+
+            
+            _task = Task.Factory.StartNew(() => TransferFolders(returnStatus,sizeFromHell, _lock, _ct), _cts.Token,TaskCreationOptions.None,moveTS);
             try
             {
                 await _task.ContinueWith((task) => UpdateYourself(returnStatus));
@@ -263,7 +271,7 @@ public class FolderViewModel : INotifyPropertyChanged
             {
                 try
                 {
-                    await Task.Run(() => DirectorySize.DirSizeIterative(DirInfo)).ContinueWith(task => DirSize = task.Result).ConfigureAwait(false);
+                    await Task.Factory.StartNew(() => DirectorySize.DirSizeIterative(DirInfo),CancellationToken.None,TaskCreationOptions.None,getSizeTS).ContinueWith(task => DirSize = task.Result).ConfigureAwait(false);
                 }
                 catch (IOException ex)
                 {
@@ -400,7 +408,7 @@ public class FolderViewModel : INotifyPropertyChanged
             set
             {
                 _folderModel.DirSize = value;
-                SizeString = Ext.ToPrettySize(value, 2);
+                SizeString = Ext.ToPrettySize(value, Constants.DirSizeStringLength);
                 OnPropertyChanged(nameof(DirSize));
             }
         }

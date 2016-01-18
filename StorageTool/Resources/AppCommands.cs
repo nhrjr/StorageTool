@@ -33,11 +33,6 @@ namespace StorageTool.Resources
         {
             this.execute(parameter);
         }
-    }
-
-    public class FolderViewCommands
-    {
-
-
+        
     }
 }

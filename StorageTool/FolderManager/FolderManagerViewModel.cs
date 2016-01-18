@@ -23,16 +23,102 @@ using StorageTool.Resources;
 
 namespace StorageTool
 {
+    public class HeaderNames : INotifyPropertyChanged
+    {
+        private string _source;
+        private string _storage;
+        private string _unlinked;
+        private string _duplicate;
+        private string _all;
+
+        public HeaderNames()
+        {
+            this.Source = "Source";
+            this.Storage = "Storage";
+            this.Unlinked = "Unlinked";
+            this.Duplicate = "Duplicate";
+            this.All = "All";
+        }
+
+        public void SetNumbers(int source, int storage, int unlinked, int duplicate, int all)
+        {
+            Source = "Source (" + source + ")";
+            Storage = "Storage (" + storage + ")";
+            Unlinked = "Unlinked (" + unlinked + ")";
+            Duplicate = "Duplicate (" + duplicate + ")";
+            All = "All (" + all + ")";
+        }
+
+
+        public string Source
+        {
+            get { return _source; }
+            set
+            {
+                _source = value;
+                OnPropertyChanged(nameof(Source));
+            }
+        }
+
+        public string Storage
+        {
+            get { return _storage; }
+            set
+            {
+                _storage = value;
+                OnPropertyChanged(nameof(Storage));
+            }
+        }
+
+        public string Unlinked
+        {
+            get { return _unlinked; }
+            set
+            {
+                _unlinked = value;
+                OnPropertyChanged(nameof(Unlinked));
+            }
+        }
+
+        public string Duplicate
+        {
+            get { return _duplicate; }
+            set
+            {
+                _duplicate = value;
+                OnPropertyChanged(nameof(Duplicate));
+            }
+        }
+
+        public string All
+        {
+            get { return _all; }
+            set
+            {
+                _all = value;
+                OnPropertyChanged(nameof(All));
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public void OnPropertyChanged(string propName)
+        {
+            if (this.PropertyChanged != null)
+                this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
+        }
+    }
+
     public class FolderManagerViewModel : INotifyPropertyChanged
     {
         private bool _showUnlinkedFolders = false;
         private bool _showDuplicateFolders = false;
         private bool _isRefreshingFolders = false;
         private bool _isRefreshingSizes = false;
-        private ListSortDirection _lastDirection = ListSortDirection.Ascending;
+        private ListSortDirection _lastDirection = ListSortDirection.Ascending;        
 
-        public FolderManager FolderManager { get; set; }
-        public ObservableCollection<string> DuplicateFolders { get; set; }
+        public FolderManager FolderManager { get; set; } = new FolderManager();
+        public ObservableCollection<string> _duplicateFolers { get; set; } = new ObservableCollection<string>();
         public Profile Profile { get; set; }
 
         private AnalyzeFolders analyzeFolders = new AnalyzeFolders();
@@ -42,6 +128,8 @@ namespace StorageTool
         private CollectionViewSource _stored { get; set; } = new CollectionViewSource();
         private CollectionViewSource _unlinked { get; set; } = new CollectionViewSource();
         private CollectionViewSource _assigned { get; set; } = new CollectionViewSource();
+
+        public HeaderNames HeaderNames { get; set; } = new HeaderNames();
 
         RelayCommand _refreshCommand;
         public ICommand RefreshCommand
@@ -97,8 +185,7 @@ namespace StorageTool
         {
             Profile = p;
 
-            FolderManager = new FolderManager();
-            DuplicateFolders = new ObservableCollection<string>();
+            
 
             this._source.Source = this.FolderManager.Folders;
             this._source.Filter += SourceFilter;
@@ -114,7 +201,7 @@ namespace StorageTool
 
             RefreshFolders();
             FolderManager.ModelPropertyChangedEvent += RefreshCollectionViewSources;
-            //FolderManager.ModelPropertyChangedEvent += RefreshFolders;
+            FolderManager.ModelPropertyChangedEvent += RefreshFolders;
             folderWatcher.NotifyFileSystemChangesEvent += OnFileSystemChanged;
             folderWatcher.NotifyFileSizeChangesEvent += OnFileSizeChanged;
             folderWatcher.StartFileSystemWatcher(Profile.GameFolder.FullName);
@@ -151,7 +238,7 @@ namespace StorageTool
         public void OnDelete()
         {
             FolderManager.ModelPropertyChangedEvent -= RefreshCollectionViewSources;
-            //FolderManager.ModelPropertyChangedEvent -= RefreshFolders;
+            FolderManager.ModelPropertyChangedEvent -= RefreshFolders;
             folderWatcher.NotifyFileSystemChangesEvent -= OnFileSystemChanged;
             folderWatcher.NotifyFileSizeChangesEvent -= OnFileSizeChanged;
             folderWatcher.StopFileSystemWatcher(Profile.GameFolder.FullName);
@@ -160,7 +247,7 @@ namespace StorageTool
 
         private void OnFileSystemChanged()
         {
-            //RefreshFolders();
+            RefreshFolders();
         }
 
         private void OnFileSizeChanged()
@@ -196,39 +283,36 @@ namespace StorageTool
                 analyzeFolders.GetFolderStructure(Profile);
                 DuplicateFolders = new ObservableCollection<string>(analyzeFolders.DuplicateFolders);
 
-                foreach (string g in analyzeFolders.StorableFolders)
+                foreach (DirectoryInfo g in analyzeFolders.StorableFolders)
                 {
-                    if (!FolderManager.Folders.Any(f => f.DirInfo.FullName == g))
+                    if (!FolderManager.Folders.Any(f => f.DirInfo.Name == g.Name))
                     {
-                        DirectoryInfo tmp = new DirectoryInfo(g);
-                        FolderManager.AddFolder(new FolderViewModel(tmp), Profile.StorageFolder, TaskMode.STORE, TaskStatus.Inactive, Mapping.Source);
+                        FolderManager.AddFolder(new FolderViewModel(g), Profile.StorageFolder, TaskMode.STORE, TaskStatus.Inactive, Mapping.Source);
                     }
 
                 }
-                foreach (string g in analyzeFolders.LinkedFolders)
+                foreach (DirectoryInfo g in analyzeFolders.LinkedFolders)
                 {
-                    if (!FolderManager.Folders.Any(f => f.DirInfo.FullName == g))
+                    if (!FolderManager.Folders.Any(f => f.DirInfo.Name == g.Name))
                     {
-                        DirectoryInfo tmp = new DirectoryInfo(g);
-                        FolderManager.AddFolder(new FolderViewModel(tmp), Profile.GameFolder, TaskMode.RESTORE, TaskStatus.Inactive, Mapping.Stored);
+                        FolderManager.AddFolder(new FolderViewModel(g), Profile.GameFolder, TaskMode.RESTORE, TaskStatus.Inactive, Mapping.Stored);
                     }
                 }
-                foreach (string g in analyzeFolders.UnlinkedFolders)
+                foreach (DirectoryInfo g in analyzeFolders.UnlinkedFolders)
                 {
-                    if (!FolderManager.Folders.Any(f => f.DirInfo.FullName == g))
+                    if (!FolderManager.Folders.Any(f => f.DirInfo.Name == g.Name))
                     {
-                        DirectoryInfo tmp = new DirectoryInfo(g);
-                        FolderManager.AddFolder(new FolderViewModel(tmp), Profile.GameFolder, TaskMode.RELINK, TaskStatus.Inactive, Mapping.Unlinked);
+                        FolderManager.AddFolder(new FolderViewModel(g), Profile.GameFolder, TaskMode.RELINK, TaskStatus.Inactive, Mapping.Unlinked);
                     }
                 }
 
                 foreach (FolderViewModel g in FolderManager.Folders.Reverse())
                 {
-                    if (!analyzeFolders.StorableFolders.Any(f => f == g.DirInfo.FullName))
+                    if (!analyzeFolders.StorableFolders.Any(f => f.FullName == g.DirInfo.FullName))
                     {
-                        if (!analyzeFolders.LinkedFolders.Any(f => f == g.DirInfo.FullName))
+                        if (!analyzeFolders.LinkedFolders.Any(f => f.FullName == g.DirInfo.FullName))
                         {
-                            if (!analyzeFolders.UnlinkedFolders.Any(f => f == g.DirInfo.FullName))
+                            if (!analyzeFolders.UnlinkedFolders.Any(f => f.FullName == g.DirInfo.FullName))
                             {
                                 if (g.Status == TaskStatus.Inactive)
                                 {
@@ -241,6 +325,8 @@ namespace StorageTool
                 
                 ShowUnlinkedFolders = (Unlinked.Cast<object>().Count() > 0) ? true : false;
                 ShowDuplicateFolders = (DuplicateFolders.Count > 0) ? true : false;
+
+                HeaderNames.SetNumbers(Source.Count,Stored.Count,Unlinked.Count,DuplicateFolders.Count,FolderManager.Folders.Count);
             }
             catch (IOException e)
             {
@@ -289,6 +375,16 @@ namespace StorageTool
         public ListCollectionView Assigned
         {
             get { return (ListCollectionView)_assigned.View; }
+        }
+
+        public ObservableCollection<string> DuplicateFolders
+        {
+            get { return _duplicateFolers; }
+            set
+            {
+                _duplicateFolers = value;
+                OnPropertyChanged(nameof(DuplicateFolders));
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

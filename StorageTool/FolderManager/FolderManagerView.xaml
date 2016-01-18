@@ -11,7 +11,6 @@
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </UserControl.Resources>
 
-    <!--FOLDERPANE-->
     <TabControl x:Name="tabControl" BorderThickness="0" Padding="0" Margin="0">
         <TabControl.Resources>
             <Style TargetType="{x:Type TabItem}">
@@ -45,12 +44,9 @@
                     </Setter.Value>
                 </Setter>
             </Style>
-            <!--<Style TargetType="{x:Type TabPanel}">
-                <Setter Property="HorizontalAlignment" Value="Center" />
-            </Style>-->
         </TabControl.Resources>
 
-        <TabItem Header="Source">
+        <TabItem Header="{Binding HeaderNames.Source}">
             <ListView x:Name="sourceList" ItemsSource="{Binding Source}"  Style="{DynamicResource ListViewStyle}">
                 <ListView.View>
                     <GridView>
@@ -77,7 +73,7 @@
             </ListView>
         </TabItem>
 
-        <TabItem Header="Storage">
+        <TabItem Header="{Binding HeaderNames.Storage}">
             <ListView x:Name="storageList" ItemsSource="{Binding Stored}"  Style="{DynamicResource ListViewStyle}">
                 <ListView.View>
                     <GridView>
@@ -104,7 +100,7 @@
             </ListView>
         </TabItem>
 
-        <TabItem Header="Unlinked" Visibility="{Binding ShowUnlinkedFolders, Converter={StaticResource BoolToVis}}" >
+        <TabItem Header="{Binding HeaderNames.Unlinked}" Visibility="{Binding ShowUnlinkedFolders, Converter={StaticResource BoolToVis}}" >
             <ListView x:Name="unlinkedList" ItemsSource="{Binding Unlinked}"  Style="{DynamicResource ListViewStyle}">
                 <ListView.View>
                     <GridView>
@@ -131,7 +127,7 @@
             </ListView>
         </TabItem>
 
-        <TabItem Header="Duplicate" Visibility="{Binding ShowDuplicateFolders, Converter={StaticResource BoolToVis}}">
+        <TabItem Header="{Binding HeaderNames.Duplicate}" Visibility="{Binding ShowDuplicateFolders, Converter={StaticResource BoolToVis}}">
             <ListView x:Name="duplicateList" ItemsSource="{Binding DuplicateFolders}"  Style="{DynamicResource ListViewStyle}">
                 <ListView.View>
                     <GridView>
@@ -144,7 +140,7 @@
         </TabItem>
 
         <!--DEBUGVIEW-->
-        <!--<TabItem Header="All">
+        <TabItem Header="{Binding HeaderNames.All}">
             <ListView x:Name="allList" ItemsSource="{Binding FolderManager.Folders}"  Style="{DynamicResource ListViewStyle}">
                 <ListView.View>
                     <GridView>
@@ -180,7 +176,7 @@
                     </GridView>
                 </ListView.View>
             </ListView>
-        </TabItem>-->
+        </TabItem>
     </TabControl>
 
 </UserControl>

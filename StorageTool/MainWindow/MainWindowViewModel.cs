@@ -24,22 +24,23 @@ namespace StorageTool
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {
-        //public FolderManagerViewModel _activeDisplayViewModel;
         public ObservableCollection<FolderManagerViewModel> _displayViewModels = new ObservableCollection<FolderManagerViewModel>();
-        public ProfileViewModel _profileViewModel = new ProfileViewModel();
+        public ProfileManager _profileViewModel;
         public CompositeCollection _assigned = new CompositeCollection();
         private ProfileManagerViewModel _profileManagerViewModel;
 
         public MainWindowViewModel()
         {
-            _profileManagerViewModel = new ProfileManagerViewModel(_profileViewModel);
-            //Profiles = new ProfileCollection(Properties.Settings.Default.Config.Profiles);
+            ProfileViewModel = new ProfileManager(Properties.Settings.Default.Config.Profiles);
             ProfileViewModel.SetActiveProfileEvent += SetDisplayViewModels;
-            ProfileViewModel.RemoveActiveProfileEvent += SetDisplayViewModels;          
-            ProfileViewModel.Add(new Profile("TestCases1", @"C:\TestCases\case1_games", @"C:\TestCases\case1_storage"));
-            ProfileViewModel.Add(new Profile("TestCases2", @"C:\TestCases\case2_games", @"C:\TestCases\case2_storage"));
-            ProfileViewModel.Add(new Profile("Steam", @"C:\Games\Steam\SteamApps\common", @"D:\Games\Steam"));
-            ProfileViewModel.Add(new Profile("Generic", @"C:\Games", @"D:\Games\Generic"));
+            ProfileViewModel.RemoveActiveProfileEvent += SetDisplayViewModels;
+
+            _profileManagerViewModel = new ProfileManagerViewModel(_profileViewModel);            
+              
+            //ProfileViewModel.Add(new Profile("TestCases1", @"C:\TestCases\case1_games", @"C:\TestCases\case1_storage"));
+            //ProfileViewModel.Add(new Profile("TestCases2", @"C:\TestCases\case2_games", @"C:\TestCases\case2_storage"));
+            //ProfileViewModel.Add(new Profile("Steam", @"C:\Games\Steam\SteamApps\common", @"D:\Games\Steam"));
+            //ProfileViewModel.Add(new Profile("Generic", @"C:\Games", @"D:\Games\Generic"));
             SetDisplayViewModels();
             //SetActiveDisplay();            
         }
@@ -143,7 +144,7 @@ namespace StorageTool
             }
         }
 
-        public ProfileViewModel ProfileViewModel
+        public ProfileManager ProfileViewModel
         {
             get { return _profileViewModel; }
             set

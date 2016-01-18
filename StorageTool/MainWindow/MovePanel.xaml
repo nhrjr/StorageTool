@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:StorageTool"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="500">
-    <ListView x:Name="Move_Queue" ItemsSource="{Binding Assigned}" Margin="0" MinHeight="150"  Style="{DynamicResource ListViewStyle}">
+    <ListView x:Name="Move_Queue" ItemsSource="{Binding Assigned}" Margin="0" Style="{DynamicResource ListViewStyle}">
             <!--<ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -32,7 +32,7 @@
                     <GridViewColumn Width="100"  Header="Progress">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <ProgressBar Height="10" Maximum="100" Value="{Binding Progress}" HorizontalContentAlignment="Stretch">
+                                <ProgressBar Height="10" Maximum="100" Value="{Binding Progress}" HorizontalContentAlignment="Stretch" Foreground="{DynamicResource ForeGroundBlue}">
                                     <ProgressBar.ToolTip>
                                         <TextBlock Text="{Binding ProcessedBitsString}"/>
                                     </ProgressBar.ToolTip>
