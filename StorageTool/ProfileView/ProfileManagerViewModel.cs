@@ -17,15 +17,38 @@ namespace StorageTool
         public class ProfileManagerViewModel : INotifyPropertyChanged
         {
 
-        private string _sourceInput = Constants.ProfileInputSourceDefault;
-        private string _storageInput = Constants.ProfileInputStorageDefault;
-        private string _profileName = Constants.ProfileInputNameDefault;
+        private string _sourceInput = null;
+        private string _storageInput = null;
+        private string _profileName = null;
 
-        private ProfileManager _profileViewModel;        
+        private ProfileManager _profileManager;        
 
-        public ProfileManagerViewModel(ProfileManager profileViewModel)
+        public ProfileManagerViewModel(ProfileManager profileManager)
         {
-            _profileViewModel = profileViewModel;
+            _profileManager = profileManager;
+            _profileManager.PropertyChanged += UpdateViewModel;
+        }
+
+        private void UpdateViewModel(object sender, PropertyChangedEventArgs e)
+        {
+            string input = e.PropertyName;
+            if(input == "ActiveProfile")
+            {
+                if(_profileManager.ActiveProfile != null)
+                {
+                    SourceInput = _profileManager.ActiveProfile.GameFolder.FullName;
+                    StorageInput = _profileManager.ActiveProfile.StorageFolder.FullName;
+                    ProfileName = _profileManager.ActiveProfile.ProfileName;
+                }
+                else
+                {
+                    SourceInput = null;
+                    StorageInput = null;
+                    ProfileName = null;
+                }
+
+
+            }
         }
 
         RelayCommand _pickFolderCommand;
@@ -42,9 +65,9 @@ namespace StorageTool
                         if (result == System.Windows.Forms.DialogResult.OK)
                         {
                             if(param as string == "Source")
-                                LeftInput = dialog.SelectedPath;
+                                SourceInput = dialog.SelectedPath;
                             if (param as string == "Storage")
-                                RightInput = dialog.SelectedPath;
+                                StorageInput = dialog.SelectedPath;
                         }
                     }, param => true);
                 }
@@ -61,7 +84,7 @@ namespace StorageTool
                 {
                     _returnKey = new RelayCommand(param =>
                     {
-                        bool var = _profileViewModel.Add(new Profile(_profileName,_sourceInput,_storageInput));
+                        bool var = _profileManager.Add(new Profile(_profileName,_sourceInput,_storageInput));
                         //if (!var)
                         //    _profileName = Constants.ProfileInputNameAlreadyExists;
                     }, param => true);
@@ -79,29 +102,28 @@ namespace StorageTool
                 {
                     _removeSelectedCommand = new RelayCommand(param =>
                     {
-                        _profileViewModel.RemoveActive();
-                        _profileViewModel.SetDefaultActive();
+                        _profileManager.RemoveActive();
                     }, param => true);
                 }
                 return _removeSelectedCommand;
             }
         }
 
-        RelayCommand _editSelectedCommand;
-        public ICommand EditSelectedCommand
-        {
-            get
-            {
-                if (_editSelectedCommand == null)
-                {
-                    _editSelectedCommand = new RelayCommand(param =>
-                    {
+        //RelayCommand _editSelectedCommand;
+        //public ICommand EditSelectedCommand
+        //{
+        //    get
+        //    {
+        //        if (_editSelectedCommand == null)
+        //        {
+        //            _editSelectedCommand = new RelayCommand(param =>
+        //            {
 
-                    }, param => true);
-                }
-                return _editSelectedCommand;
-            }
-        }
+        //            }, param => true);
+        //        }
+        //        return _editSelectedCommand;
+        //    }
+        //}
 
         //RelayCommand _cancelCommand;
         //public ICommand CancelCommand
@@ -120,13 +142,6 @@ namespace StorageTool
         //    }
         //}
 
-        public void Clear()
-        {
-            LeftInput = Constants.ProfileInputSourceDefault;
-            RightInput = Constants.ProfileInputStorageDefault;
-            ProfileName = Constants.ProfileInputNameDefault;
-        }
-
         public Profile GetProfile()
         {
             if (_sourceInput != null && _storageInput != null && _profileName != null)
@@ -139,23 +154,23 @@ namespace StorageTool
             }
         }
 
-        public string LeftInput
+        public string SourceInput
         {
             get { return _sourceInput; }
             set
             {
                 _sourceInput = value;
-                OnPropertyChanged("LeftInput");
+                OnPropertyChanged(nameof(SourceInput));
             }
         }
 
-        public string RightInput
+        public string StorageInput
         {
             get { return _storageInput; }
             set
             {
                 _storageInput = value;
-                OnPropertyChanged("RightInput");
+                OnPropertyChanged(nameof(StorageInput));
             }
         }
 
@@ -165,7 +180,7 @@ namespace StorageTool
             set
             {
                 _profileName = value;
-                OnPropertyChanged("ProfileName");
+                OnPropertyChanged(nameof(ProfileName));
             }
         }
 

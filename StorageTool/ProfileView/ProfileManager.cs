@@ -13,17 +13,14 @@ using StorageTool.Resources;
 
 namespace StorageTool
 {
-    public delegate void SetActiveProfileEventHandler();
-    public delegate void RemoveActiveProfileEventHandler();
+    public delegate void ChangedProfilesEventHandler();
 
     public class ProfileManager : INotifyPropertyChanged
     {
         private ObservableCollection<Profile> _profiles = new ObservableCollection<Profile>();
         private Profile _activeProfile = new Profile();
-        //private Visibility _showManageProfileView = Visibility.Collapsed;
 
-        public event SetActiveProfileEventHandler SetActiveProfileEvent;
-        public event RemoveActiveProfileEventHandler RemoveActiveProfileEvent;
+        public ChangedProfilesEventHandler ChangedProfilesEvent;
 
         public ProfileManager() { }
         public ProfileManager(List<ProfileBase> input)
@@ -51,84 +48,54 @@ namespace StorageTool
             return var;
         }
 
-        //RelayCommand _openProfileInputDialogCommand;
-        //public ICommand OpenProfileInputDialogCommand
-        //{
-        //    get
-        //    {
-        //        if (_openProfileInputDialogCommand == null)
-        //        {
-        //            _openProfileInputDialogCommand = new RelayCommand(param =>
-        //            {
-        //                var w = new ProfileInputWindow(this);
-        //                w.Owner = Application.Current.MainWindow;
-        //                w.ShowDialog();
-        //            }, param => true);
-        //        }
-        //        return _openProfileInputDialogCommand;
-        //    }
-        //}
-
-
-
-
-        //RelayCommand _manageProfilesCommand;
-        //public ICommand ManageProfilesCommand
-        //{
-        //    get
-        //    {
-        //        if (_manageProfilesCommand == null)
-        //        {
-        //            _manageProfilesCommand = new RelayCommand(param =>
-        //            {
-        //                if(ShowManageProfileView == Visibility.Collapsed)
-        //                    ShowManageProfileView = Visibility.Visible;
-        //                else
-        //                    ShowManageProfileView = Visibility.Collapsed;
-        //            }, param => true);
-        //        }
-        //        return _manageProfilesCommand;
-        //    }
-        //}
-
         public bool Add(Profile input)
         {
             if (input != null)
             {
-                if (!Profiles.Any(item => item.ProfileName == input.ProfileName))
+                var var1 = new DirectoryInfo(input.GameFolder.FullName);
+                var var2 = new DirectoryInfo(input.StorageFolder.FullName);
+                if (var1.Exists && var2.Exists)
                 {
-                    var var1 = new DirectoryInfo(input.GameFolder.FullName);
-                    var var2 = new DirectoryInfo(input.StorageFolder.FullName);
-                    if (var1.Exists && var2.Exists)
+                    if (!Profiles.Any(item => item.ProfileName == input.ProfileName))
                     {
                         Profiles.Add(input);
                         ActiveProfile = input;
-                        Properties.Settings.Default.Config.Profiles = GetProfileBase();
-                        Properties.Settings.Default.Save();
-                        return true;
                     }
-
-                }
+                    else
+                    {
+                        int index = -1;
+                        foreach(Profile p in Profiles)
+                        {
+                            if(p.ProfileName == input.ProfileName)
+                            {
+                                index = Profiles.IndexOf(p);
+                            }
+                        }
+                        if (index > 0)
+                        {
+                            Profiles.RemoveAt(index);
+                            Profiles.Add(input);
+                        }
+                    }
+                    if (ChangedProfilesEvent != null)
+                    {
+                        ChangedProfilesEvent();
+                    }
+                    Properties.Settings.Default.Config.Profiles = GetProfileBase();
+                    Properties.Settings.Default.Save();
+                    return true;
+                }                  
             }
             return false;
-        }
-
-        public void SetDefaultActive()
-        {
-            if(Profiles.Count > 0)
-            {
-                this.ActiveProfile = Profiles[0];
-            }
-        }      
-  
+        } 
 
         public void RemoveActive()
         {
-            if (RemoveActiveProfileEvent != null)
-            {
-                RemoveActiveProfileEvent();
-            }
             Profiles.Remove(ActiveProfile);
+            if (ChangedProfilesEvent != null)
+            {
+                ChangedProfilesEvent();
+            }
             Properties.Settings.Default.Save();
         }
 
@@ -149,22 +116,8 @@ namespace StorageTool
             {
                 _activeProfile = value;
                 OnPropertyChanged(nameof(ActiveProfile));
-                if (SetActiveProfileEvent != null)
-                {
-                    SetActiveProfileEvent();
-                }               
             }
         }
-
-        //public Visibility ShowManageProfileView
-        //{
-        //    get { return _showManageProfileView; }
-        //    set
-        //    {
-        //        _showManageProfileView = value;
-        //        OnPropertyChanged(nameof(ShowManageProfileView));
-        //    }
-        //}
 
         public event PropertyChangedEventHandler PropertyChanged;
 

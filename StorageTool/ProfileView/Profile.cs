@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 
 namespace StorageTool
 {
-    public class Profile :INotifyPropertyChanged
+    public class Profile :INotifyPropertyChanged, IEquatable<Profile>
     {
-        private string profileName = null;
-        private DirectoryInfo storageFolder = null;
-        private DirectoryInfo gameFolder = null;
+        private string profileName;
+        private DirectoryInfo storageFolder;
+        private DirectoryInfo gameFolder;
 
         public Profile()
         {
@@ -23,8 +23,8 @@ namespace StorageTool
         public Profile(Profile prof)
         {
             ProfileName = prof.ProfileName;
-            StorageFolder = prof.StorageFolder;
-            GameFolder = prof.GameFolder;
+            StorageFolder = new DirectoryInfo( prof.StorageFolder.FullName);
+            GameFolder = new DirectoryInfo( prof.GameFolder.FullName);
         }
 
         public Profile (string name, string gF, string sF)
@@ -81,6 +81,27 @@ namespace StorageTool
             if (this.PropertyChanged != null)
                 this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
         }
+
+        #region Equality
+        public bool Equals(Profile other)
+        {
+            if (other == null) return false;
+            if (profileName == null || gameFolder == null || storageFolder == null) return false;
+            return string.Equals(profileName, other.profileName) &&
+                string.Equals(gameFolder.FullName, other.gameFolder.FullName) &&
+                string.Equals( storageFolder.FullName, other.storageFolder.FullName );
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != GetType()) return false;
+            return Equals(obj as Profile);
+        }
+        #endregion
+
+
     }
 
     [Serializable]

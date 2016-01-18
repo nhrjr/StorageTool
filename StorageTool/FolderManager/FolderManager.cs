@@ -32,7 +32,7 @@ namespace StorageTool
         private bool _isRefreshingFolders = false;
         private bool _isRefreshingSizes = false;
 
-        private Profile Profile;
+        public Profile Profile { get; set; }
 
         public ObservableCollection<FolderViewModel> Folders { get; set; } = new ObservableCollection<FolderViewModel>();
         public ObservableCollection<string> DuplicateFolders { get; set; } = new ObservableCollection<string>();
@@ -43,12 +43,7 @@ namespace StorageTool
 
         public FolderManager(Profile p)
         {
-            Profile = p;
-            InitFolderManager();
-        }
-
-        public FolderManager()
-        {
+            Profile = new Profile(p);
             InitFolderManager();
         }
 

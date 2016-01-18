@@ -33,7 +33,7 @@
         <Expander Header="Manage Profiles" Margin="7,7,7,7" DockPanel.Dock="Top" Grid.Row="0">
             <local:ProfileManageView DataContext="{Binding ProfileManagerViewModel}"/>
         </Expander>
-        <TabControl ItemsSource="{Binding DisplayViewModels}" SelectedValue="{Binding ProfileViewModel.ActiveProfile, UpdateSourceTrigger=PropertyChanged}"
+        <TabControl Name="MainTabControl" ItemsSource="{Binding DisplayViewModels}" SelectedValue="{Binding ProfileManager.ActiveProfile, UpdateSourceTrigger=PropertyChanged}"
                     SelectedValuePath="Profile" Margin="7,7,7,7" Padding="0" BorderThickness="0" DockPanel.Dock="Top" Grid.Row="1">
             <TabControl.Resources>
                 <Style TargetType="{x:Type TabItem}">
