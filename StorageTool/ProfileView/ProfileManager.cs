@@ -92,7 +92,7 @@ namespace StorageTool
         public void RemoveActive()
         {
             Profiles.Remove(ActiveProfile);
-            if (ChangedProfilesEvent != null)
+            if (this.ChangedProfilesEvent != null)
             {
                 ChangedProfilesEvent();
             }

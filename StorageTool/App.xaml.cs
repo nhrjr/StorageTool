@@ -25,7 +25,7 @@ namespace StorageTool
             {
                 StorageTool.Properties.Settings.Default.Config = new Config();
             }
-            StorageTool.Properties.Settings.Default.Upgrade();
+            //StorageTool.Properties.Settings.Default.Upgrade();
         }
         private void Application_Exit(object sender, ExitEventArgs e)
         {

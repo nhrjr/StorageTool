@@ -11,47 +11,15 @@
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </UserControl.Resources>
 
-    <TabControl x:Name="tabControl" BorderThickness="0" Padding="0" Margin="0">
-        <TabControl.Resources>
-            <Style TargetType="{x:Type TabItem}">
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type TabItem}">
-                            <Border x:Name="Panel" CornerRadius="3,3,0,0" Margin="3,2,3,-1" Background="{x:Null}" BorderBrush="Black" Tag="{Binding DataContext, RelativeSource={RelativeSource FindAncestor, AncestorLevel=1, AncestorType={x:Type local:MainWindow}}}">
-                                <ContentPresenter x:Name="ContentSite"
-									VerticalAlignment="Center"
-									HorizontalAlignment="Center"
-									ContentSource="Header"
-									MinWidth="60"
-									Margin="5,2"
-                                        />
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsSelected" Value="True">
-                                    <Setter TargetName="Panel" Property="TextBlock.FontWeight" Value="Bold" />
-                                    <Setter TargetName="Panel" Property="Background" Value="White" />
-                                    <Setter TargetName="Panel" Property="TextBlock.Foreground" Value="Black" />
-                                    <Setter TargetName="Panel" Property="BorderThickness" Value="1,1,1,0" />
-                                </Trigger>
-                                <Trigger Property="IsSelected" Value="False">
-                                    <Setter TargetName="Panel" Property="TextBlock.FontWeight" Value="Bold" />
-                                    <Setter TargetName="Panel" Property="Background" Value="LightGray" />
-                                    <Setter TargetName="Panel" Property="TextBlock.Foreground" Value="#FF555353" />
-                                    <Setter TargetName="Panel" Property="BorderThickness" Value="0,0,0,1" />
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-        </TabControl.Resources>
+    <TabControl x:Name="tabControl" BorderThickness="0" Padding="0" Margin="0" ItemContainerStyle="{DynamicResource FolderManagerViewTabItem}">
+
 
         <TabItem Header="{Binding HeaderNames.Source}">
-            <ListView x:Name="sourceList" ItemsSource="{Binding Source}"  Style="{DynamicResource ListViewStyle}">
+            <ListView x:Name="sourceList" ItemsSource="{Binding Source}"  Style="{DynamicResource ListViewStyle}" ItemContainerStyle="{DynamicResource ListViewItemStyle}" >
                 <ListView.View>
-                    <GridView>
+                    <GridView ColumnHeaderContainerStyle="{DynamicResource GridViewColumnHeaderStyle}">
                         <GridViewColumn Width="300" DisplayMemberBinding="{Binding DirInfo.Name}">
-                            <GridViewColumnHeader Tag="Source" Command="{Binding SortCustomViewsCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Content="Name"/>
+                            <GridViewColumnHeader Tag="Source" Command="{Binding SortCustomViewsCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Content="Name" Style="{DynamicResource GridViewColumnHeaderStyle}"/>
                         </GridViewColumn>
                         <GridViewColumn  Width="100">
                             <GridViewColumn.CellTemplate>
@@ -59,7 +27,7 @@
                                     <TextBlock HorizontalAlignment="Right" Text="{Binding SizeString}" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
-                            <GridViewColumnHeader Tag="Source" Command="{Binding HeaderClickCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Content="Size"/>
+                            <GridViewColumnHeader Tag="Source" Command="{Binding SortCustomViewsCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Content="Size"/>
                         </GridViewColumn>
                         <GridViewColumn Width="60">
                             <GridViewColumn.CellTemplate>
@@ -74,9 +42,9 @@
         </TabItem>
 
         <TabItem Header="{Binding HeaderNames.Storage}">
-            <ListView x:Name="storageList" ItemsSource="{Binding Stored}"  Style="{DynamicResource ListViewStyle}">
+            <ListView x:Name="storageList" ItemsSource="{Binding Stored}"  Style="{DynamicResource ListViewStyle}" ItemContainerStyle="{DynamicResource ListViewItemStyle}">
                 <ListView.View>
-                    <GridView>
+                    <GridView ColumnHeaderContainerStyle="{DynamicResource GridViewColumnHeaderStyle}">
                         <GridViewColumn  DisplayMemberBinding="{Binding DirInfo.Name}" Width="300">
                             <GridViewColumnHeader Tag="Stored" Command="{Binding SortCustomViewsCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Content="Name"/>
                         </GridViewColumn>
@@ -101,9 +69,9 @@
         </TabItem>
 
         <TabItem Header="{Binding HeaderNames.Unlinked}" Visibility="{Binding ShowUnlinkedFolders, Converter={StaticResource BoolToVis}}" >
-            <ListView x:Name="unlinkedList" ItemsSource="{Binding Unlinked}"  Style="{DynamicResource ListViewStyle}">
+            <ListView x:Name="unlinkedList" ItemsSource="{Binding Unlinked}"  Style="{DynamicResource ListViewStyle}" ItemContainerStyle="{DynamicResource ListViewItemStyle}">
                 <ListView.View>
-                    <GridView>
+                    <GridView ColumnHeaderContainerStyle="{DynamicResource GridViewColumnHeaderStyle}">
                         <GridViewColumn  DisplayMemberBinding="{Binding DirInfo.Name}" Width="300">
                             <GridViewColumnHeader Tag="Unlinked" Command="{Binding SortCustomViewsCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Self}}" Content="Name"/>
                         </GridViewColumn>
@@ -128,7 +96,7 @@
         </TabItem>
 
         <TabItem Header="{Binding HeaderNames.Duplicate}" Visibility="{Binding ShowDuplicateFolders, Converter={StaticResource BoolToVis}}">
-            <ListView x:Name="duplicateList" ItemsSource="{Binding DuplicateFolders}"  Style="{DynamicResource ListViewStyle}">
+            <ListView x:Name="duplicateList" ItemsSource="{Binding DuplicateFolders}"  Style="{DynamicResource ListViewStyle}" ItemContainerStyle="{DynamicResource ListViewItemStyle}">
                 <ListView.View>
                     <GridView>
                         <GridViewColumn  DisplayMemberBinding="{Binding}" Width="250">
@@ -141,9 +109,9 @@
 
         <!--DEBUGVIEW-->
         <!--<TabItem Header="{Binding HeaderNames.All}">
-            <ListView x:Name="allList" ItemsSource="{Binding FolderManager.Folders}"  Style="{DynamicResource ListViewStyle}">
+            <ListView x:Name="allList" ItemsSource="{Binding FolderManager.Folders}"  Style="{DynamicResource ListViewStyle}" ItemContainerStyle="{DynamicResource ListViewItemStyle}">
                 <ListView.View>
-                    <GridView>
+                    <GridView ColumnHeaderContainerStyle="{DynamicResource GridViewColumnHeaderStyle}">
                         <GridViewColumn Width="Auto" DisplayMemberBinding="{Binding DirInfo.FullName}">
                             <GridViewColumnHeader Tag="DirInfo.Name" Content="Name"/>
                         </GridViewColumn>

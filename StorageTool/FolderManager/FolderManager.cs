@@ -65,6 +65,7 @@ namespace StorageTool
             folderWatcher.NotifyFileSizeChangesEvent -= RefreshSizes;
             folderWatcher.StopFileSystemWatcher(Profile.GameFolder.FullName);
             folderWatcher.StopFileSystemWatcher(Profile.StorageFolder.FullName);
+            
         }
 
 

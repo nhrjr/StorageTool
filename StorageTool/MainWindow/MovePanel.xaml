@@ -6,14 +6,14 @@
              xmlns:local="clr-namespace:StorageTool"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="500">
-    <ListView x:Name="Move_Queue" ItemsSource="{Binding Assigned}" Margin="0" Style="{DynamicResource ListViewStyle}">
+    <ListView x:Name="Move_Queue" ItemsSource="{Binding Assigned}" Margin="0" Style="{DynamicResource ListViewStyle}" ItemContainerStyle="{DynamicResource ListViewItemStyle}">
             <!--<ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                 </Style>
             </ListView.ItemContainerStyle>-->
             <ListView.View>
-                <GridView>
+                <GridView ColumnHeaderContainerStyle="{DynamicResource GridViewColumnHeaderStyle}">
 
                     <GridViewColumn Width="150" Header="Name" >
                         <GridViewColumn.CellTemplate>

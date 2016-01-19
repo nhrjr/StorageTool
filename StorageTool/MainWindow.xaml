@@ -15,6 +15,7 @@
         MinWidth="600"
         Height="800"
         Width="600"
+        WindowStartupLocation="CenterScreen"
         >
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
@@ -30,51 +31,14 @@
             <RowDefinition Height="200" />
         </Grid.RowDefinitions>
 
-        <Expander Header="Manage Profiles" Margin="7,7,7,7" DockPanel.Dock="Top" Grid.Row="0">
+        <Border BorderBrush="Black" BorderThickness="1" Margin="7,7,7,7">
+        <Expander Header="Manage Profiles"  DockPanel.Dock="Top" Grid.Row="0">
             <local:ProfileManageView DataContext="{Binding ProfileManagerViewModel}"/>
         </Expander>
+        </Border>
         <TabControl Name="MainTabControl" ItemsSource="{Binding DisplayViewModels}" SelectedValue="{Binding ProfileManager.ActiveProfile, UpdateSourceTrigger=PropertyChanged}"
-                    SelectedValuePath="Profile" Margin="7,7,7,7" Padding="0" BorderThickness="0" DockPanel.Dock="Top" Grid.Row="1">
-            <TabControl.Resources>
-                <Style TargetType="{x:Type TabItem}">
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="{x:Type TabItem}">
-                                <Border x:Name="Panel" CornerRadius="4" BorderThickness="1" Background="{x:Null}" BorderBrush="Black" Margin="10,0,0,5" Tag="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=local:MainWindow, AncestorLevel=1}, Path=DataContext}">
-                                    <ContentPresenter x:Name="ContentSite"
-                                        VerticalAlignment="Center"
-                                        HorizontalAlignment="Center"
-                                        ContentSource="Header"
-                                        MinWidth="60"
-                                        Margin="5,2"
-                                        />
-                                    <Border.ContextMenu>
-                                        <ContextMenu>
-                                            <MenuItem Header="Open Source Folder" Command="{Binding PlacementTarget.Tag.OpenExplorerCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" CommandParameter="Source"/>
-                                            <MenuItem Header="Open Storage Folder" Command="{Binding PlacementTarget.Tag.OpenExplorerCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" CommandParameter="Storage"/>
-                                        </ContextMenu>
-                                    </Border.ContextMenu>
-                                </Border>
-                                <ControlTemplate.Triggers>
-                                        <Trigger Property="IsSelected" Value="True">
-                                            <Setter TargetName="Panel" Property="TextBlock.FontWeight" Value="Bold" />
-                                            <Setter TargetName="Panel" Property="Background" Value="{DynamicResource ForeGroundBlue}" />
-                                            <Setter TargetName="Panel" Property="TextBlock.Foreground" Value="White" />
-                                        </Trigger>
-                                        <Trigger Property="IsSelected" Value="False">
-                                            <Setter TargetName="Panel" Property="TextBlock.FontWeight" Value="Bold" />
-                                        <Setter TargetName="Panel" Property="Background" Value="LightGray" />
-                                        <Setter TargetName="Panel" Property="TextBlock.Foreground" Value="#666666" />
-                                        </Trigger>
-                                </ControlTemplate.Triggers>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
-                <Style TargetType="{x:Type TabPanel}">
-                    <Setter Property="HorizontalAlignment" Value="Center" />
-                </Style>
-            </TabControl.Resources>
+                    SelectedValuePath="Profile" Margin="7,7,7,7" Padding="0" BorderThickness="0" DockPanel.Dock="Top" Grid.Row="1" ItemContainerStyle="{DynamicResource TabItemMainView}">
+
             <TabControl.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Profile.ProfileName}"/>
