@@ -171,6 +171,7 @@ namespace StorageTool
         {
             if (e.PropertyName == "Status" || e.PropertyName == "Mapping")
             {
+                RefreshFolders();
                 if(ModelPropertyChangedEvent != null)
                     App.Current.Dispatcher.BeginInvoke(new Action(() => { ModelPropertyChangedEvent(); }));
             }

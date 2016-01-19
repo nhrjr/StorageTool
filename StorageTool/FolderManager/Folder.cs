@@ -180,13 +180,16 @@ public class FolderViewModel : INotifyPropertyChanged
             var sizeFromHell = new Progress<long>((fu) =>
             {
                 ProcessedBits += fu;
-                Progress = (int)(100 * ProcessedBits / DirSize);
+                if (DirSize != null && DirSize != 0)
+                    Progress = (int)(100 * ProcessedBits / DirSize);
+                else
+                    Progress = 0;
             });
 
             this.Status = TaskStatus.Running;
             _cts = new CancellationTokenSource();
             CancellationToken _ct = _cts.Token;
-            bool returnStatus = true;
+            bool returnStatus = false;
 
             
             _task = Task.Factory.StartNew(() => TransferFolders(returnStatus,sizeFromHell, _lock, _ct), _cts.Token,TaskCreationOptions.None,moveTS);
@@ -207,6 +210,7 @@ public class FolderViewModel : INotifyPropertyChanged
         private void UpdateYourself(bool returnStatus)
         {
             ReturnStatus = returnStatus;
+            MessageBox.Show(ReturnStatus.ToString());
             if (returnStatus)
             {
                 string targetDir = Ass.Target.FullName;

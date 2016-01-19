@@ -98,7 +98,7 @@
         <TabItem Header="{Binding HeaderNames.Duplicate}" Visibility="{Binding ShowDuplicateFolders, Converter={StaticResource BoolToVis}}">
             <ListView x:Name="duplicateList" ItemsSource="{Binding DuplicateFolders}"  Style="{DynamicResource ListViewStyle}" ItemContainerStyle="{DynamicResource ListViewItemStyle}">
                 <ListView.View>
-                    <GridView>
+                    <GridView ColumnHeaderContainerStyle="{DynamicResource GridViewColumnHeaderStyle}">
                         <GridViewColumn  DisplayMemberBinding="{Binding}" Width="250">
                             <GridViewColumnHeader Tag="DirInfo.Name" Content="Duplicate"/>
                         </GridViewColumn>

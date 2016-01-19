@@ -16,12 +16,13 @@ namespace StorageTool.Resources
     {
         public static bool LinkStorageToSource(Assignment prof)
         {
-            bool returnStatus = true;
+            bool returnStatus = false;
             try
             {
                 string sourceDir = prof.Source.FullName;
                 string targetDir = prof.Target.FullName;// + @"\" + prof.Source.Name;
                 JunctionPoint.Create(@targetDir, @sourceDir, false);
+                returnStatus = true;
             }
             catch (IOException ioexp)
             {
@@ -34,11 +35,11 @@ namespace StorageTool.Resources
         {
             string sourceDir = prof.Source.FullName;
             string targetDir = prof.Target.FullName;// + @"\" + prof.Source.Name;
-            bool returnStatus = true;
+            bool returnStatus = false;
             try
             {
                 returnStatus = CopyFolders(prof, sizeFromHell, _lock, ct);
-                if (returnStatus == false)
+                if (returnStatus == true)
                 {
                     return returnStatus;
                 }
@@ -68,7 +69,7 @@ namespace StorageTool.Resources
         {
             string sourceDir = prof.Source.FullName;
             string targetDir = prof.Target.FullName;// + @"\" + prof.Source.Name;
-            bool returnStatus = true;
+            bool returnStatus = false;
             try
             {
                 /// find a junction, which has a different name, than the folder to be moved
