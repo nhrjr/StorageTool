@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 
+
 namespace StorageTool.Resources
 {
     public static class DirectorySize
@@ -35,35 +36,17 @@ namespace StorageTool.Resources
         public static long DirSizeIterative(DirectoryInfo dir)
         {
             long Size = 0;
-            Stack<DirectoryInfo> stack = new Stack<DirectoryInfo>();
-            stack.Push(dir);
+            
             try
             {
-                while ( stack.Count > 0)
+                List<FileInfo> allDirs = dir.GetFiles("*", SearchOption.AllDirectories).ToList();
+                foreach (FileInfo f in allDirs)
                 {
-                    DirectoryInfo tmp = stack.Pop();
-                    if(tmp.Exists)
-                        Size += getSizeOfFiles(tmp);
-                    DirectoryInfo[] dis = tmp.GetDirectories();
-                    foreach (DirectoryInfo di in dis)
-                    {
-                        stack.Push(di);
-                    }
-                }  
+                    Size += f.Length;
+                }
             }
             catch (IOException ex)
             {
-            }
-            return Size;
-        }
-
-        public static long getSizeOfFiles(DirectoryInfo dir)
-        {
-            long Size = 0;
-            FileInfo[] fis = dir.GetFiles();
-            foreach (FileInfo fi in fis)
-            {
-                Size += fi.Length;
             }
             return Size;
         }
@@ -89,6 +72,14 @@ namespace StorageTool.Resources
             {
             }
             return Size;
+        }
+
+        public static long DirSizeScriptingRuntime(DirectoryInfo dir)
+        {
+            Scripting.FileSystemObject fso = new Scripting.FileSystemObject();
+            Scripting.Folder folder = fso.GetFolder(dir.FullName);
+            long dirSize = (long)folder.Size;
+            return dirSize;
         }
     }
 }

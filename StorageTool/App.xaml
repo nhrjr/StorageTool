@@ -99,6 +99,7 @@
                                     <ContextMenu>
                                         <MenuItem Header="Open Source Folder" Command="{Binding PlacementTarget.Tag.OpenExplorerCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" CommandParameter="Source"/>
                                         <MenuItem Header="Open Storage Folder" Command="{Binding PlacementTarget.Tag.OpenExplorerCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" CommandParameter="Storage"/>
+                                        <MenuItem Header="Refresh Folders" Command="{Binding PlacementTarget.Tag.RefreshFoldersCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}"/>
                                     </ContextMenu>
                                 </Border.ContextMenu>
                             </Border>

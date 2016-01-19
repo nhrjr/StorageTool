@@ -51,7 +51,7 @@ namespace StorageTool
         {
             BindingOperations.EnableCollectionSynchronization(Folders, _lock);
 
-            folderWatcher.NotifyFileSystemChangesEvent += RefreshFolders;
+            //folderWatcher.NotifyFileSystemChangesEvent += RefreshFolders;
             folderWatcher.NotifyFileSizeChangesEvent += RefreshSizes;
             folderWatcher.StartFileSystemWatcher(Profile.GameFolder.FullName);
             folderWatcher.StartFileSystemWatcher(Profile.StorageFolder.FullName);
@@ -61,7 +61,7 @@ namespace StorageTool
 
         ~FolderManager()
         {
-            folderWatcher.NotifyFileSystemChangesEvent -= RefreshFolders;
+            //folderWatcher.NotifyFileSystemChangesEvent -= RefreshFolders;
             folderWatcher.NotifyFileSizeChangesEvent -= RefreshSizes;
             folderWatcher.StopFileSystemWatcher(Profile.GameFolder.FullName);
             folderWatcher.StopFileSystemWatcher(Profile.StorageFolder.FullName);
@@ -94,7 +94,7 @@ namespace StorageTool
             Folders.Remove(folder);
         }
 
-        private void RefreshSizes()
+        public void RefreshSizes()
         {
             if (_isRefreshingSizes == true)
             {
@@ -103,7 +103,7 @@ namespace StorageTool
             foreach (FolderViewModel f in Folders) { f.DirSize = null; f.GetSize(); }
         }
 
-        private void RefreshFolders()
+        public void RefreshFolders()
         {
             if (_isRefreshingFolders == true)
                 return;
@@ -111,15 +111,29 @@ namespace StorageTool
             {
                 _isRefreshingFolders = true;
 
-                //await Task.Factory.StartNew(() =>
-                //{
-
                     analyzeFolders.GetFolderStructure(Profile);
                     DuplicateFolders = new ObservableCollection<string>(analyzeFolders.DuplicateFolders);
 
-                    foreach (DirectoryInfo g in analyzeFolders.StorableFolders)
+                foreach (FolderViewModel g in Folders.Reverse())
+                {
+                    if (!analyzeFolders.StorableFolders.Any(f => f.FullName == g.DirInfo.FullName && g.Mapping == Mapping.Source))
                     {
-                        if (!Folders.Any(f => f.DirInfo.Name == g.Name))
+                        if (!analyzeFolders.LinkedFolders.Any(f => f.FullName == g.DirInfo.FullName && g.Mapping == Mapping.Stored))
+                        {
+                            if (!analyzeFolders.UnlinkedFolders.Any(f => f.FullName == g.DirInfo.FullName && g.Mapping == Mapping.Unlinked))
+                            {
+                                if (g.Status == TaskStatus.Inactive)
+                                {
+                                    RemoveFolder(g);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                foreach (DirectoryInfo g in analyzeFolders.StorableFolders)
+                    {
+                        if (!Folders.Any(f => f.DirInfo.Name == g.Name && f.Mapping == Mapping.Source))
                         {
                             AddFolder(new FolderViewModel(g), Profile.StorageFolder, TaskMode.STORE, TaskStatus.Inactive, Mapping.Source);
                         }
@@ -127,36 +141,20 @@ namespace StorageTool
                     }
                     foreach (DirectoryInfo g in analyzeFolders.LinkedFolders)
                     {
-                        if (!Folders.Any(f => f.DirInfo.Name == g.Name))
+                        if (!Folders.Any(f => f.DirInfo.Name == g.Name && f.Mapping == Mapping.Stored))
                         {
                             AddFolder(new FolderViewModel(g), Profile.GameFolder, TaskMode.RESTORE, TaskStatus.Inactive, Mapping.Stored);
                         }
                     }
                     foreach (DirectoryInfo g in analyzeFolders.UnlinkedFolders)
                     {
-                        if (!Folders.Any(f => f.DirInfo.Name == g.Name))
+                        if (!Folders.Any(f => f.DirInfo.Name == g.Name && f.Mapping == Mapping.Unlinked))
                         {
                             AddFolder(new FolderViewModel(g), Profile.GameFolder, TaskMode.RELINK, TaskStatus.Inactive, Mapping.Unlinked);
                         }
                     }
 
-                    foreach (FolderViewModel g in Folders.Reverse())
-                    {
-                        if (!analyzeFolders.StorableFolders.Any(f => f.FullName == g.DirInfo.FullName))
-                        {
-                            if (!analyzeFolders.LinkedFolders.Any(f => f.FullName == g.DirInfo.FullName))
-                            {
-                                if (!analyzeFolders.UnlinkedFolders.Any(f => f.FullName == g.DirInfo.FullName))
-                                {
-                                    if (g.Status == TaskStatus.Inactive)
-                                    {
-                                        RemoveFolder(g);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                //});
+
             }
             catch (IOException e)
             {
@@ -171,7 +169,6 @@ namespace StorageTool
         {
             if (e.PropertyName == "Status" || e.PropertyName == "Mapping")
             {
-                RefreshFolders();
                 if(ModelPropertyChangedEvent != null)
                     App.Current.Dispatcher.BeginInvoke(new Action(() => { ModelPropertyChangedEvent(); }));
             }

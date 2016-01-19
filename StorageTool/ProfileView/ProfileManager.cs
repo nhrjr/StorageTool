@@ -71,7 +71,7 @@ namespace StorageTool
                                 index = Profiles.IndexOf(p);
                             }
                         }
-                        if (index > 0)
+                        if (index >= 0)
                         {
                             Profiles.RemoveAt(index);
                             Profiles.Add(input);

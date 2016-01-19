@@ -175,6 +175,7 @@
     <Compile Include="ProfileView\ProfileManagerViewModel.cs" />
     <Compile Include="Resources\SortAdorner.cs" />
     <Compile Include="Resources\MoveHelper.cs" />
+    <Compile Include="Resources\TabItemGeneratorBehavior.cs" />
     <Page Include="FolderManager\FolderManagerView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -253,6 +254,17 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="FodyWeavers.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="Scripting">
+      <Guid>{420B2830-E718-11CF-893D-00A0C9054228}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Fody.1.28.3\build\Fody.targets" Condition="Exists('..\packages\Fody.1.28.3\build\Fody.targets')" />

@@ -21,8 +21,18 @@ namespace StorageTool.Resources
             {
                 string sourceDir = prof.Source.FullName;
                 string targetDir = prof.Target.FullName;// + @"\" + prof.Source.Name;
-                JunctionPoint.Create(@targetDir, @sourceDir, false);
-                returnStatus = true;
+                if (!AnalyzeFolders.ExistsAsDirectory(targetDir))
+                {
+                    JunctionPoint.Create(@targetDir, @sourceDir, false);
+                    returnStatus = true;
+                }
+                else
+                {
+                    returnStatus = false;
+                }
+                
+                
+                
             }
             catch (IOException ioexp)
             {
@@ -39,27 +49,32 @@ namespace StorageTool.Resources
             try
             {
                 returnStatus = CopyFolders(prof, sizeFromHell, _lock, ct);
-                if (returnStatus == true)
+                if (returnStatus == false)
                 {
                     return returnStatus;
                 }
-                DirectoryInfo deletableDirInfo = prof.Source;
-                deletableDirInfo.Delete(true);
-                JunctionPoint.Create(@sourceDir, @targetDir, false);
+                else
+                {
+                    DirectoryInfo deletableDirInfo = prof.Source;
+                    deletableDirInfo.Delete(true);
+                    if (!AnalyzeFolders.ExistsAsDirectory(targetDir))
+                    {
+                        JunctionPoint.Create(@targetDir, @sourceDir, false);
+                    }
+                }
             }
 
             catch (IOException ioexp)
             {
-                //HAHAAAAA JA! Das Passiert
-                try
-                {
-                    JunctionPoint.Create(@sourceDir, @targetDir, false);
-                }
-                finally { }
+                ////HAHAAAAA JA! Das Passiert
+                //try
+                //{
+                //    JunctionPoint.Create(@sourceDir, @targetDir, false);
+                //}
+                //finally { }
             }
             catch (UnauthorizedAccessException unauth)
             {
-                //MessageBox.Show(unauth.Message);
             }
             return returnStatus;
 
@@ -123,9 +138,7 @@ namespace StorageTool.Resources
 
         public static bool CopyFolders(Assignment item, IProgress<long> sizeFromHell, object _lock, CancellationToken ct)
         {
-            //string targetDir = item.Target.FullName;// + @"\" + item.Source.Name;
             Directory.CreateDirectory(item.Target.FullName);
-            //item.Target = new DirectoryInfo(targetDir); //TODO WHY?
             List<DirectoryInfo> allDirs = item.Source.GetDirectories("*", SearchOption.AllDirectories).ToList();
             allDirs.Add(item.Source);
             //Creates all of the directories and subdirectories

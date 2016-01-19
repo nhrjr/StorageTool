@@ -101,6 +101,25 @@ namespace StorageTool
             }
         }
 
+        RelayCommand _refreshFoldersCommand;
+        public ICommand RefreshFoldersCommand
+        {
+            get
+            {
+                if (_refreshFoldersCommand == null)
+                {
+                    _refreshFoldersCommand = new RelayCommand(param =>
+                    {
+                        foreach(FolderManagerViewModel f in DisplayViewModels)
+                        {
+                            f.FolderManager.RefreshFolders();
+                        }
+                    }, param => true);
+                }
+                return _refreshFoldersCommand;
+            }
+        }
+
         RelayCommand _cancelAllCommand;
         public ICommand CancelAllCommand
         {

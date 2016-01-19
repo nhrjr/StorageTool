@@ -60,7 +60,7 @@ public class FolderViewModel : INotifyPropertyChanged
         private int _progress;
 
         static OrderedTaskScheduler moveTS = new OrderedTaskScheduler();
-        static LimitedConcurrencyLevelTaskScheduler getSizeTS = new LimitedConcurrencyLevelTaskScheduler(Constants.GetSizeConcurrencyLevel);
+        static StaTaskScheduler getSizeTS = new StaTaskScheduler((Environment.ProcessorCount - 1)/2);        
         //static IOTaskScheduler getSizeTS = new IOTaskScheduler();
 
         RelayCommand _pauseCommand;
@@ -69,6 +69,7 @@ public class FolderViewModel : INotifyPropertyChanged
         RelayCommand _restoreCommand;
         RelayCommand _linkCommand;
 
+        #region Commands
         public ICommand CancelCommand
         {
             get
@@ -160,11 +161,13 @@ public class FolderViewModel : INotifyPropertyChanged
                 return _linkCommand;
             }
         }
+        #endregion
 
         public FolderViewModel(string path)
         {
             Status = TaskStatus.Inactive;
             DirInfo = new DirectoryInfo(path);
+            DirSize = null;
             GetSize();
         }
 
@@ -172,6 +175,7 @@ public class FolderViewModel : INotifyPropertyChanged
         {
             Status = TaskStatus.Inactive;
             DirInfo = dir;
+            DirSize = null;
             GetSize();
         }
 
@@ -190,9 +194,8 @@ public class FolderViewModel : INotifyPropertyChanged
             _cts = new CancellationTokenSource();
             CancellationToken _ct = _cts.Token;
             bool returnStatus = false;
-
             
-            _task = Task.Factory.StartNew(() => TransferFolders(returnStatus,sizeFromHell, _lock, _ct), _cts.Token,TaskCreationOptions.None,moveTS);
+            _task = Task.Factory.StartNew(() => TransferFolders(ref returnStatus,sizeFromHell, _lock, _ct), _cts.Token,TaskCreationOptions.None,moveTS);
             try
             {
                 await _task.ContinueWith((task) => UpdateYourself(returnStatus));
@@ -210,7 +213,6 @@ public class FolderViewModel : INotifyPropertyChanged
         private void UpdateYourself(bool returnStatus)
         {
             ReturnStatus = returnStatus;
-            MessageBox.Show(ReturnStatus.ToString());
             if (returnStatus)
             {
                 string targetDir = Ass.Target.FullName;
@@ -251,7 +253,7 @@ public class FolderViewModel : INotifyPropertyChanged
             }          
         }
 
-        private void TransferFolders(bool returnStatus, IProgress<long> sizeFromHell, object _lock, CancellationToken ct)
+        private void TransferFolders(ref bool returnStatus, IProgress<long> sizeFromHell, object _lock, CancellationToken ct)
         {
             //Status = TaskStatus.Running;
             switch (Ass.Mode)
@@ -269,18 +271,19 @@ public class FolderViewModel : INotifyPropertyChanged
             }
         }
 
-        public async void GetSize()
+        public void GetSize()
         {
             if (DirSize == null)
             {
-                try
-                {
-                    await Task.Factory.StartNew(() => DirectorySize.DirSizeIterative(DirInfo),CancellationToken.None,TaskCreationOptions.None,getSizeTS).ContinueWith(task => DirSize = task.Result).ConfigureAwait(false);
-                }
-                catch (IOException ex)
-                {
-                    DirSize = null;
-                }
+                Task.Factory.StartNew(() => DirectorySize.DirSizeScriptingRuntime(DirInfo), CancellationToken.None, TaskCreationOptions.None, getSizeTS).ContinueWith(task => DirSize = task.Result);
+                //try
+                //{
+                    
+                //}
+                //catch (IOException ex)
+                //{
+                //    DirSize = null;
+                //}
             }
         }
 

@@ -90,5 +90,11 @@ namespace StorageTool
             this.UnlinkedFolders = _uFolders;
             this.LinkedFolders = _lFolders;
         }
+
+        public static bool ExistsAsDirectory(string path)
+        {
+            DirectoryInfo var = new DirectoryInfo(path);
+            return var.Exists;
+        }
     }
 }
