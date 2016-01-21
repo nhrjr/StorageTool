@@ -65,29 +65,36 @@ namespace StorageTool
         }
 
 
-        public void AddFolder(FolderViewModel folder, TaskStatus status)
+        public void AddFolder(FolderViewModel folder, Mapping mapping)
         {
-            folder.PropertyChanged += FolderPropertyChanged;
-            folder.Status = status;
-            Folders.Add(folder);
-        }
-
-        public void AddFolder(FolderViewModel folder, DirectoryInfo target, TaskMode mode, TaskStatus status, Mapping mapping)
-        {
-            folder.PropertyChanged += FolderPropertyChanged;
-            string targetDir = target.FullName + @"\" + folder.DirInfo.Name;
+            //folder.PropertyChanged += FolderPropertyChanged;
+            folder.Status = TaskStatus.Inactive;
             folder.Ass.Source = folder.DirInfo;
-            folder.Ass.Target = new DirectoryInfo(targetDir);
-            folder.Ass.Mode = mode;
-            folder.Status = status;
-            folder.Mapping = mapping;
+            switch (mapping)
+            {
+                case Mapping.Source:
+                    folder.Mapping = mapping;
+                    folder.Ass.Mode = TaskMode.STORE;
+                    folder.Ass.Target = new DirectoryInfo(Profile.StorageFolder.FullName + @"\" + folder.DirInfo.Name);
+                    break;
+                case Mapping.Stored:
+                    folder.Mapping = mapping;
+                    folder.Ass.Mode = TaskMode.STORE;
+                    folder.Ass.Target = new DirectoryInfo(Profile.GameFolder.FullName + @"\" + folder.DirInfo.Name);
+                    break;
+                case Mapping.Unlinked:
+                    folder.Mapping = mapping;
+                    folder.Ass.Mode = TaskMode.LINK;
+                    folder.Ass.Target = new DirectoryInfo(Profile.GameFolder.FullName + @"\" + folder.DirInfo.Name);
+                    break;
+            }        
 
             Folders.Add(folder);
         }
 
         public void RemoveFolder(FolderViewModel folder)
         {
-            folder.PropertyChanged -= FolderPropertyChanged;
+            //folder.PropertyChanged -= FolderPropertyChanged;
             Folders.Remove(folder);
         }
 
@@ -100,17 +107,18 @@ namespace StorageTool
             foreach (FolderViewModel f in Folders) { f.DirSize = null; f.GetSize(); }
         }
 
-        public void RefreshFolders()
+        public async void RefreshFolders()
         {
-            if (_isRefreshingFolders == true)
-                return;
+            //if (_isRefreshingFolders == true)
+            //    return;
             try
             {
-                //Task.Factory.StartNew(() =>
-                //{
+                await Task.Factory.StartNew(() =>
+                {
                     _isRefreshingFolders = true;
 
                     analyzeFolders.GetFolderStructure(Profile);
+
                     DuplicateFolders = new ObservableCollection<string>(analyzeFolders.DuplicateFolders);
 
                     foreach (FolderViewModel g in Folders.Reverse())
@@ -134,7 +142,7 @@ namespace StorageTool
                     {
                         if (!Folders.Any(f => f.DirInfo.Name == g.Name && f.Mapping == Mapping.Source))
                         {
-                            AddFolder(new FolderViewModel(g), Profile.StorageFolder, TaskMode.STORE, TaskStatus.Inactive, Mapping.Source);
+                            AddFolder(new FolderViewModel(g),  Mapping.Source);
                         }
 
                     }
@@ -142,41 +150,42 @@ namespace StorageTool
                     {
                         if (!Folders.Any(f => f.DirInfo.Name == g.Name && f.Mapping == Mapping.Stored))
                         {
-                            AddFolder(new FolderViewModel(g), Profile.GameFolder, TaskMode.RESTORE, TaskStatus.Inactive, Mapping.Stored);
+                            AddFolder(new FolderViewModel(g), Mapping.Stored);
                         }
                     }
                     foreach (DirectoryInfo g in analyzeFolders.UnlinkedFolders)
                     {
                         if (!Folders.Any(f => f.DirInfo.Name == g.Name && f.Mapping == Mapping.Unlinked))
                         {
-                            AddFolder(new FolderViewModel(g), Profile.GameFolder, TaskMode.LINK, TaskStatus.Inactive, Mapping.Unlinked);
+                            AddFolder(new FolderViewModel(g), Mapping.Unlinked);
                         }
                     }
 
-                //}, CancellationToken.None, TaskCreationOptions.None, refreshTS);
+                }, CancellationToken.None, TaskCreationOptions.None, refreshTS);
             }
             catch (IOException e)
             {
             }
             finally
             {
-               _isRefreshingFolders = false;
+               //_isRefreshingFolders = false;
+                ModelPropertyChangedEvent();
             }
         }
 
-        void FolderPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == "Status" || e.PropertyName == "Mapping")
-            {
-                if (ModelPropertyChangedEvent != null)
-                    App.Current.Dispatcher.BeginInvoke(new Action(() => { ModelPropertyChangedEvent(); }));
+        //void FolderPropertyChanged(object sender, PropertyChangedEventArgs e)
+        //{
+        //    if (e.PropertyName == "Status" || e.PropertyName == "Mapping")
+        //    {
+        //        if (ModelPropertyChangedEvent != null)
+        //            App.Current.Dispatcher.BeginInvoke(new Action(() => { ModelPropertyChangedEvent(); }));
 
                 //var sender1 = sender as FolderViewModel;
                 //if ( sender1 != null && sender1.Status != TaskStatus.Running)
                 //{
                 //    App.Current.Dispatcher.BeginInvoke(new Action(() => { RefreshFolders(); }));
                 //}
-            }
-        }
+        //    }
+        //}
     }
 }

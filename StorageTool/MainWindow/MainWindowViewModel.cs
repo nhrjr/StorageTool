@@ -68,6 +68,7 @@ namespace StorageTool
                 if (!FolderManagerViewModels.Any(item => item.Profile.Equals(p)))
                 {
                     FolderManagerViewModel var = new FolderManagerViewModel(p);
+                    var.FolderManager.RefreshFolders();
                     FolderManagerViewModels.Add(var);
                     CollectionContainer cc = new CollectionContainer();
                     cc.Collection = var.Assigned;

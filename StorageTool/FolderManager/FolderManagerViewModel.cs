@@ -128,7 +128,8 @@ namespace StorageTool
 
         private void RefreshUI()
         {
-            this.Source.Refresh();
+            App.Current.Dispatcher.BeginInvoke(new Action(() => {
+                this.Source.Refresh();
             this.Stored.Refresh();
             this.Unlinked.Refresh();
             this.Assigned.Refresh();
@@ -137,6 +138,7 @@ namespace StorageTool
             ShowDuplicateFolders = (DuplicateFolders.Count > 0) ? true : false;
 
             HeaderNames.SetNumbers(Source.Count, Stored.Count, Unlinked.Count, DuplicateFolders.Count, FolderManager.Folders.Count);
+            }));
         }   
 
         public bool ShowDuplicateFolders

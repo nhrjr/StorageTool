@@ -39,7 +39,8 @@ namespace StorageTool
     {
         Source,
         Stored,
-        Unlinked        
+        Unlinked,
+        Duplicate        
     }
 
 public class FolderViewModel : INotifyPropertyChanged
@@ -60,7 +61,7 @@ public class FolderViewModel : INotifyPropertyChanged
         private int _progress;
 
         private static OrderedTaskScheduler moveTS = new OrderedTaskScheduler();
-        private static OrderedTaskScheduler getSizeTS = new OrderedTaskScheduler();        
+        private static WorkStealingTaskScheduler getSizeTS = new WorkStealingTaskScheduler(1);        
         //static IOTaskScheduler getSizeTS = new IOTaskScheduler();
 
         RelayCommand _pauseCommand;

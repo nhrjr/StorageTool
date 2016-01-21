@@ -165,14 +165,14 @@
     <Compile Include="Views\ProfileManageView.xaml.cs">
       <DependentUpon>ProfileManageView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ProfileView\ProfileManager.cs" />
+    <Compile Include="ProfileManager\ProfileManager.cs" />
     <Compile Include="Resources\Constants.cs" />
     <Compile Include="Resources\HeaderNames.cs" />
     <Compile Include="Resources\QueueItem.cs" />
     <Compile Include="Resources\AppCommands.cs" />
     <Compile Include="Resources\Config.cs" />
     <Compile Include="Resources\FolderWatcher.cs" />
-    <Compile Include="ProfileView\ProfileManagerViewModel.cs" />
+    <Compile Include="ProfileManager\ProfileManagerViewModel.cs" />
     <Compile Include="Resources\SortAdorner.cs" />
     <Compile Include="Resources\MoveHelper.cs" />
     <Compile Include="Resources\TabItemGeneratorBehavior.cs" />
@@ -189,7 +189,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Resources\AnalyzeFolders.cs" />
-    <Compile Include="ProfileView\Profile.cs" />
+    <Compile Include="ProfileManager\Profile.cs" />
     <Compile Include="Resources\DirectorySize.cs" />
     <Compile Include="Resources\Ext.cs" />
     <Compile Include="Resources\JunctionPoint.cs" />
