@@ -29,9 +29,9 @@ namespace StorageTool
     public enum TaskStatus
     {
         Inactive,
-        Running,
-        Completed,
-        Cancelled
+        Running
+        //Completed,
+        //Cancelled
         //Error
     }
 
@@ -59,8 +59,8 @@ public class FolderViewModel : INotifyPropertyChanged
         private long _processedBits;
         private int _progress;
 
-        static OrderedTaskScheduler moveTS = new OrderedTaskScheduler();
-        static StaTaskScheduler getSizeTS = new StaTaskScheduler((Environment.ProcessorCount - 1)/2);        
+        private static OrderedTaskScheduler moveTS = new OrderedTaskScheduler();
+        private static OrderedTaskScheduler getSizeTS = new OrderedTaskScheduler();        
         //static IOTaskScheduler getSizeTS = new IOTaskScheduler();
 
         RelayCommand _pauseCommand;
@@ -215,18 +215,14 @@ public class FolderViewModel : INotifyPropertyChanged
             ReturnStatus = returnStatus;
             if (returnStatus)
             {
-                string targetDir = Ass.Target.FullName;
-                DirInfo = new DirectoryInfo(targetDir);
                 Progress = 0;
                 ProcessedBits = 0;
-                if (Ass.Mode == TaskMode.STORE) { Mapping = Mapping.Stored; Ass.Mode = TaskMode.RESTORE; Ass.SwitchTargets(); }
-                else if(Ass.Mode == TaskMode.RESTORE) { Mapping = Mapping.Source; Ass.Mode = TaskMode.STORE; Ass.SwitchTargets(); }
-                else if(Ass.Mode == TaskMode.RELINK) { Mapping = Mapping.Stored; Ass.Mode = TaskMode.RESTORE; }
-                Status = TaskStatus.Completed;
+                if (Ass.Mode == TaskMode.STORE) { Mapping = Mapping.Stored; Ass.Mode = TaskMode.RESTORE; DirInfo = new DirectoryInfo(Ass.Target.FullName); Ass.SwitchTargets();  }
+                else if(Ass.Mode == TaskMode.RESTORE) { Mapping = Mapping.Source; Ass.Mode = TaskMode.STORE; DirInfo = new DirectoryInfo(Ass.Target.FullName); Ass.SwitchTargets();  }
+                else if(Ass.Mode == TaskMode.LINK) { Mapping = Mapping.Stored; Ass.Mode = TaskMode.RESTORE; }
             }
             else
             {                
-                Status = TaskStatus.Cancelled;
                 string targetDir = Ass.Target.FullName;
                 DirectoryInfo deletableDirInfo = new DirectoryInfo(targetDir);
                 deletableDirInfo.Delete(true);
@@ -238,9 +234,8 @@ public class FolderViewModel : INotifyPropertyChanged
                 }
                 else if (Ass.Mode == TaskMode.STORE)
                 {
-                    if (_canceled == false) { Mapping = Mapping.Unlinked; Ass.Mode = TaskMode.RELINK; }
+                    if (_canceled == false) { Mapping = Mapping.Unlinked; Ass.Mode = TaskMode.LINK; }
                 }                
-                Status = TaskStatus.Completed;
             }
         }
 
@@ -264,7 +259,7 @@ public class FolderViewModel : INotifyPropertyChanged
                 case TaskMode.RESTORE:
                     returnStatus = MoveHelper.MoveStorageToSource(_ass, sizeFromHell, _lock, ct);
                     break;
-                case TaskMode.RELINK:
+                case TaskMode.LINK:
                     returnStatus = MoveHelper.LinkStorageToSource(_ass);
                     Progress = 100;
                     break;
@@ -275,10 +270,11 @@ public class FolderViewModel : INotifyPropertyChanged
         {
             if (DirSize == null)
             {
-                Task.Factory.StartNew(() => DirectorySize.DirSizeScriptingRuntime(DirInfo), CancellationToken.None, TaskCreationOptions.None, getSizeTS).ContinueWith(task => DirSize = task.Result);
+                Task.Factory.StartNew(() => DirectorySize.DirSizeIterative(DirInfo), CancellationToken.None, TaskCreationOptions.None, getSizeTS).ContinueWith(task => DirSize = task.Result);
+                //DirSize = -1;
                 //try
                 //{
-                    
+
                 //}
                 //catch (IOException ex)
                 //{
@@ -286,6 +282,8 @@ public class FolderViewModel : INotifyPropertyChanged
                 //}
             }
         }
+
+        #region Properties
 
         public Assignment Ass
         {
@@ -419,6 +417,7 @@ public class FolderViewModel : INotifyPropertyChanged
                 OnPropertyChanged(nameof(DirSize));
             }
         }
+        #endregion
 
         public event PropertyChangedEventHandler PropertyChanged;
 

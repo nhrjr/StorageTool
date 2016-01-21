@@ -22,7 +22,30 @@ namespace StorageTool
 
         public ChangedProfilesEventHandler ChangedProfilesEvent;
 
-        public ProfileManager() { }
+        private void LoadConfig()
+        {
+            if (Properties.Settings.Default.Config == null)
+            {
+                StorageTool.Properties.Settings.Default.Config = new Config();
+            }
+            else
+            {
+                //StorageTool.Properties.Settings.Default.Upgrade();
+                Profiles = convertProfileBaseToProfile(Properties.Settings.Default.Config.Profiles);
+            }
+        }
+
+        private void SaveConfig()
+        {
+            Properties.Settings.Default.Config.Profiles = GetProfileBase();
+            Properties.Settings.Default.Save();
+        }
+
+        public ProfileManager()
+        {
+            LoadConfig();
+        }
+
         public ProfileManager(List<ProfileBase> input)
         {
             Profiles = convertProfileBaseToProfile(input);
@@ -75,14 +98,15 @@ namespace StorageTool
                         {
                             Profiles.RemoveAt(index);
                             Profiles.Add(input);
+                            ActiveProfile = input;
                         }
                     }
                     if (ChangedProfilesEvent != null)
                     {
                         ChangedProfilesEvent();
                     }
-                    Properties.Settings.Default.Config.Profiles = GetProfileBase();
-                    Properties.Settings.Default.Save();
+                    SaveConfig();
+
                     return true;
                 }                  
             }
@@ -96,7 +120,7 @@ namespace StorageTool
             {
                 ChangedProfilesEvent();
             }
-            Properties.Settings.Default.Save();
+            SaveConfig();
         }
 
         public ObservableCollection<Profile> Profiles

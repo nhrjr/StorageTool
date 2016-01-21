@@ -57,15 +57,16 @@ namespace StorageTool.Resources
                 {
                     DirectoryInfo deletableDirInfo = prof.Source;
                     deletableDirInfo.Delete(true);
-                    if (!AnalyzeFolders.ExistsAsDirectory(targetDir))
+                    if (!AnalyzeFolders.ExistsAsDirectory(sourceDir))
                     {
-                        JunctionPoint.Create(@targetDir, @sourceDir, false);
+                        JunctionPoint.Create(@sourceDir,@targetDir, false);
                     }
                 }
             }
 
             catch (IOException ioexp)
             {
+                MessageBox.Show("Cannot create" + sourceDir + " at " + targetDir);
                 ////HAHAAAAA JA! Das Passiert
                 //try
                 //{

@@ -24,41 +24,51 @@ namespace StorageTool
 {
     public class MainWindowViewModel : INotifyPropertyChanged
     {
-        public ObservableCollection<FolderManagerViewModel> _displayViewModels = new ObservableCollection<FolderManagerViewModel>();
+        public ObservableCollection<FolderManagerViewModel> _folderManagerViewModels = new ObservableCollection<FolderManagerViewModel>();
         public CompositeCollection _assigned = new CompositeCollection();
 
-        private ProfileManager _profileManager;        
+        private ProfileManager _profileManager = new ProfileManager();        
         private ProfileManagerViewModel _profileManagerViewModel;
 
         public MainWindowViewModel()
         {
-            if (Properties.Settings.Default.Config != null)
-                ProfileManager = new ProfileManager(Properties.Settings.Default.Config.Profiles);
-            else
-                ProfileManager = new ProfileManager();
+            _profileManager.ChangedProfilesEvent += UpdateDisplaySettings;
 
-            ProfileManager.ChangedProfilesEvent += SetDisplayViewModels;
+            _profileManagerViewModel = new ProfileManagerViewModel(_profileManager);
 
-            _profileManagerViewModel = new ProfileManagerViewModel(_profileManager);            
-              
-            SetDisplayViewModels();
+            foreach (Profile p in _profileManager.Profiles)
+            {
+                FolderManagerViewModel var = new FolderManagerViewModel(p);
+                FolderManagerViewModels.Add(var);
+                CollectionContainer cc = new CollectionContainer();
+                cc.Collection = var.Assigned;
+                this.Assigned.Add(cc);
+            }
         }
 
-        private void SetDisplayViewModels()
+        public void InitializeModelData()
         {
-            foreach (FolderManagerViewModel f in DisplayViewModels.Reverse())
+            foreach(FolderManagerViewModel f in FolderManagerViewModels)
             {
-                if (!ProfileManager.Profiles.Any(item => item.Equals(f.Profile)))
+                Task.Run(() =>  f.FolderManager.RefreshFolders());
+            }
+        }
+
+        private void UpdateDisplaySettings()
+        {
+            foreach (FolderManagerViewModel f in FolderManagerViewModels.Reverse())
+            {
+                if (!_profileManager.Profiles.Any(item => item.Equals(f.Profile)))
                 {
-                    DisplayViewModels.Remove(f);
+                    FolderManagerViewModels.Remove(f);
                 }
             }
-            foreach (Profile p in ProfileManager.Profiles)
+            foreach (Profile p in _profileManager.Profiles)
             { 
-                if (!DisplayViewModels.Any(item => item.Profile.Equals(p)))
+                if (!FolderManagerViewModels.Any(item => item.Profile.Equals(p)))
                 {
                     FolderManagerViewModel var = new FolderManagerViewModel(p);
-                    DisplayViewModels.Add(var);
+                    FolderManagerViewModels.Add(var);
                     CollectionContainer cc = new CollectionContainer();
                     cc.Collection = var.Assigned;
                     this.Assigned.Add(cc);
@@ -70,7 +80,7 @@ namespace StorageTool
         public int NumberOfOpenMoves()
         {
             int var = 0;
-            foreach (FolderManagerViewModel p in DisplayViewModels)
+            foreach (FolderManagerViewModel p in FolderManagerViewModels)
             {
                 var += p.Assigned.Count;
             }
@@ -90,9 +100,9 @@ namespace StorageTool
                         if (comm != null)
                         {
                             if (comm == "Source")
-                                comm = ProfileManager.ActiveProfile.GameFolder.FullName;
+                                comm = _profileManager.ActiveProfile.GameFolder.FullName;
                             if (comm == "Storage")
-                                comm = ProfileManager.ActiveProfile.StorageFolder.FullName;
+                                comm = _profileManager.ActiveProfile.StorageFolder.FullName;
                             Process.Start(comm);
                         }
                     }, param => true);
@@ -110,7 +120,7 @@ namespace StorageTool
                 {
                     _refreshFoldersCommand = new RelayCommand(param =>
                     {
-                        foreach(FolderManagerViewModel f in DisplayViewModels)
+                        foreach(FolderManagerViewModel f in FolderManagerViewModels)
                         {
                             f.FolderManager.RefreshFolders();
                         }
@@ -129,7 +139,7 @@ namespace StorageTool
                 {
                     _cancelAllCommand = new RelayCommand(param =>
                     {
-                        foreach(FolderManagerViewModel f in DisplayViewModels)
+                        foreach(FolderManagerViewModel f in FolderManagerViewModels)
                         {
                             foreach(FolderViewModel v in f.FolderManager.Folders)
                                 v.CancelCommand.Execute(this);
@@ -152,13 +162,13 @@ namespace StorageTool
             }
         }
 
-        public ObservableCollection<FolderManagerViewModel> DisplayViewModels
+        public ObservableCollection<FolderManagerViewModel> FolderManagerViewModels
         {
-            get { return _displayViewModels; }
+            get { return _folderManagerViewModels; }
             set
             {
-                _displayViewModels = value;
-                OnPropertyChanged(nameof(DisplayViewModels));
+                _folderManagerViewModels = value;
+                OnPropertyChanged(nameof(FolderManagerViewModels));
             }
         }
 

@@ -39,10 +39,14 @@ namespace StorageTool.Resources
             
             try
             {
-                List<FileInfo> allDirs = dir.GetFiles("*", SearchOption.AllDirectories).ToList();
-                foreach (FileInfo f in allDirs)
+                List<DirectoryInfo> allDirs = dir.GetDirectories("*", SearchOption.AllDirectories).ToList();
+                allDirs.Add(dir);
+                foreach (DirectoryInfo f in allDirs)
                 {
-                    Size += f.Length;
+                    foreach(FileInfo i in f.GetFiles().ToList())
+                    {
+                        Size += i.Length;
+                    }
                 }
             }
             catch (IOException ex)

@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Schedulers;
 using System.Windows;
 using System.IO;
 using System.ComponentModel;
@@ -27,6 +29,8 @@ namespace StorageTool
     public class FolderManager
     {
         public static object _lock = new object();
+        private static OrderedTaskScheduler refreshTS = new OrderedTaskScheduler();
+
         public event ModelPropertyChangedEventHandler ModelPropertyChangedEvent;
 
         private bool _isRefreshingFolders = false;
@@ -44,28 +48,20 @@ namespace StorageTool
         public FolderManager(Profile p)
         {
             Profile = new Profile(p);
-            InitFolderManager();
-        }
-
-        private void InitFolderManager()
-        {
             BindingOperations.EnableCollectionSynchronization(Folders, _lock);
 
-            //folderWatcher.NotifyFileSystemChangesEvent += RefreshFolders;
+            folderWatcher.NotifyFileSystemChangesEvent += RefreshFolders;
             folderWatcher.NotifyFileSizeChangesEvent += RefreshSizes;
             folderWatcher.StartFileSystemWatcher(Profile.GameFolder.FullName);
             folderWatcher.StartFileSystemWatcher(Profile.StorageFolder.FullName);
-
-            RefreshFolders();
         }
 
         ~FolderManager()
         {
-            //folderWatcher.NotifyFileSystemChangesEvent -= RefreshFolders;
+            folderWatcher.NotifyFileSystemChangesEvent -= RefreshFolders;
             folderWatcher.NotifyFileSizeChangesEvent -= RefreshSizes;
             folderWatcher.StopFileSystemWatcher(Profile.GameFolder.FullName);
             folderWatcher.StopFileSystemWatcher(Profile.StorageFolder.FullName);
-            
         }
 
 
@@ -85,6 +81,7 @@ namespace StorageTool
             folder.Ass.Mode = mode;
             folder.Status = status;
             folder.Mapping = mapping;
+
             Folders.Add(folder);
         }
 
@@ -109,29 +106,31 @@ namespace StorageTool
                 return;
             try
             {
-                _isRefreshingFolders = true;
+                //Task.Factory.StartNew(() =>
+                //{
+                    _isRefreshingFolders = true;
 
                     analyzeFolders.GetFolderStructure(Profile);
                     DuplicateFolders = new ObservableCollection<string>(analyzeFolders.DuplicateFolders);
 
-                foreach (FolderViewModel g in Folders.Reverse())
-                {
-                    if (!analyzeFolders.StorableFolders.Any(f => f.FullName == g.DirInfo.FullName && g.Mapping == Mapping.Source))
+                    foreach (FolderViewModel g in Folders.Reverse())
                     {
-                        if (!analyzeFolders.LinkedFolders.Any(f => f.FullName == g.DirInfo.FullName && g.Mapping == Mapping.Stored))
+                        if (!analyzeFolders.StorableFolders.Any(f => f.FullName == g.DirInfo.FullName && g.Mapping == Mapping.Source))
                         {
-                            if (!analyzeFolders.UnlinkedFolders.Any(f => f.FullName == g.DirInfo.FullName && g.Mapping == Mapping.Unlinked))
+                            if (!analyzeFolders.LinkedFolders.Any(f => f.FullName == g.DirInfo.FullName && g.Mapping == Mapping.Stored))
                             {
-                                if (g.Status == TaskStatus.Inactive)
+                                if (!analyzeFolders.UnlinkedFolders.Any(f => f.FullName == g.DirInfo.FullName && g.Mapping == Mapping.Unlinked))
                                 {
-                                    RemoveFolder(g);
+                                    if (g.Status == TaskStatus.Inactive)
+                                    {
+                                        RemoveFolder(g);
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
-                foreach (DirectoryInfo g in analyzeFolders.StorableFolders)
+                    foreach (DirectoryInfo g in analyzeFolders.StorableFolders)
                     {
                         if (!Folders.Any(f => f.DirInfo.Name == g.Name && f.Mapping == Mapping.Source))
                         {
@@ -150,18 +149,18 @@ namespace StorageTool
                     {
                         if (!Folders.Any(f => f.DirInfo.Name == g.Name && f.Mapping == Mapping.Unlinked))
                         {
-                            AddFolder(new FolderViewModel(g), Profile.GameFolder, TaskMode.RELINK, TaskStatus.Inactive, Mapping.Unlinked);
+                            AddFolder(new FolderViewModel(g), Profile.GameFolder, TaskMode.LINK, TaskStatus.Inactive, Mapping.Unlinked);
                         }
                     }
 
-
+                //}, CancellationToken.None, TaskCreationOptions.None, refreshTS);
             }
             catch (IOException e)
             {
             }
             finally
             {
-                _isRefreshingFolders = false;
+               _isRefreshingFolders = false;
             }
         }
 
@@ -169,8 +168,14 @@ namespace StorageTool
         {
             if (e.PropertyName == "Status" || e.PropertyName == "Mapping")
             {
-                if(ModelPropertyChangedEvent != null)
+                if (ModelPropertyChangedEvent != null)
                     App.Current.Dispatcher.BeginInvoke(new Action(() => { ModelPropertyChangedEvent(); }));
+
+                //var sender1 = sender as FolderViewModel;
+                //if ( sender1 != null && sender1.Status != TaskStatus.Running)
+                //{
+                //    App.Current.Dispatcher.BeginInvoke(new Action(() => { RefreshFolders(); }));
+                //}
             }
         }
     }

@@ -37,7 +37,7 @@
             <local:ProfileManageView DataContext="{Binding ProfileManagerViewModel}"/>
         </Expander>
         </Border>
-        <TabControl Name="MainTabControl" ItemsSource="{Binding DisplayViewModels}" SelectedValue="{Binding ProfileManager.ActiveProfile, UpdateSourceTrigger=PropertyChanged}"
+        <TabControl Name="MainTabControl" ItemsSource="{Binding FolderManagerViewModels}" SelectedValue="{Binding ProfileManager.ActiveProfile, UpdateSourceTrigger=PropertyChanged}"
                     SelectedValuePath="Profile" Margin="7,7,7,7" Padding="0" BorderThickness="0" DockPanel.Dock="Top" Grid.Row="1" ItemContainerStyle="{DynamicResource TabItemMainView}">
 
             <TabControl.ItemTemplate>

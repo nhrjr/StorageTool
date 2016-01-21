@@ -91,13 +91,12 @@ namespace StorageTool
             this._assigned.Source = this.FolderManager.Folders;
             this._assigned.Filter += AssignedFilter;
 
-            FolderManager.ModelPropertyChangedEvent += RefreshCollectionViewSources;
-            RefreshCollectionViewSources();
+            FolderManager.ModelPropertyChangedEvent += RefreshUI;
         }
 
         ~FolderManagerViewModel()
         {
-            FolderManager.ModelPropertyChangedEvent -= RefreshCollectionViewSources;
+            FolderManager.ModelPropertyChangedEvent -= RefreshUI;
         }
 
         public void SourceFilter(object sender, FilterEventArgs e)
@@ -127,7 +126,7 @@ namespace StorageTool
 
         }
 
-        private void RefreshCollectionViewSources()
+        private void RefreshUI()
         {
             this.Source.Refresh();
             this.Stored.Refresh();

@@ -1,0 +1,41 @@
+﻿<UserControl x:Class="StorageTool.ProfileManageView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:StorageTool"
+             mc:Ignorable="d" Height="100" Width="550" Background="White">
+    <!--<Border BorderBrush="Black" BorderThickness="1">-->
+    <Grid Margin="0,0,0,0">        
+        <TextBlock x:Name="SourceLabel" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Source:" VerticalAlignment="Top" Height="20" Width="69"/>
+        <TextBlock x:Name="StorageLabel" HorizontalAlignment="Left" Margin="10,35,0,0" TextWrapping="Wrap" Text="Storage:" VerticalAlignment="Top" Width="69" Height="20"/>
+        <TextBlock x:Name="ProfileNameLabel" HorizontalAlignment="Left" Margin="10,60,0,0" TextWrapping="Wrap" Text="Profilename:" VerticalAlignment="Top" Height="20" Width="69"/>
+
+
+        <!--<Button x:Name="cancelButton" Command="{Binding CancelCommand}" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}" Content="Cancel" Margin="99,122,0,0" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Width="75"/>-->
+        <Button x:Name="removeProfile"  Content="Remove Selected" Command="{Binding RemoveSelectedCommand}" HorizontalAlignment="Left" Margin="440,70,0,0" VerticalAlignment="Top" Width="100" Height="20"/>
+
+        <Button x:Name="pickFolderLeft" Command="{Binding PickFolderCommand}" CommandParameter="Source" Content="..." Margin="387,10,0,0" VerticalAlignment="Top" Height="20" HorizontalAlignment="Left" Width="24"/>
+        <Button x:Name="pickFolderRight" Command="{Binding PickFolderCommand}" CommandParameter="Storage" Content="..." Margin="387,35,0,0" HorizontalAlignment="Left" Width="24" Height="20" VerticalAlignment="Top"/>
+        <TextBox x:Name="inputLeft" Foreground="Gray" Padding="5,1,1,0" Text="{Binding SourceInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"  Margin="84,10,0,0" Height="20" VerticalAlignment="Top" Background="White" HorizontalAlignment="Left" Width="298">
+            <TextBox.InputBindings>
+                <KeyBinding Key="Return" Command="{Binding ReturnKey}" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"/>
+            </TextBox.InputBindings>
+        </TextBox>
+        <TextBox x:Name="inputRight" Foreground="Gray"  Padding="5,1,1,0" Text="{Binding StorageInput, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" Margin="84,35,0,0" Height="20" VerticalAlignment="Top" Background="White" HorizontalAlignment="Left" Width="298">
+            <TextBox.InputBindings>
+                <KeyBinding Key="Return" Command="{Binding ReturnKey}" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"/>
+            </TextBox.InputBindings>
+        </TextBox>
+        <TextBox x:Name="profileName" Foreground="Gray" Padding="5,1,1,0" Text="{Binding ProfileName,Mode=Twoway, UpdateSourceTrigger=PropertyChanged}" Margin="84,60,0,0" TextWrapping="Wrap" RenderTransformOrigin="0.459,-0.163" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Width="238">
+            <TextBox.InputBindings>
+                <KeyBinding Key="Return" Command="{Binding ReturnKey}" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}"/>
+            </TextBox.InputBindings>
+        </TextBox>
+
+        <Button x:Name="addProfileButton" Command="{Binding ReturnKey}" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}" Content="OK" Margin="327,60,0,0" RenderTransformOrigin="1.311,0.826" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Width="84"/>
+
+
+    </Grid>
+    <!--</Border>-->
+</UserControl>

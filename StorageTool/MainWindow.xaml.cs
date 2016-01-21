@@ -27,11 +27,21 @@ namespace StorageTool
     
     public partial class MainWindow : Window
     {
-        MainWindowViewModel mainWindowViewModel = new MainWindowViewModel();
+        MainWindowViewModel mainWindowViewModel;
         public MainWindow()
         {
             InitializeComponent();
+            mainWindowViewModel = new MainWindowViewModel();
             this.DataContext = mainWindowViewModel;
+            mainWindowViewModel.InitializeModelData();
+
+            //this.Loaded += MainWindow_Loaded;            
+        }
+
+        private void MainWindow_Loaded(object sender, EventArgs e)
+        {
+            this.Loaded -= MainWindow_Loaded;
+            mainWindowViewModel.InitializeModelData();
         }
 
         private void OnClosing(object sender, CancelEventArgs cancelEventArgs)

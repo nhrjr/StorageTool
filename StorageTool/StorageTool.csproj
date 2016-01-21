@@ -152,17 +152,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="FolderManager\FolderManagerView.xaml.cs">
+    <Compile Include="Views\FolderManagerView.xaml.cs">
       <DependentUpon>FolderManagerView.xaml</DependentUpon>
     </Compile>
     <Compile Include="FolderManager\Folder.cs" />
     <Compile Include="FolderManager\FolderManager.cs" />
     <Compile Include="FolderManager\FolderManagerViewModel.cs" />
     <Compile Include="MainWindow\MainWindowViewModel.cs" />
-    <Compile Include="MainWindow\MovePanel.xaml.cs">
+    <Compile Include="Views\MovePanel.xaml.cs">
       <DependentUpon>MovePanel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ProfileView\ProfileManageView.xaml.cs">
+    <Compile Include="Views\ProfileManageView.xaml.cs">
       <DependentUpon>ProfileManageView.xaml</DependentUpon>
     </Compile>
     <Compile Include="ProfileView\ProfileManager.cs" />
@@ -176,7 +176,7 @@
     <Compile Include="Resources\SortAdorner.cs" />
     <Compile Include="Resources\MoveHelper.cs" />
     <Compile Include="Resources\TabItemGeneratorBehavior.cs" />
-    <Page Include="FolderManager\FolderManagerView.xaml">
+    <Page Include="Views\FolderManagerView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -198,11 +198,11 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="MainWindow\MovePanel.xaml">
+    <Page Include="Views\MovePanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ProfileView\ProfileManageView.xaml">
+    <Page Include="Views\ProfileManageView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

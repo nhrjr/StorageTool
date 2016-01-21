@@ -14,7 +14,7 @@ using StorageTool.Resources;
 namespace StorageTool
 {
 
-        public class ProfileManagerViewModel : INotifyPropertyChanged
+        public class ProfileManagerViewModel : INotifyPropertyChanged, IDataErrorInfo
         {
 
         private string _sourceInput = null;
@@ -85,8 +85,6 @@ namespace StorageTool
                     _returnKey = new RelayCommand(param =>
                     {
                         bool var = _profileManager.Add(new Profile(_profileName,_sourceInput,_storageInput));
-                        //if (!var)
-                        //    _profileName = Constants.ProfileInputNameAlreadyExists;
                     }, param => true);
                 }
                 return _returnKey;
@@ -108,39 +106,6 @@ namespace StorageTool
                 return _removeSelectedCommand;
             }
         }
-
-        //RelayCommand _editSelectedCommand;
-        //public ICommand EditSelectedCommand
-        //{
-        //    get
-        //    {
-        //        if (_editSelectedCommand == null)
-        //        {
-        //            _editSelectedCommand = new RelayCommand(param =>
-        //            {
-
-        //            }, param => true);
-        //        }
-        //        return _editSelectedCommand;
-        //    }
-        //}
-
-        //RelayCommand _cancelCommand;
-        //public ICommand CancelCommand
-        //{
-        //    get
-        //    {
-        //        if (_cancelCommand == null)
-        //        {
-        //            _cancelCommand = new RelayCommand(param =>
-        //            {
-        //                Window thisWindow = param as Window;
-        //                thisWindow.Close();
-        //            }, param => true);
-        //        }
-        //        return _cancelCommand;
-        //    }
-        //}
 
         public Profile GetProfile()
         {
@@ -182,6 +147,54 @@ namespace StorageTool
                 _profileName = value;
                 OnPropertyChanged(nameof(ProfileName));
             }
+        }
+
+        public string Error
+        {
+            get { return "Error"; }
+        }
+
+        public string this[string inputbox]
+        {
+            get
+            {
+                return Validate(inputbox);
+            }
+        }
+
+        private string Validate(string propertyName)
+        {
+            string validationMessage = string.Empty;
+            try
+            {
+                switch (propertyName)
+                {
+                    case "SourceInput":
+                        if (_sourceInput != null)
+                        {
+                            var sourceValidate = new DirectoryInfo(@_sourceInput);
+                            if (!sourceValidate.Exists)
+                                validationMessage = "Directory does not exist.";
+                        }
+
+                        break;
+                    case "StorageInput":
+                        if (_storageInput != null)
+                        {
+                            var storageValidate = new DirectoryInfo(@_storageInput);
+                            if (!storageValidate.Exists)
+                                validationMessage = "Directory does not exist.";
+                        }
+
+                        break;
+                }
+            }
+            catch(ArgumentException e)
+            {
+                validationMessage = "Illegal character in path.";
+            }
+            return validationMessage;
+
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
