@@ -43,6 +43,8 @@ namespace StorageTool
 
         private AnalyzeFolders analyzeFolders = new AnalyzeFolders();
         private FolderWatcher folderWatcher = new FolderWatcher();
+        //private FolderWatcher storageWatcher = new FolderWatcher();
+        //private FolderWatcher sourceWatcher = new FolderWatcher();
 
 
         public FolderManager(Profile p)
@@ -50,24 +52,27 @@ namespace StorageTool
             Profile = new Profile(p);
             BindingOperations.EnableCollectionSynchronization(Folders, _lock);
 
+            //sourceWatcher.NotifyFileSystemChangesEvent += ModifySourceFolder;
+            //storageWatcher.NotifyFileSystemChangesEvent += ModifyStorageFolder;
             folderWatcher.NotifyFileSystemChangesEvent += RefreshFolders;
-            folderWatcher.NotifyFileSizeChangesEvent += RefreshSizes;
-            folderWatcher.StartFileSystemWatcher(Profile.GameFolder.FullName);
-            folderWatcher.StartFileSystemWatcher(Profile.StorageFolder.FullName);
+            //folderWatcher.NotifyFileSizeChangesEvent += RefreshSizes;
+            folderWatcher.StartFolderWatcher(Profile.GameFolder.FullName);
+            folderWatcher.StartFolderWatcher(Profile.StorageFolder.FullName);
         }
 
         ~FolderManager()
         {
+            //sourceWatcher.NotifyFileSystemChangesEvent -= ModifySourceFolder;
+            //storageWatcher.NotifyFileSystemChangesEvent -= ModifyStorageFolder;
             folderWatcher.NotifyFileSystemChangesEvent -= RefreshFolders;
-            folderWatcher.NotifyFileSizeChangesEvent -= RefreshSizes;
+            //folderWatcher.NotifyFileSizeChangesEvent -= RefreshSizes;
             folderWatcher.StopFileSystemWatcher(Profile.GameFolder.FullName);
             folderWatcher.StopFileSystemWatcher(Profile.StorageFolder.FullName);
         }
 
-
         public void AddFolder(FolderViewModel folder, Mapping mapping)
         {
-            //folder.PropertyChanged += FolderPropertyChanged;
+            folder.PropertyChanged += FolderPropertyChanged;
             folder.Status = TaskStatus.Inactive;
             folder.Ass.Source = folder.DirInfo;
             switch (mapping)
@@ -87,34 +92,38 @@ namespace StorageTool
                     folder.Ass.Mode = TaskMode.LINK;
                     folder.Ass.Target = new DirectoryInfo(Profile.GameFolder.FullName + @"\" + folder.DirInfo.Name);
                     break;
-            }        
-
+            }
+            
             Folders.Add(folder);
+            
         }
 
         public void RemoveFolder(FolderViewModel folder)
         {
-            //folder.PropertyChanged -= FolderPropertyChanged;
+            folder.PropertyChanged -= FolderPropertyChanged;
             Folders.Remove(folder);
         }
 
         public void RefreshSizes()
         {
-            if (_isRefreshingSizes == true)
+            //if (_isRefreshingSizes == true)
+            //{
+            //    return;
+            //}
+            foreach (FolderViewModel f in Folders)
             {
-                return;
+                    f.DirSize = null; f.GetSize();
             }
-            foreach (FolderViewModel f in Folders) { f.DirSize = null; f.GetSize(); }
         }
 
         public async void RefreshFolders()
         {
-            //if (_isRefreshingFolders == true)
-            //    return;
+            if (_isRefreshingFolders == true)
+                return;
             try
             {
-                await Task.Factory.StartNew(() =>
-                {
+                //await Task.Factory.StartNew(() =>
+                //{
                     _isRefreshingFolders = true;
 
                     analyzeFolders.GetFolderStructure(Profile);
@@ -161,31 +170,31 @@ namespace StorageTool
                         }
                     }
 
-                }, CancellationToken.None, TaskCreationOptions.None, refreshTS);
+                //}, CancellationToken.None, TaskCreationOptions.None, refreshTS);
             }
             catch (IOException e)
             {
             }
             finally
             {
-               //_isRefreshingFolders = false;
+                _isRefreshingFolders = false;
                 ModelPropertyChangedEvent();
             }
         }
 
-        //void FolderPropertyChanged(object sender, PropertyChangedEventArgs e)
-        //{
-        //    if (e.PropertyName == "Status" || e.PropertyName == "Mapping")
-        //    {
-        //        if (ModelPropertyChangedEvent != null)
-        //            App.Current.Dispatcher.BeginInvoke(new Action(() => { ModelPropertyChangedEvent(); }));
+        void FolderPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "Status" || e.PropertyName == "Mapping")
+            {
+                if (ModelPropertyChangedEvent != null)
+                    App.Current.Dispatcher.BeginInvoke(new Action(() => { ModelPropertyChangedEvent(); }));
 
-                //var sender1 = sender as FolderViewModel;
-                //if ( sender1 != null && sender1.Status != TaskStatus.Running)
-                //{
-                //    App.Current.Dispatcher.BeginInvoke(new Action(() => { RefreshFolders(); }));
-                //}
-        //    }
-        //}
+                var sender1 = sender as FolderViewModel;
+                if (sender1 != null && sender1.Status != TaskStatus.Running)
+                {
+                    App.Current.Dispatcher.BeginInvoke(new Action(() => { RefreshFolders(); }));
+                }
+            }
+        }
     }
 }

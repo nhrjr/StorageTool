@@ -126,18 +126,18 @@ namespace StorageTool
 
         }
 
-        private void RefreshUI()
+        public void RefreshUI()
         {
             App.Current.Dispatcher.BeginInvoke(new Action(() => {
                 this.Source.Refresh();
-            this.Stored.Refresh();
-            this.Unlinked.Refresh();
-            this.Assigned.Refresh();
+                this.Stored.Refresh();
+                this.Unlinked.Refresh();
+                this.Assigned.Refresh();
 
-            ShowUnlinkedFolders = (Unlinked.Cast<object>().Count() > 0) ? true : false;
-            ShowDuplicateFolders = (DuplicateFolders.Count > 0) ? true : false;
+                ShowUnlinkedFolders = (Unlinked.Cast<object>().Count() > 0) ? true : false;
+                ShowDuplicateFolders = (DuplicateFolders.Count > 0) ? true : false;
 
-            HeaderNames.SetNumbers(Source.Count, Stored.Count, Unlinked.Count, DuplicateFolders.Count, FolderManager.Folders.Count);
+                HeaderNames.SetNumbers(Source.Count, Stored.Count, Unlinked.Count, DuplicateFolders.Count, FolderManager.Folders.Count);
             }));
         }   
 

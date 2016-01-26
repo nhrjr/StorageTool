@@ -16,8 +16,10 @@ namespace StorageTool
         public List<DirectoryInfo> UnlinkedFolders { get; set; }
         public List<DirectoryInfo> StorableFolders { get; set; }
         public List<string> DuplicateFolders { get; set; }
-        private static int numberOfCalls = 0;
-
+        //private static int numberOfCalls = 0;
+        //public DirectoryInfo AddThisFolder { get; set; }
+        //public Mapping WithThisMapping { get; set; }
+        
         public AnalyzeFolders()
         {
             LinkedFolders = new List<DirectoryInfo>();
@@ -28,7 +30,7 @@ namespace StorageTool
 
         public void GetFolderStructure(Profile input)
         {
-            numberOfCalls++;
+            //numberOfCalls++;
             LinkedFolders.Clear();
             StorableFolders.Clear();
             UnlinkedFolders.Clear();

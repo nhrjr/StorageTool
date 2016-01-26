@@ -124,6 +124,7 @@ namespace StorageTool
                         foreach(FolderManagerViewModel f in FolderManagerViewModels)
                         {
                             f.FolderManager.RefreshFolders();
+                            f.RefreshUI();
                         }
                     }, param => true);
                 }

@@ -59,9 +59,10 @@ public class FolderViewModel : INotifyPropertyChanged
         private Assignment _ass = new Assignment();
         private long _processedBits;
         private int _progress;
+        private FolderWatcher subFolderWatcher = new FolderWatcher();
 
         private static OrderedTaskScheduler moveTS = new OrderedTaskScheduler();
-        private static WorkStealingTaskScheduler getSizeTS = new WorkStealingTaskScheduler(1);        
+        private static WorkStealingTaskScheduler getSizeTS = new WorkStealingTaskScheduler(2);        
         //static IOTaskScheduler getSizeTS = new IOTaskScheduler();
 
         RelayCommand _pauseCommand;
@@ -170,6 +171,9 @@ public class FolderViewModel : INotifyPropertyChanged
             DirInfo = new DirectoryInfo(path);
             DirSize = null;
             GetSize();
+            subFolderWatcher.StartSubFolderWatcher(DirInfo.FullName);
+            subFolderWatcher.NotifyFileSystemChangesEvent += GetSize;
+
         }
 
         public FolderViewModel(DirectoryInfo dir)
@@ -178,6 +182,14 @@ public class FolderViewModel : INotifyPropertyChanged
             DirInfo = dir;
             DirSize = null;
             GetSize();
+            subFolderWatcher.StartSubFolderWatcher(DirInfo.FullName);
+            subFolderWatcher.NotifyFileSystemChangesEvent += GetSize;
+        }
+
+        ~FolderViewModel()
+        {
+            subFolderWatcher.NotifyFileSystemChangesEvent -= GetSize;
+            subFolderWatcher.StopFileSystemWatcher(DirInfo.FullName);
         }
 
         private async void StartTask()
@@ -269,9 +281,10 @@ public class FolderViewModel : INotifyPropertyChanged
 
         public void GetSize()
         {
-            if (DirSize == null)
-            {
-                Task.Factory.StartNew(() => DirectorySize.DirSizeIterative(DirInfo), CancellationToken.None, TaskCreationOptions.None, getSizeTS).ContinueWith(task => DirSize = task.Result);
+            //if (DirSize == null)
+            //{
+            DirSize = null;
+            Task.Factory.StartNew(() => DirectorySize.DirSizeIterative(DirInfo), CancellationToken.None, TaskCreationOptions.None, getSizeTS).ContinueWith(task => { if (task.Result >= 0) { DirSize = task.Result; } else { DirSize = -1; } });
                 //DirSize = -1;
                 //try
                 //{
@@ -281,7 +294,7 @@ public class FolderViewModel : INotifyPropertyChanged
                 //{
                 //    DirSize = null;
                 //}
-            }
+            //}
         }
 
         #region Properties

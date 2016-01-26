@@ -38,6 +38,10 @@ namespace StorageTool.Resources
             {
                 returnStatus = false;
             }
+            catch (UnauthorizedAccessException unauth)
+            {
+                MessageBox.Show(unauth.Message);
+            }
             return returnStatus;
         }
 
@@ -66,16 +70,11 @@ namespace StorageTool.Resources
 
             catch (IOException ioexp)
             {
-                MessageBox.Show("Cannot create" + sourceDir + " at " + targetDir);
-                ////HAHAAAAA JA! Das Passiert
-                //try
-                //{
-                //    JunctionPoint.Create(@sourceDir, @targetDir, false);
-                //}
-                //finally { }
+                MessageBox.Show("Unable to create NTFS-Junction with source: " + sourceDir + " at " + targetDir);
             }
             catch (UnauthorizedAccessException unauth)
             {
+                MessageBox.Show(unauth.Message);
             }
             return returnStatus;
 
@@ -127,12 +126,11 @@ namespace StorageTool.Resources
             }
             catch (IOException ioexp)
             {
+                MessageBox.Show("Unable to create NTFS-Junction with source: " + sourceDir + " at " + targetDir);
             }
             catch (UnauthorizedAccessException unauth)
             {
-            }
-            catch (ArgumentNullException tada)
-            {
+                MessageBox.Show(unauth.Message);
             }
             return returnStatus;
         }
@@ -159,18 +157,10 @@ namespace StorageTool.Resources
                     {
                         return false;
                     }
-
                     lock (_lock)
-                        sizeFromHell.Report(file.Length/2);
-                    using (FileStream SourceStream = file.OpenRead())
-                    {
-                        using (FileStream DestinationStream = File.Create(outputPath + @"\" + file.Name))
-                        {
-                            SourceStream.CopyTo(DestinationStream);
-                        }
-                    }
                     sizeFromHell.Report(file.Length/2);
-
+                    file.CopyTo(outputPath + @"\" + file.Name);
+                    sizeFromHell.Report(file.Length/2);
                 }
             }
             return true;
