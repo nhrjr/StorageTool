@@ -19,7 +19,7 @@
         WindowStartupLocation="CenterScreen"
         >
     <Window.Resources>
-        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        
         <Style TargetType="ListViewItem">
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
             <Setter Property="VerticalContentAlignment" Value="Stretch" />

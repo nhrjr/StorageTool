@@ -49,6 +49,8 @@ public class FolderViewModel : INotifyPropertyChanged
         private bool _paused = false;
         private bool? _returnStatus = null;
         private bool _canceled = false;
+        private Visibility _isCanceled = Visibility.Visible;
+        private bool _isGettingSize = false;
         private FolderModel _folderModel = new FolderModel();
         private string _sizeString;
         private string _processedBitsString;
@@ -59,11 +61,9 @@ public class FolderViewModel : INotifyPropertyChanged
         private Assignment _ass = new Assignment();
         private long _processedBits;
         private int _progress;
-        private FolderWatcher subFolderWatcher = new FolderWatcher();
 
         private static OrderedTaskScheduler moveTS = new OrderedTaskScheduler();
-        private static WorkStealingTaskScheduler getSizeTS = new WorkStealingTaskScheduler(2);        
-        //static IOTaskScheduler getSizeTS = new IOTaskScheduler();
+        private static LimitedConcurrencyLevelTaskScheduler getSizeTS = new LimitedConcurrencyLevelTaskScheduler(3);        
 
         RelayCommand _pauseCommand;
         RelayCommand _cancelCommand;
@@ -171,9 +171,6 @@ public class FolderViewModel : INotifyPropertyChanged
             DirInfo = new DirectoryInfo(path);
             DirSize = null;
             GetSize();
-            subFolderWatcher.StartSubFolderWatcher(DirInfo.FullName);
-            subFolderWatcher.NotifyFileSystemChangesEvent += GetSize;
-
         }
 
         public FolderViewModel(DirectoryInfo dir)
@@ -182,14 +179,6 @@ public class FolderViewModel : INotifyPropertyChanged
             DirInfo = dir;
             DirSize = null;
             GetSize();
-            subFolderWatcher.StartSubFolderWatcher(DirInfo.FullName);
-            subFolderWatcher.NotifyFileSystemChangesEvent += GetSize;
-        }
-
-        ~FolderViewModel()
-        {
-            subFolderWatcher.NotifyFileSystemChangesEvent -= GetSize;
-            subFolderWatcher.StopFileSystemWatcher(DirInfo.FullName);
         }
 
         private async void StartTask()
@@ -217,7 +206,7 @@ public class FolderViewModel : INotifyPropertyChanged
             finally
             {
                 _cts.Dispose();
-                _canceled = false;
+                Canceled = false;
                 this.Status = TaskStatus.Inactive;
             }
             
@@ -238,7 +227,8 @@ public class FolderViewModel : INotifyPropertyChanged
             {                
                 string targetDir = Ass.Target.FullName;
                 DirectoryInfo deletableDirInfo = new DirectoryInfo(targetDir);
-                deletableDirInfo.Delete(true);
+                if(deletableDirInfo.Exists)
+                    deletableDirInfo.Delete(true);
                 Progress = 0;
                 ProcessedBits = 0;
                 if (Ass.Mode == TaskMode.RESTORE)
@@ -247,7 +237,7 @@ public class FolderViewModel : INotifyPropertyChanged
                 }
                 else if (Ass.Mode == TaskMode.STORE)
                 {
-                    if (_canceled == false) { Mapping = Mapping.Unlinked; Ass.Mode = TaskMode.LINK; }
+                    if (Canceled == false) { Mapping = Mapping.Unlinked; Ass.Mode = TaskMode.LINK; }
                 }                
             }
         }
@@ -256,7 +246,7 @@ public class FolderViewModel : INotifyPropertyChanged
         {
             if (Status == TaskStatus.Running)
             {
-                _canceled = true;
+                Canceled = true;
                 _cts.Cancel();
             }          
         }
@@ -281,20 +271,11 @@ public class FolderViewModel : INotifyPropertyChanged
 
         public void GetSize()
         {
-            //if (DirSize == null)
-            //{
+            if (_isGettingSize == true && _status == TaskStatus.Inactive)
+                return;
             DirSize = null;
-            Task.Factory.StartNew(() => DirectorySize.DirSizeIterative(DirInfo), CancellationToken.None, TaskCreationOptions.None, getSizeTS).ContinueWith(task => { if (task.Result >= 0) { DirSize = task.Result; } else { DirSize = -1; } });
-                //DirSize = -1;
-                //try
-                //{
-
-                //}
-                //catch (IOException ex)
-                //{
-                //    DirSize = null;
-                //}
-            //}
+            _isGettingSize = true;
+            Task.Factory.StartNew(() => DirectorySize.DirSizeIterative(DirInfo), CancellationToken.None, TaskCreationOptions.None, getSizeTS).ContinueWith(task => { if (task.Result >= 0) { DirSize = task.Result; } else { DirSize = -1; } _isGettingSize = false; });
         }
 
         #region Properties
@@ -391,6 +372,37 @@ public class FolderViewModel : INotifyPropertyChanged
             {
                 _paused = value;
                 OnPropertyChanged(nameof(Paused));
+            }
+        }
+
+        public bool Canceled
+        {
+            get
+            {
+                return _canceled;
+            }
+            private set
+            {
+                _canceled = value;
+                if(_canceled == true)
+                {
+                    IsCanceled = Visibility.Hidden;
+                }
+                else
+                {
+                    IsCanceled = Visibility.Visible;
+                }
+                OnPropertyChanged(nameof(Canceled));
+            }
+        }
+
+        public Visibility IsCanceled
+        {
+            get { return _isCanceled; }
+            set
+            {
+                _isCanceled = value;
+                OnPropertyChanged(nameof(IsCanceled));
             }
         }
 

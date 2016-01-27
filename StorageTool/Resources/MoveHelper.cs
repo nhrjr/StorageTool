@@ -138,8 +138,10 @@ namespace StorageTool.Resources
         public static bool CopyFolders(Assignment item, IProgress<long> sizeFromHell, object _lock, CancellationToken ct)
         {
             Directory.CreateDirectory(item.Target.FullName);
-            List<DirectoryInfo> allDirs = item.Source.GetDirectories("*", SearchOption.AllDirectories).ToList();
+            List<DirectoryInfo> allDirs = new List<DirectoryInfo>();
             allDirs.Add(item.Source);
+            allDirs.AddRange(item.Source.GetDirectories("*", SearchOption.AllDirectories).ToList());
+            
             //Creates all of the directories and subdirectories
             foreach (DirectoryInfo dirInfo in allDirs)
             {
@@ -159,7 +161,14 @@ namespace StorageTool.Resources
                     }
                     lock (_lock)
                     sizeFromHell.Report(file.Length/2);
-                    file.CopyTo(outputPath + @"\" + file.Name);
+                    //file.CopyTo(outputPath + @"\" + file.Name);
+                    using (FileStream SourceStream = file.OpenRead())
+                    {
+                        using (FileStream DestinationStream = File.Create(outputPath + @"\" + file.Name))
+                        {
+                            SourceStream.CopyTo(DestinationStream);
+                        }
+                    }
                     sizeFromHell.Report(file.Length/2);
                 }
             }

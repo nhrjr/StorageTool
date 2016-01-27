@@ -57,7 +57,9 @@ namespace StorageTool
             folderWatcher.NotifyFileSystemChangesEvent += RefreshFolders;
             //folderWatcher.NotifyFileSizeChangesEvent += RefreshSizes;
             folderWatcher.StartFolderWatcher(Profile.GameFolder.FullName);
+            //folderWatcher.StartSubFolderWatcher(Profile.GameFolder.FullName);
             folderWatcher.StartFolderWatcher(Profile.StorageFolder.FullName);
+            //folderWatcher.StartSubFolderWatcher(Profile.StorageFolder.FullName);
         }
 
         ~FolderManager()
@@ -84,7 +86,7 @@ namespace StorageTool
                     break;
                 case Mapping.Stored:
                     folder.Mapping = mapping;
-                    folder.Ass.Mode = TaskMode.STORE;
+                    folder.Ass.Mode = TaskMode.RESTORE;
                     folder.Ass.Target = new DirectoryInfo(Profile.GameFolder.FullName + @"\" + folder.DirInfo.Name);
                     break;
                 case Mapping.Unlinked:
@@ -104,7 +106,7 @@ namespace StorageTool
             Folders.Remove(folder);
         }
 
-        public void RefreshSizes()
+        public void RefreshSizes(string path)
         {
             //if (_isRefreshingSizes == true)
             //{
@@ -112,11 +114,12 @@ namespace StorageTool
             //}
             foreach (FolderViewModel f in Folders)
             {
-                    f.DirSize = null; f.GetSize();
+                if(f.Status == TaskStatus.Inactive && path == f.DirInfo.FullName)
+                    f.GetSize();
             }
         }
 
-        public async void RefreshFolders()
+        public void RefreshFolders()
         {
             if (_isRefreshingFolders == true)
                 return;
@@ -124,51 +127,54 @@ namespace StorageTool
             {
                 //await Task.Factory.StartNew(() =>
                 //{
-                    _isRefreshingFolders = true;
+                _isRefreshingFolders = true;
 
-                    analyzeFolders.GetFolderStructure(Profile);
+                analyzeFolders.GetFolderStructure(Profile);
 
-                    DuplicateFolders = new ObservableCollection<string>(analyzeFolders.DuplicateFolders);
+                DuplicateFolders = new ObservableCollection<string>(analyzeFolders.DuplicateFolders);
 
-                    foreach (FolderViewModel g in Folders.Reverse())
+                foreach (FolderViewModel g in Folders.Reverse())
+                {
+                    bool isNotInStorable = (!analyzeFolders.StorableFolders.Any(f => f.FullName == g.DirInfo.FullName && g.Mapping == Mapping.Source));
+                    bool isNotInLinked = (!analyzeFolders.LinkedFolders.Any(f => f.FullName == g.DirInfo.FullName && g.Mapping == Mapping.Stored));
+                    bool isNotInUnlinked = (!analyzeFolders.UnlinkedFolders.Any(f => f.FullName == g.DirInfo.FullName && g.Mapping == Mapping.Unlinked));
+
+                    if( isNotInLinked && isNotInStorable && isNotInUnlinked)
                     {
-                        if (!analyzeFolders.StorableFolders.Any(f => f.FullName == g.DirInfo.FullName && g.Mapping == Mapping.Source))
+                        if (g.Status == TaskStatus.Inactive)
                         {
-                            if (!analyzeFolders.LinkedFolders.Any(f => f.FullName == g.DirInfo.FullName && g.Mapping == Mapping.Stored))
-                            {
-                                if (!analyzeFolders.UnlinkedFolders.Any(f => f.FullName == g.DirInfo.FullName && g.Mapping == Mapping.Unlinked))
-                                {
-                                    if (g.Status == TaskStatus.Inactive)
-                                    {
-                                        RemoveFolder(g);
-                                    }
-                                }
-                            }
+                            RemoveFolder(g);
                         }
                     }
+                    string toRemove = null;
+                    if (g.Status == TaskStatus.Running)
+                        toRemove = DuplicateFolders.FirstOrDefault(w => g.DirInfo.Name == w);
+                    if(!string.IsNullOrEmpty(toRemove))
+                        DuplicateFolders.Remove(toRemove);
+                }
 
-                    foreach (DirectoryInfo g in analyzeFolders.StorableFolders)
+                foreach (DirectoryInfo g in analyzeFolders.StorableFolders)
+                {
+                    if (!Folders.Any(f => f.DirInfo.Name == g.Name && f.Mapping == Mapping.Source))
                     {
-                        if (!Folders.Any(f => f.DirInfo.Name == g.Name && f.Mapping == Mapping.Source))
-                        {
-                            AddFolder(new FolderViewModel(g),  Mapping.Source);
-                        }
+                        AddFolder(new FolderViewModel(g),  Mapping.Source);
+                    }
 
-                    }
-                    foreach (DirectoryInfo g in analyzeFolders.LinkedFolders)
+                }
+                foreach (DirectoryInfo g in analyzeFolders.LinkedFolders)
+                {
+                    if (!Folders.Any(f => f.DirInfo.Name == g.Name && f.Mapping == Mapping.Stored))
                     {
-                        if (!Folders.Any(f => f.DirInfo.Name == g.Name && f.Mapping == Mapping.Stored))
-                        {
-                            AddFolder(new FolderViewModel(g), Mapping.Stored);
-                        }
+                        AddFolder(new FolderViewModel(g), Mapping.Stored);
                     }
-                    foreach (DirectoryInfo g in analyzeFolders.UnlinkedFolders)
+                }
+                foreach (DirectoryInfo g in analyzeFolders.UnlinkedFolders)
+                {
+                    if (!Folders.Any(f => f.DirInfo.Name == g.Name && f.Mapping == Mapping.Unlinked))
                     {
-                        if (!Folders.Any(f => f.DirInfo.Name == g.Name && f.Mapping == Mapping.Unlinked))
-                        {
-                            AddFolder(new FolderViewModel(g), Mapping.Unlinked);
-                        }
+                        AddFolder(new FolderViewModel(g), Mapping.Unlinked);
                     }
+                }
 
                 //}, CancellationToken.None, TaskCreationOptions.None, refreshTS);
             }

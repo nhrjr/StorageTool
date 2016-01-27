@@ -52,7 +52,7 @@
                     <GridViewColumn Width="60">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <ToggleButton x:Name="CancelButton" Command="{Binding PauseCommand}">
+                                <ToggleButton x:Name="CancelButton" Command="{Binding PauseCommand}"  Visibility="{Binding IsCanceled}">
                                     <ToggleButton.Style>
                                         <Style TargetType="{x:Type ToggleButton}">
                                             <Style.Triggers>
@@ -73,7 +73,7 @@
                     <GridViewColumn Width="60">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <Button Content="Cancel" Command="{Binding CancelCommand}" CommandParameter="{Binding}"/>
+                                <Button Content="Cancel" Command="{Binding CancelCommand}" CommandParameter="{Binding}" Visibility="{Binding IsCanceled}"/>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>

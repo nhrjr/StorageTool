@@ -8,6 +8,7 @@
              Exit="Application_Exit">
     <Application.Resources>
             <ResourceDictionary>
+            <BooleanToVisibilityConverter x:Key="BoolToVis" />
             <SolidColorBrush x:Key="ListBorder" Color="Black"/>
                 
             <SolidColorBrush x:Key="ForeGroundBlue" Color="#FF4576EA"/>

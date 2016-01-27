@@ -10,13 +10,15 @@ using System.IO;
 namespace StorageTool
 {
     public delegate void NotifyFileSystemChangesEventHandler();
+    public delegate void NotifyFileSizeChangesEventHandler(string path);
+
 
     public class FolderWatcher
     {
         private List<FileSystemWatcher> FSysWatchers { get; set; } = new List<FileSystemWatcher>();
 
         public event NotifyFileSystemChangesEventHandler NotifyFileSystemChangesEvent;
-        //public event NotifyFileSystemChangesEventHandler NotifyFileSizeChangesEvent;
+        public event NotifyFileSizeChangesEventHandler NotifyFileSizeChangesEvent;
 
         public void NotifyFileSystemChanges()
         {
@@ -26,13 +28,13 @@ namespace StorageTool
             }
         }
 
-        //public void NotifyFileSizeChanges()
-        //{
-        //    if (NotifyFileSizeChangesEvent != null)
-        //    {
-        //        App.Current.Dispatcher.BeginInvoke(new Action(() => { NotifyFileSizeChangesEvent(); }));
-        //    }
-        //}
+        public void NotifyFileSizeChanges(string path)
+        {
+            if (NotifyFileSizeChangesEvent != null)
+            {
+                App.Current.Dispatcher.BeginInvoke(new Action(() => { NotifyFileSizeChangesEvent(path); }));
+            }
+        }
 
         public void StartFolderWatcher(string folderPath)
         {
@@ -82,15 +84,15 @@ namespace StorageTool
 
             // Gets or sets the type of changes to watch for.
             // In this case we will watch change of filename, last modified time, size and directory name
-            fileSystemWatcher.NotifyFilter = System.IO.NotifyFilters.Size | NotifyFilters.DirectoryName | NotifyFilters.DirectoryName;
+            fileSystemWatcher.NotifyFilter = System.IO.NotifyFilters.Size;
 
 
 
             // Event handlers that are watching for specific event
-            fileSystemWatcher.Created += new System.IO.FileSystemEventHandler(fileSystemWatcher_Created);
+            //fileSystemWatcher.Created += new System.IO.FileSystemEventHandler(fileSystemWatcher_Created);
             fileSystemWatcher.Changed += new System.IO.FileSystemEventHandler(fileSystemWatcher_Changed);
-            fileSystemWatcher.Deleted += new System.IO.FileSystemEventHandler(fileSystemWatcher_Deleted);
-            fileSystemWatcher.Renamed += new System.IO.RenamedEventHandler(fileSystemWatcher_Renamed);
+            //fileSystemWatcher.Deleted += new System.IO.FileSystemEventHandler(fileSystemWatcher_Deleted);
+            //fileSystemWatcher.Renamed += new System.IO.RenamedEventHandler(fileSystemWatcher_Renamed);
 
             // NOTE: If you want to monitor specified files in folder, you can use this filter
             // fileSystemWatcher.Filter
@@ -126,7 +128,8 @@ namespace StorageTool
         void fileSystemWatcher_Changed(object sender, System.IO.FileSystemEventArgs e)
         {
             //displayfilesystemwatcherinfo(e.changetype, e.name);
-            NotifyFileSystemChanges();
+            string path = e.Name;
+            NotifyFileSizeChanges(path);
         }
 
         void fileSystemWatcher_Deleted(object sender, System.IO.FileSystemEventArgs e)
