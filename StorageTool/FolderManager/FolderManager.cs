@@ -34,7 +34,7 @@ namespace StorageTool
         public event ModelPropertyChangedEventHandler ModelPropertyChangedEvent;
 
         private bool _isRefreshingFolders = false;
-        private bool _isRefreshingSizes = false;
+        //private bool _isRefreshingSizes = false;
 
         public Profile Profile { get; set; }
 
@@ -74,7 +74,7 @@ namespace StorageTool
 
         public void AddFolder(FolderViewModel folder, Mapping mapping)
         {
-            folder.PropertyChanged += FolderPropertyChanged;
+            
             folder.Status = TaskStatus.Inactive;
             folder.Ass.Source = folder.DirInfo;
             switch (mapping)
@@ -95,9 +95,10 @@ namespace StorageTool
                     folder.Ass.Target = new DirectoryInfo(Profile.GameFolder.FullName + @"\" + folder.DirInfo.Name);
                     break;
             }
-            
+            folder.PropertyChanged += FolderPropertyChanged;
             Folders.Add(folder);
             
+
         }
 
         public void RemoveFolder(FolderViewModel folder)
@@ -180,9 +181,11 @@ namespace StorageTool
             }
             catch (IOException e)
             {
+                MessageBox.Show(e.Message);
             }
             finally
             {
+                //DirectorySize.Instance.CalculateSizes();
                 _isRefreshingFolders = false;
                 ModelPropertyChangedEvent();
             }
