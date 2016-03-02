@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Windows;
 
 
 namespace StorageTool.Resources
@@ -27,8 +28,9 @@ namespace StorageTool.Resources
                         Size += await DirSizeAsync(di).ConfigureAwait(false);
                 }
             }
-            catch (IOException ex)
+            catch (IOException ioexp)
             {
+                MessageBox.Show(ioexp.Message);
             }
             return Size;
         }
@@ -49,8 +51,9 @@ namespace StorageTool.Resources
                     }
                 }
             }
-            catch (IOException ex)
+            catch (IOException ioexp)
             {
+                MessageBox.Show(ioexp.Message);
             }
             return Size;
         }
@@ -74,6 +77,7 @@ namespace StorageTool.Resources
             }
             catch (IOException ex)
             {
+                MessageBox.Show(ex.Message);
             }
             return Size;
         }

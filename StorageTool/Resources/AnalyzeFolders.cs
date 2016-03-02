@@ -65,7 +65,7 @@ namespace StorageTool
                 }
                 catch (IOException ex)
                 {
-                    //MessageBox.Show(ex.Message);
+                    MessageBox.Show(ex.Message);
                 }
             }
             List<string> dSFolders = new List<string>();

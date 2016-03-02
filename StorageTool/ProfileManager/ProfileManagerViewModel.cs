@@ -191,6 +191,7 @@ namespace StorageTool
             }
             catch(ArgumentException e)
             {
+                MessageBox.Show(e.Message);
                 validationMessage = "Illegal character in path.";
             }
             return validationMessage;

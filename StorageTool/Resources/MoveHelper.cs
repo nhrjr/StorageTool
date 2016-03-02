@@ -36,6 +36,7 @@ namespace StorageTool.Resources
             }
             catch (IOException ioexp)
             {
+                MessageBox.Show(ioexp.Message);
                 returnStatus = false;
             }
             catch (UnauthorizedAccessException unauth)
@@ -70,7 +71,8 @@ namespace StorageTool.Resources
 
             catch (IOException ioexp)
             {
-                MessageBox.Show("Unable to create NTFS-Junction with source: " + sourceDir + " at " + targetDir);
+                MessageBox.Show(ioexp.Message);
+                //MessageBox.Show("Unable to create NTFS-Junction with source: " + sourceDir + " at " + targetDir);
             }
             catch (UnauthorizedAccessException unauth)
             {
@@ -126,13 +128,37 @@ namespace StorageTool.Resources
             }
             catch (IOException ioexp)
             {
-                MessageBox.Show("Unable to create NTFS-Junction with source: " + sourceDir + " at " + targetDir);
+                MessageBox.Show(ioexp.Message);
+                //MessageBox.Show("Unable to create NTFS-Junction with source: " + sourceDir + " at " + targetDir);
             }
             catch (UnauthorizedAccessException unauth)
             {
                 MessageBox.Show(unauth.Message);
             }
             return returnStatus;
+        }
+
+        private static async Task<bool> CopyFiles(IEnumerable<FileInfo> files , IProgress<long> sizeFromHell, object _lock, CancellationToken ct, string outputPath)
+        {
+            foreach (FileInfo file in files)
+            {
+                if (ct.IsCancellationRequested)
+                {
+                    return false;
+                }
+                lock (_lock)
+                sizeFromHell.Report(file.Length / 2);
+                //file.CopyTo(outputPath + @"\" + file.Name);
+                using (FileStream SourceStream = file.Open(FileMode.Open, FileAccess.Read))
+                {
+                    using (FileStream DestinationStream = File.Create(outputPath + @"\" + file.Name))
+                    {
+                        await SourceStream.CopyToAsync(DestinationStream);
+                    }
+                }
+                sizeFromHell.Report(file.Length / 2);
+            }
+            return true;
         }
 
         public static bool CopyFolders(Assignment item, IProgress<long> sizeFromHell, object _lock, CancellationToken ct)
@@ -153,6 +179,7 @@ namespace StorageTool.Resources
                 string outputPath = dirPath.Replace(item.Source.FullName, item.Target.FullName);
                 Directory.CreateDirectory(outputPath);
 
+                //CopyFiles(dirInfo.EnumerateFiles(),sizeFromHell,_lock,ct, outputPath);
                 foreach (FileInfo file in dirInfo.EnumerateFiles())
                 {
                     if (ct.IsCancellationRequested)
@@ -160,17 +187,38 @@ namespace StorageTool.Resources
                         return false;
                     }
                     lock (_lock)
-                    sizeFromHell.Report(file.Length/2);
+                    sizeFromHell.Report(file.Length / 2);
                     //file.CopyTo(outputPath + @"\" + file.Name);
-                    using (FileStream SourceStream = file.OpenRead())
+                    using (FileStream SourceStream = file.Open(FileMode.Open, FileAccess.Read))
                     {
                         using (FileStream DestinationStream = File.Create(outputPath + @"\" + file.Name))
                         {
                             SourceStream.CopyTo(DestinationStream);
                         }
                     }
-                    sizeFromHell.Report(file.Length/2);
+                    sizeFromHell.Report(file.Length / 2);
                 }
+                //var result = Parallel.ForEach(dirInfo.EnumerateFiles(), (file, state) => {
+                //    if (ct.IsCancellationRequested)
+                //    {
+                //        state.Break();
+                //    }
+                //    lock (_lock)
+                //    sizeFromHell.Report(file.Length / 2);
+                //    //file.CopyTo(outputPath + @"\" + file.Name);
+                //    using (FileStream SourceStream = file.OpenRead())
+                //    {
+                //        using (FileStream DestinationStream = File.Create(outputPath + @"\" + file.Name))
+                //        {
+                //            SourceStream.CopyTo(DestinationStream);
+                //        }
+                //    }
+                //    sizeFromHell.Report(file.Length / 2);
+                //});
+                //if(result.IsCompleted == false)
+                //{
+                //    return false;
+                //}
             }
             return true;
         }

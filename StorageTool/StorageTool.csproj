@@ -175,7 +175,6 @@
     <Compile Include="ProfileManager\ProfileManagerViewModel.cs" />
     <Compile Include="Resources\SortAdorner.cs" />
     <Compile Include="Resources\MoveHelper.cs" />
-    <Compile Include="Resources\TabItemGeneratorBehavior.cs" />
     <Page Include="Views\FolderManagerView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

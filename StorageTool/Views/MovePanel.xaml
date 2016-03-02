@@ -27,7 +27,7 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn Width="80" Header="Status" DisplayMemberBinding="{Binding Status}"/>
+                    <!--<GridViewColumn Width="70" Header="Status" DisplayMemberBinding="{Binding Status}"/>-->
 
                     <GridViewColumn Width="100"  Header="Progress">
                         <GridViewColumn.CellTemplate>
@@ -41,10 +41,10 @@
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
 
-                    <GridViewColumn Width="80"  Header="Size">
+                    <GridViewColumn Width="150"  Header="Size">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock HorizontalAlignment="Right" Text="{Binding SizeString}" />
+                            <TextBlock HorizontalAlignment="Right" Text="{Binding ProcessedAndSizeString}" />
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
