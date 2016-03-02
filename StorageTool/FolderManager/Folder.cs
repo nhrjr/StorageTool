@@ -63,15 +63,15 @@ public class FolderViewModel : INotifyPropertyChanged
         private int _progress;
 
         private static OrderedTaskScheduler moveTS = new OrderedTaskScheduler();
-        private static LimitedConcurrencyLevelTaskScheduler getSizeTS = new LimitedConcurrencyLevelTaskScheduler(3);        
+        private static LimitedConcurrencyLevelTaskScheduler getSizeTS = new LimitedConcurrencyLevelTaskScheduler(Environment.ProcessorCount - 1);
 
+        #region Commands
         RelayCommand _pauseCommand;
         RelayCommand _cancelCommand;
         RelayCommand _storeCommand;
         RelayCommand _restoreCommand;
         RelayCommand _linkCommand;
 
-        #region Commands
         public ICommand CancelCommand
         {
             get
@@ -202,7 +202,7 @@ public class FolderViewModel : INotifyPropertyChanged
             {
                 await _task.ContinueWith((task) => UpdateYourself(returnStatus));
             }
-            catch (AggregateException ex) { }
+            //catch (AggregateException ex) { }
             finally
             {
                 _cts.Dispose();
@@ -420,6 +420,14 @@ public class FolderViewModel : INotifyPropertyChanged
             }
         }
 
+        public string ProcessedAndSizeString
+        {
+            get
+            {
+                return ProcessedBitsString + " / " + SizeString;
+            }
+
+        }
         public string ProcessedBitsString
         {
             get
@@ -430,6 +438,7 @@ public class FolderViewModel : INotifyPropertyChanged
             {
                 _processedBitsString = value;
                 OnPropertyChanged(nameof(ProcessedBitsString));
+                OnPropertyChanged(nameof(ProcessedAndSizeString));
             }
         }
 
