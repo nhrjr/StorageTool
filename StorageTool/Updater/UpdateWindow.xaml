@@ -1,0 +1,26 @@
+﻿<Window x:Class="StorageTool.Updater.UpdateWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:StorageTool.Updater"
+        mc:Ignorable="d"
+        Title="UpdateWindow" Height="351.337" Width="292.781">
+    <Grid Margin="10">
+            <TextBlock  Text="Current version:  " Margin="0,0,170,280"/>
+            <TextBlock FontSize="12" FontWeight="Bold" Text="{Binding CurrentVersion}" Margin="0,25,3,256"/>
+            <TextBlock Text="Description: " Margin="0,51,196,228"/>
+            <TextBlock FontSize="12" Text="{Binding UpdateDescription}" TextWrapping="Wrap" Margin="0,72,0,213" />
+            <!-- show buttons first -->
+            <!--<Button      Grid.Row="0" Height="30" Margin="3,10,3,3" x:Name="btnInstallAtExit" Content="Install When I Exit" Click="InstallAtExit_Click" />-->
+            <Button      Grid.Row="1" Height="30" Margin="3,3,3,10" x:Name="btnInstallNow" Content="Install Now" Click="InstallNow_Click" />
+            <!-- hide progress items until a button is pressed (use a throbber if actual progress bar can't be used) -->
+            <!-- throbber image was generated at http://ajaxload.info/ -->
+            <!--<TextBlock   Grid.Row="0" Height="30" Margin="3,10,3,3" x:Name="lblDownload" Visibility="Collapsed" Text="Downloading..." HorizontalAlignment="Center" VerticalAlignment="Bottom" />-->
+            <!--<Image       Grid.Row="1" Height="0" Margin="3,3,3,10" x:Name="imgThrobber" local:ImageBehavior.AnimatedSource="/NAppUpdate.SampleApp;component/throbber.gif" />-->
+            <!--<ProgressBar Grid.Row="0" Height="30" Margin="3,10,3,3" x:Name="prgDownload" Value="{Binding DownloadProgress}" Visibility="Collapsed"/>-->
+
+
+
+    </Grid>
+</Window>
