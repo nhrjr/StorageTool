@@ -7,18 +7,18 @@
         mc:Ignorable="d"
         Title="UpdateWindow" Height="351.337" Width="292.781">
     <Grid Margin="10">
-            <TextBlock  Text="Current version:  " Margin="0,0,170,280"/>
-            <TextBlock FontSize="12" FontWeight="Bold" Text="{Binding CurrentVersion}" Margin="0,25,3,256"/>
-            <TextBlock Text="Description: " Margin="0,51,196,228"/>
-            <TextBlock FontSize="12" Text="{Binding UpdateDescription}" TextWrapping="Wrap" Margin="0,72,0,213" />
-            <!-- show buttons first -->
-            <!--<Button      Grid.Row="0" Height="30" Margin="3,10,3,3" x:Name="btnInstallAtExit" Content="Install When I Exit" Click="InstallAtExit_Click" />-->
-            <Button      Grid.Row="1" Height="30" Margin="3,3,3,10" x:Name="btnInstallNow" Content="Install Now" Click="InstallNow_Click" />
-            <!-- hide progress items until a button is pressed (use a throbber if actual progress bar can't be used) -->
-            <!-- throbber image was generated at http://ajaxload.info/ -->
-            <!--<TextBlock   Grid.Row="0" Height="30" Margin="3,10,3,3" x:Name="lblDownload" Visibility="Collapsed" Text="Downloading..." HorizontalAlignment="Center" VerticalAlignment="Bottom" />-->
-            <!--<Image       Grid.Row="1" Height="0" Margin="3,3,3,10" x:Name="imgThrobber" local:ImageBehavior.AnimatedSource="/NAppUpdate.SampleApp;component/throbber.gif" />-->
-            <!--<ProgressBar Grid.Row="0" Height="30" Margin="3,10,3,3" x:Name="prgDownload" Value="{Binding DownloadProgress}" Visibility="Collapsed"/>-->
+        <TextBlock  Text="Current version:  " Margin="0,0,10,272"/>
+        <TextBlock FontSize="12" FontWeight="Bold" Text="{Binding CurrentVersion}" Margin="3,33,0,219"/>
+        <TextBlock Text="Description: " Margin="0,81,10,170"/>
+        <TextBlock FontSize="12" Text="{Binding UpdateDescription}" TextWrapping="Wrap" Margin="3,130,3,104" />
+        <!-- show buttons first -->
+        <!--<Button      Grid.Row="0" Height="30" Margin="3,10,3,3" x:Name="btnInstallAtExit" Content="Install When I Exit" Click="InstallAtExit_Click" />-->
+        <Button Height="30" Margin="6,244,0,26" x:Name="btnInstallNow" Content="Install Now" Click="InstallNow_Click" />
+        <!-- hide progress items until a button is pressed (use a throbber if actual progress bar can't be used) -->
+        <!-- throbber image was generated at http://ajaxload.info/ -->
+        <!--<TextBlock   Grid.Row="0" Height="30" Margin="3,10,3,3" x:Name="lblDownload" Visibility="Collapsed" Text="Downloading..." HorizontalAlignment="Center" VerticalAlignment="Bottom" />-->
+        <!--<Image       Grid.Row="1" Height="0" Margin="3,3,3,10" x:Name="imgThrobber" local:ImageBehavior.AnimatedSource="/NAppUpdate.SampleApp;component/throbber.gif" />-->
+        <!--<ProgressBar Grid.Row="0" Height="30" Margin="3,10,3,3" x:Name="prgDownload" Value="{Binding DownloadProgress}" Visibility="Collapsed"/>-->
 
 
 

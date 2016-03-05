@@ -13,11 +13,62 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using System.Diagnostics;
 using NAppUpdate.Framework;
 using NAppUpdate.Framework.Common;
+using NAppUpdate.Framework.Tasks;
+
 
 namespace StorageTool.Updater
 {
+
+    public class UpdateTaskInfo
+    {
+        // TaskDescription?
+        public string FileDescription { get; set; }
+        public string FileName { get; set; }
+        public string FileVersion { get; set; }
+        public long? FileSize { get; set; }
+        public DateTime? FileDate { get; set; }
+    }
+
+    public class UpdateTaskHelper
+    {
+        private readonly UpdateManager _manager;
+
+        public IList<UpdateTaskInfo> TaskListInfo { get; private set; }
+        public string CurrentVersion { get; private set; }
+        public string UpdateDescription { get; private set; }
+        public string UpdateFileName { get; private set; }
+        public string UpdateVersion { get; private set; }
+        public DateTime? UpdateDate { get; private set; }
+        public long UpdateFileSize { get; private set; }
+
+        public UpdateTaskHelper()
+        {
+            _manager = UpdateManager.Instance;
+            this.GetUpdateTaskInfo();
+            //this.CurrentVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+            FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
+            string version = fvi.FileVersion;
+            this.CurrentVersion = version;
+        }
+
+        public IList<UpdateTaskInfo> GetUpdateTaskInfo()
+        {
+            var taskListInfo = new List<UpdateTaskInfo>();
+            foreach (IUpdateTask task in _manager.Tasks)
+            {
+                var fileTask = task as FileUpdateTask;
+                if (fileTask == null) continue;
+
+                this.UpdateDescription = fileTask.Description;
+            }
+            this.TaskListInfo = taskListInfo;
+            return taskListInfo;
+        }
+    }
     /// <summary>
     /// Interaction logic for UpdateWindow.xaml
     /// </summary>
@@ -25,7 +76,6 @@ namespace StorageTool.Updater
     {
         private readonly UpdateManager _updateManager;
         private readonly UpdateTaskHelper _helper;
-        private IList<UpdateTaskInfo> _updates;
 
         public UpdateWindow()
         {
@@ -48,15 +98,14 @@ namespace StorageTool.Updater
                 d.BeginInvoke(new Action(Hide));
                 try
                 {
-                    _updateManager.ApplyUpdates(true);
+                    _updateManager.ApplyUpdates(true,true,false);
                     d.BeginInvoke(new Action(Close));
                 }
                 catch
                 {
                     d.BeginInvoke(new Action(this.Show));
                     // this.WindowState = WindowState.Normal;
-                    MessageBox.Show(
-                        "An error occurred while trying to install software updates");
+                    MessageBox.Show("An error occurred while trying to install software updates");
                 }
 
                 _updateManager.CleanUp();

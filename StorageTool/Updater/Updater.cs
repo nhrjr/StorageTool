@@ -10,62 +10,21 @@ using NAppUpdate.Framework.Common;
 using NAppUpdate.Framework.Tasks;
 using System.Windows;
 using System.Windows.Threading;
+using System.Diagnostics;
 
 namespace StorageTool.Updater
 {
-    public class UpdateTaskInfo
-    {
-        // TaskDescription?
-        public string FileDescription { get; set; }
-        public string FileName { get; set; }
-        public string FileVersion { get; set; }
-        public long? FileSize { get; set; }
-        public DateTime? FileDate { get; set; }
-    }
-
-    public class UpdateTaskHelper
-    {
-        private readonly UpdateManager _manager;
-
-        public IList<UpdateTaskInfo> TaskListInfo { get; private set; }
-        public string CurrentVersion { get; private set; }
-        public string UpdateDescription { get; private set; }
-        public string UpdateFileName { get; private set; }
-        public string UpdateVersion { get; private set; }
-        public DateTime? UpdateDate { get; private set; }
-        public long UpdateFileSize { get; private set; }
-
-        public UpdateTaskHelper()
-        {
-            _manager = UpdateManager.Instance;
-            this.GetUpdateTaskInfo();
-            this.CurrentVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
-        }
-
-        public IList<UpdateTaskInfo> GetUpdateTaskInfo()
-        {
-            var taskListInfo = new List<UpdateTaskInfo>();
-            foreach (IUpdateTask task in _manager.Tasks)
-            {
-                var fileTask = task as FileUpdateTask;
-                if (fileTask == null) continue;
-
-                this.UpdateDescription = fileTask.Description;
-            }
-            this.TaskListInfo = taskListInfo;
-            return taskListInfo;
-        }
-    }
-
     class UpdateWrapper
     {
         public string AppVersion
         {
             get
             {
-                if (File.Exists("CurrentVersion.txt"))
-                    return File.ReadAllText("CurrentVersion.txt");
-                return "1.0";
+                System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
+                string version = fvi.FileVersion;
+
+                return version;
             }
         }
 
@@ -76,15 +35,16 @@ namespace StorageTool.Updater
         {
             _updateManager.UpdateSource = PrepareUpdateSource();
             _updateManager.ReinstateIfRestarted();
+            _updateManager.CleanUp();
         }
 
         private NAppUpdate.Framework.Sources.IUpdateSource PrepareUpdateSource()
         {
             // Normally this would be a web based source.
             // But for the demo app, we prepare an in-memory source.
-            var source = new NAppUpdate.Framework.Sources.MemorySource(File.ReadAllText("SampleAppUpdateFeed.xml"));
-            //var source = new NAppUpdate.Framework.Sources.SimpleWebSource("http://raw.githubusercontent.com/nhrjr")
-            source.AddTempFile(new Uri("http://SomeSite.com/Files/NewVersion.txt"), "NewVersion.txt");
+            //var source = new NAppUpdate.Framework.Sources.MemorySource(File.ReadAllText("C:\\Users\\nhrjr\\Documents\\Visual Studio 2015\\Projects\\StorageTool\\StorageTool\\UpdateFeed\\AppUpdateFeed.xml"));
+            var source = new NAppUpdate.Framework.Sources.SimpleWebSource("http://umami.spdns.eu/AppUpdateFeed.xml");
+            //source.AddTempFile(new Uri("https://github.com/nhrjr/StorageTool/releases/download/v0.3.1-alpha/StorageTool.exe"), "C:\\Users\\nhrjr\\Documents\\Visual Studio 2015\\Projects\\StorageTool\\StorageTool\\UpdateFeed\\StorageTool.exe");
             
             return source;
         }
