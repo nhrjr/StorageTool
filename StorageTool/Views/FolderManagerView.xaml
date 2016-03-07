@@ -108,7 +108,7 @@
         </TabItem>
 
         <!--DEBUGVIEW-->
-        <TabItem Header="{Binding HeaderNames.All}">
+        <!--<TabItem Header="{Binding HeaderNames.All}">
             <ListView x:Name="allList" ItemsSource="{Binding FolderManager.Folders}"  Style="{DynamicResource ListViewStyle}" ItemContainerStyle="{DynamicResource ListViewItemStyle}">
                 <ListView.View>
                     <GridView ColumnHeaderContainerStyle="{DynamicResource GridViewColumnHeaderStyle}">
@@ -144,7 +144,7 @@
                     </GridView>
                 </ListView.View>
             </ListView>
-        </TabItem>
+        </TabItem>-->
     </TabControl>
 
 </UserControl>

@@ -19,6 +19,7 @@ using Monitor.Core.Utilities;
 using System.Diagnostics;
 using StorageTool.Resources;
 
+
 namespace StorageTool
 {
     /// <summary>
@@ -33,9 +34,9 @@ namespace StorageTool
             InitializeComponent();
             mainWindowViewModel = new MainWindowViewModel();
             this.DataContext = mainWindowViewModel;
-            mainWindowViewModel.InitializeModelData();
+            //mainWindowViewModel.InitializeModelData();
 
-            //this.Loaded += MainWindow_Loaded;            
+            this.Loaded += MainWindow_Loaded;            
         }
 
         private void MainWindow_Loaded(object sender, EventArgs e)

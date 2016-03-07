@@ -34,7 +34,7 @@
         </TextBox>
 
         <Button x:Name="addProfileButton" Command="{Binding ReturnKey}" CommandParameter="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=Window}}" Content="OK" Margin="327,60,0,0" RenderTransformOrigin="1.311,0.826" Height="20" VerticalAlignment="Top" HorizontalAlignment="Left" Width="84"/>
-        <Button x:Name="UpdateButton" Command="{Binding UpdateCommand}" Content="Restart" HorizontalAlignment="Left" Margin="440,10,0,0" VerticalAlignment="Top" Width="75" BorderBrush="White" Background="White"/>
+        <!--<Button x:Name="UpdateButton" Command="{Binding UpdateCommand}" Content="Restart" HorizontalAlignment="Left" Margin="440,10,0,0" VerticalAlignment="Top" Width="75" BorderBrush="White" Background="White"/>-->
 
     </Grid>
     <!--</Border>-->

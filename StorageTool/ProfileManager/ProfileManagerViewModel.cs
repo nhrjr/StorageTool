@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 
 using StorageTool.Resources;
-using StorageTool.Updater;
 
 namespace StorageTool
 {
@@ -52,31 +51,31 @@ namespace StorageTool
             }
         }
 
-        RelayCommand _updateCommand;
-        public ICommand UpdateCommand
-        {
-            get
-            {
-                if (_updateCommand == null)
-                {
-                    _updateCommand = new RelayCommand(param =>
-                    {
-                        //System.Diagnostics.Process.Start(Application.ResourceAssembly.Location);
-                        //System.Windows.Application.Current.Shutdown();
-                        CheckForUpdates();
+        //RelayCommand _updateCommand;
+        //public ICommand UpdateCommand
+        //{
+        //    get
+        //    {
+        //        if (_updateCommand == null)
+        //        {
+        //            _updateCommand = new RelayCommand(param =>
+        //            {
+        //                //System.Diagnostics.Process.Start(Application.ResourceAssembly.Location);
+        //                //System.Windows.Application.Current.Shutdown();
+        //                CheckForUpdates();
 
-                    }, param => true);
-                }
-                return _updateCommand;
-            }
-        }
+        //            }, param => true);
+        //        }
+        //        return _updateCommand;
+        //    }
+        //}
 
-        public void CheckForUpdates()
-        {
-            UpdateWrapper upd = new UpdateWrapper();
-            upd.CheckForUpdates();
+        //public void CheckForUpdates()
+        //{
+        //    AppUpdater upd = new AppUpdater();
+        //    upd.CheckForUpdates();
 
-        }
+        //}
 
         RelayCommand _pickFolderCommand;
         public ICommand PickFolderCommand

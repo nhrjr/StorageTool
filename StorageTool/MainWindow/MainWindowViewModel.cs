@@ -29,12 +29,14 @@ namespace StorageTool
 
         private ProfileManager _profileManager = new ProfileManager();        
         private ProfileManagerViewModel _profileManagerViewModel;
+        private AppUpdater _appUpdater;
 
         public MainWindowViewModel()
         {
             _profileManager.ChangedProfilesEvent += UpdateDisplaySettings;
 
             _profileManagerViewModel = new ProfileManagerViewModel(_profileManager);
+            _appUpdater = new AppUpdater();
 
             foreach (Profile p in _profileManager.Profiles)
             {
@@ -52,6 +54,7 @@ namespace StorageTool
             {
                 Task.Run(() =>  f.FolderManager.RefreshFolders());
             }
+            _appUpdater.CheckForUpdates();
         }
 
         private void UpdateDisplaySettings()
@@ -191,6 +194,16 @@ namespace StorageTool
             {
                 _profileManagerViewModel = value;
                 OnPropertyChanged(nameof(ProfileManagerViewModel));
+            }
+        }
+
+        public AppUpdater AppUpdater
+        {
+            get { return _appUpdater; }
+            set
+            {
+                _appUpdater = value;
+                OnPropertyChanged(nameof(AppUpdater));
             }
         }
 
