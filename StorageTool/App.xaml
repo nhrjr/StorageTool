@@ -17,29 +17,29 @@
             <SolidColorBrush x:Key="MouseOverMainControl" Color="#FFA0CBFF"/>
                 
 
-                <ControlTemplate x:Key="RadioButtonTemplate" TargetType="{x:Type RadioButton}">
-                    <ToggleButton x:Name="Button" IsChecked="{Binding IsChecked, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
-                          Content="{Binding Content, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" BorderBrush="Black" Padding="2"/>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsChecked" Value="True">
-                            <!--<Setter TargetName="Button" Property="Background" Value="{DynamicResource ForeGroundBlue}"/>-->
-                            <Setter TargetName="Button" Property="Foreground" Value="Black" />
-                            
-                        </Trigger>
-                        <Trigger Property="IsChecked" Value="False">
-                            <Setter TargetName="Button" Property="Background" Value="{DynamicResource BackGroundGray}"/>
-                            <Setter TargetName="Button" Property="Foreground" Value="{DynamicResource ForeGroundGray}" />
-                        </Trigger>
-                        <MultiTrigger>
-                            <MultiTrigger.Conditions>
-                                <Condition Property="IsChecked" Value="False"/>
-                                <Condition Property="IsMouseOver" Value="True"/>
-                            </MultiTrigger.Conditions>
-                            <Setter TargetName="Button" Property="Background" Value="{DynamicResource MouseOverMainControl}"/>
-                            <Setter TargetName="Button" Property="Foreground" Value="Black" />
-                        </MultiTrigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
+            <ControlTemplate x:Key="RadioButtonTemplate" TargetType="{x:Type RadioButton}">
+                <ToggleButton x:Name="Button" IsChecked="{Binding IsChecked, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                      Content="{Binding Content, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" BorderBrush="Black" Padding="2"/>
+                <ControlTemplate.Triggers>
+                    <Trigger Property="IsChecked" Value="True">
+                        <!--<Setter TargetName="Button" Property="Background" Value="{DynamicResource ForeGroundBlue}"/>-->
+                        <Setter TargetName="Button" Property="Foreground" Value="Black" />
+                        
+                    </Trigger>
+                    <Trigger Property="IsChecked" Value="False">
+                        <Setter TargetName="Button" Property="Background" Value="{DynamicResource BackGroundGray}"/>
+                        <Setter TargetName="Button" Property="Foreground" Value="{DynamicResource ForeGroundGray}" />
+                    </Trigger>
+                    <MultiTrigger>
+                        <MultiTrigger.Conditions>
+                            <Condition Property="IsChecked" Value="False"/>
+                            <Condition Property="IsMouseOver" Value="True"/>
+                        </MultiTrigger.Conditions>
+                        <Setter TargetName="Button" Property="Background" Value="{DynamicResource MouseOverMainControl}"/>
+                        <Setter TargetName="Button" Property="Foreground" Value="Black" />
+                    </MultiTrigger>
+                </ControlTemplate.Triggers>
+            </ControlTemplate>
 
             <Style x:Key="ListViewStyle" TargetType="{x:Type ListView}">
                 <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"/>
@@ -65,6 +65,7 @@
                     </Setter.Value>
                 </Setter>
             </Style>
+                
             <Style x:Key="ListViewItemStyle" TargetType="{x:Type ListViewItem}">
                 <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
                 <Setter Property="Template">
@@ -120,13 +121,13 @@
                                                   TextBlock.FontWeight="Medium"
                                                   Margin="5,2"          
                                     />
-                                <Border.ContextMenu>
+                                <!--<Border.ContextMenu>
                                     <ContextMenu>
                                         <MenuItem Header="Open Source Folder" Command="{Binding PlacementTarget.Tag.OpenExplorerCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" CommandParameter="Source"/>
                                         <MenuItem Header="Open Storage Folder" Command="{Binding PlacementTarget.Tag.OpenExplorerCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" CommandParameter="Storage"/>
                                         <MenuItem Header="Refresh Folders" Command="{Binding PlacementTarget.Tag.RefreshFoldersCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}"/>
                                     </ContextMenu>
-                                </Border.ContextMenu>
+                                </Border.ContextMenu>-->
                             </Border>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsSelected" Value="True">

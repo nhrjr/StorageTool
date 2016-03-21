@@ -126,9 +126,8 @@ namespace StorageTool
                 return;
             try
             {
-                //await Task.Factory.StartNew(() =>
-                //{
                 _isRefreshingFolders = true;
+                Console.WriteLine("RefreshingFolders()");
 
                 analyzeFolders.GetFolderStructure(Profile);
 
@@ -144,6 +143,7 @@ namespace StorageTool
                     {
                         if (g.Status == TaskStatus.Inactive)
                         {
+                            Console.WriteLine("Removing " + g.DirInfo.Name);
                             RemoveFolder(g);
                         }
                     }
@@ -156,36 +156,36 @@ namespace StorageTool
 
                 foreach (DirectoryInfo g in analyzeFolders.StorableFolders)
                 {
-                    if (!Folders.Any(f => f.DirInfo.Name == g.Name && f.Mapping == Mapping.Source))
+                    if (!Folders.Any(f => f.DirInfo.Name == g.Name))
                     {
+                        Console.WriteLine("Adding " + g.Name + " as Source ");
                         AddFolder(new FolderViewModel(g),  Mapping.Source);
                     }
 
                 }
                 foreach (DirectoryInfo g in analyzeFolders.LinkedFolders)
                 {
-                    if (!Folders.Any(f => f.DirInfo.Name == g.Name && f.Mapping == Mapping.Stored))
+                    if (!Folders.Any(f => f.DirInfo.Name == g.Name))
                     {
+                        Console.WriteLine("Adding " + g.Name + " as Stored ");
                         AddFolder(new FolderViewModel(g), Mapping.Stored);
                     }
                 }
                 foreach (DirectoryInfo g in analyzeFolders.UnlinkedFolders)
                 {
-                    if (!Folders.Any(f => f.DirInfo.Name == g.Name && f.Mapping == Mapping.Unlinked))
+                    if (!Folders.Any(f => f.DirInfo.Name == g.Name))
                     {
+                        Console.WriteLine("Adding " + g.Name + " as Unlinked ");
                         AddFolder(new FolderViewModel(g), Mapping.Unlinked);
                     }
                 }
-
-                //}, CancellationToken.None, TaskCreationOptions.None, refreshTS);
             }
-            catch (IOException e)
+            catch (Exception e)
             {
                 MessageBox.Show(e.Message);
             }
             finally
             {
-                //DirectorySize.Instance.CalculateSizes();
                 _isRefreshingFolders = false;
                 ModelPropertyChangedEvent();
             }

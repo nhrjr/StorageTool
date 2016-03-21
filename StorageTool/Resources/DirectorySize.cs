@@ -35,6 +35,11 @@ namespace StorageTool.Resources
             return Size;
         }
 
+        public static long DireSizeFrameWork(DirectoryInfo info)
+        {
+            return info.EnumerateFiles("*", SearchOption.AllDirectories).Sum(x => x.Length);
+        }
+
         public static long DirSizeIterative(DirectoryInfo dir)
         {
             long Size = 0;

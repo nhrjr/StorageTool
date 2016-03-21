@@ -56,7 +56,8 @@ namespace StorageTool
             ObservableCollection<Profile> var = new ObservableCollection<Profile>();
             foreach (ProfileBase g in input)
             {
-                var.Add(new Profile(g.ProfileName, g.GameFolder, g.StorageFolder));
+                if (Directory.Exists(g.GameFolder) && Directory.Exists(g.StorageFolder))
+                    var.Add(new Profile(g.ProfileName, g.GameFolder, g.StorageFolder));
             }
             return var;
         }

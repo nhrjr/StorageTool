@@ -39,40 +39,7 @@ namespace StorageTool
         private CollectionViewSource _unlinked { get; set; } = new CollectionViewSource();
         private CollectionViewSource _assigned { get; set; } = new CollectionViewSource();
 
-        public HeaderNames HeaderNames { get; set; } = new HeaderNames();    
-
-        RelayCommand _sortCustomViewsCommand;
-        public ICommand SortCustomViewsCommand
-        {
-            get
-            {
-                if (_sortCustomViewsCommand == null)
-                {
-                    _sortCustomViewsCommand = new RelayCommand(param =>
-                    {
-                        _lastDirection = _lastDirection == ListSortDirection.Ascending ? ListSortDirection.Descending : ListSortDirection.Ascending;
-                        GridViewColumnHeader g = param as GridViewColumnHeader;
-                        if(g.Tag.ToString() == "Source")
-                        {
-                            Source.CustomSort = new FolderSorter(g.Content.ToString(), _lastDirection);
-                            Source.Refresh();
-                        }
-                        if (g.Tag.ToString() == "Stored")
-                        {
-                            Stored.CustomSort = new FolderSorter(g.Content.ToString(), _lastDirection);
-                            Stored.Refresh();
-                        }
-                        if (g.Tag.ToString() == "Unlinked")
-                        {
-                            Unlinked.CustomSort = new FolderSorter(g.Content.ToString(), _lastDirection);
-                            Unlinked.Refresh();
-                        }
-
-                    }, param => true);
-                }
-                return _sortCustomViewsCommand;
-            }
-        }
+        public HeaderNames HeaderNames { get; set; } = new HeaderNames();
 
         public FolderManagerViewModel(Profile p)
         {
@@ -102,7 +69,6 @@ namespace StorageTool
         public void SourceFilter(object sender, FilterEventArgs e)
         {
             FolderViewModel f = e.Item as FolderViewModel;
-
             e.Accepted = (f.Mapping == Mapping.Source && f.Status == TaskStatus.Inactive);
         }
 
@@ -116,14 +82,12 @@ namespace StorageTool
         {
             FolderViewModel f = e.Item as FolderViewModel;
             e.Accepted = (f.Mapping == Mapping.Unlinked && f.Status == TaskStatus.Inactive);
-
         }
 
         public void AssignedFilter(object sender, FilterEventArgs e)
         {
             FolderViewModel f = e.Item as FolderViewModel;
             e.Accepted = (f.Status != TaskStatus.Inactive);
-
         }
 
         public void RefreshUI()
@@ -133,14 +97,51 @@ namespace StorageTool
                 this.Stored.Refresh();
                 this.Unlinked.Refresh();
                 this.Assigned.Refresh();
+                OnPropertyChanged(nameof(DuplicateFolders));                
 
                 ShowUnlinkedFolders = (Unlinked.Cast<object>().Count() > 0) ? true : false;
                 ShowDuplicateFolders = (DuplicateFolders.Count > 0) ? true : false;
 
                 HeaderNames.SetNumbers(Source.Count, Stored.Count, Unlinked.Count, DuplicateFolders.Count, FolderManager.Folders.Count);
             }));
-        }   
+        }
 
+        #region Commands
+        RelayCommand _sortCustomViewsCommand;
+        public ICommand SortCustomViewsCommand
+        {
+            get
+            {
+                if (_sortCustomViewsCommand == null)
+                {
+                    _sortCustomViewsCommand = new RelayCommand(param =>
+                    {
+                        _lastDirection = _lastDirection == ListSortDirection.Ascending ? ListSortDirection.Descending : ListSortDirection.Ascending;
+                        GridViewColumnHeader g = param as GridViewColumnHeader;
+                        if (g.Tag.ToString() == "Source")
+                        {
+                            Source.CustomSort = new FolderSorter(g.Content.ToString(), _lastDirection);
+                            Source.Refresh();
+                        }
+                        if (g.Tag.ToString() == "Stored")
+                        {
+                            Stored.CustomSort = new FolderSorter(g.Content.ToString(), _lastDirection);
+                            Stored.Refresh();
+                        }
+                        if (g.Tag.ToString() == "Unlinked")
+                        {
+                            Unlinked.CustomSort = new FolderSorter(g.Content.ToString(), _lastDirection);
+                            Unlinked.Refresh();
+                        }
+
+                    }, param => true);
+                }
+                return _sortCustomViewsCommand;
+            }
+        }
+        #endregion
+
+        #region Properties  
         public bool ShowDuplicateFolders
         {
             get { return _showDuplicateFolders; }
@@ -190,6 +191,7 @@ namespace StorageTool
                 OnPropertyChanged(nameof(DuplicateFolders));
             }
         }
+        #endregion
 
         public event PropertyChangedEventHandler PropertyChanged;
 

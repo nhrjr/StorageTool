@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
+using System.Threading;
 
 namespace StorageTool
 {
@@ -46,6 +48,32 @@ namespace StorageTool
                 : asKb > 1 ? string.Format("{0} KB", asKb)
                 : string.Format("{0} B", Math.Round((double)value, decimalPlaces));
             return chosenValue;
+        }
+
+        public static void Profile(string description, int iterations, Action func)
+        {
+            //Run at highest priority to minimize fluctuations caused by other processes/threads
+            Process.GetCurrentProcess().PriorityClass = ProcessPriorityClass.High;
+            Thread.CurrentThread.Priority = ThreadPriority.Highest;
+
+            // warm up 
+            func();
+
+            var watch = new Stopwatch();
+
+            // clean up
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
+
+            watch.Start();
+            for (int i = 0; i < iterations; i++)
+            {
+                func();
+            }
+            watch.Stop();
+            Console.Write(description);
+            Console.WriteLine(" Time Elapsed {0} ms", watch.Elapsed.TotalMilliseconds);
         }
     }
 }

@@ -27,16 +27,18 @@ namespace StorageTool
         public ObservableCollection<FolderManagerViewModel> _folderManagerViewModels = new ObservableCollection<FolderManagerViewModel>();
         public CompositeCollection _assigned = new CompositeCollection();
 
+        private AppUpdater _appUpdater = new AppUpdater();
+        private SettingsViewModel _settingsViewModel = new SettingsViewModel();
         private ProfileManager _profileManager = new ProfileManager();        
         private ProfileManagerViewModel _profileManagerViewModel;
-        private AppUpdater _appUpdater;
+        
 
         public MainWindowViewModel()
         {
             _profileManager.ChangedProfilesEvent += UpdateDisplaySettings;
+            _appUpdater.UserRequestsInstallEvent += NumberOfRunningCopies;
 
             _profileManagerViewModel = new ProfileManagerViewModel(_profileManager);
-            _appUpdater = new AppUpdater();
 
             foreach (Profile p in _profileManager.Profiles)
             {
@@ -81,7 +83,7 @@ namespace StorageTool
 
         }
 
-        public int NumberOfOpenMoves()
+        public int NumberOfRunningCopies()
         {
             int var = 0;
             foreach (FolderManagerViewModel p in FolderManagerViewModels)
@@ -91,6 +93,7 @@ namespace StorageTool
             return var;
         }
 
+        #region Commands
         RelayCommand _openExplorerCommand;
         public ICommand OpenExplorerCommand
         {
@@ -154,9 +157,9 @@ namespace StorageTool
                 return _cancelAllCommand;
             }
         }
+        #endregion
 
-
-
+        #region Properties
         public CompositeCollection Assigned
         {
             get { return _assigned; }
@@ -207,6 +210,16 @@ namespace StorageTool
             }
         }
 
+        public SettingsViewModel SettingsViewModel
+        {
+            get { return _settingsViewModel; }
+            set
+            {
+                _settingsViewModel = value;
+                OnPropertyChanged(nameof(SettingsViewModel));
+            }
+        }
+        #endregion
 
         public event PropertyChangedEventHandler PropertyChanged;
 

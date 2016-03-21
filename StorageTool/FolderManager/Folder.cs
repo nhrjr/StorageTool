@@ -64,6 +64,7 @@ public class FolderViewModel : INotifyPropertyChanged
 
         private static OrderedTaskScheduler moveTS = new OrderedTaskScheduler();
         private static LimitedConcurrencyLevelTaskScheduler getSizeTS = new LimitedConcurrencyLevelTaskScheduler(Environment.ProcessorCount - 1);
+        //private static OrderedTaskScheduler getSizeTS = new OrderedTaskScheduler();
 
         #region Commands
         RelayCommand _pauseCommand;
@@ -226,9 +227,6 @@ public class FolderViewModel : INotifyPropertyChanged
             else
             {                
                 string targetDir = Ass.Target.FullName;
-                DirectoryInfo deletableDirInfo = new DirectoryInfo(targetDir);
-                if(deletableDirInfo.Exists)
-                    deletableDirInfo.Delete(true);
                 Progress = 0;
                 ProcessedBits = 0;
                 if (Ass.Mode == TaskMode.RESTORE)
@@ -238,7 +236,11 @@ public class FolderViewModel : INotifyPropertyChanged
                 else if (Ass.Mode == TaskMode.STORE)
                 {
                     if (Canceled == false) { Mapping = Mapping.Unlinked; Ass.Mode = TaskMode.LINK; }
-                }                
+                }
+
+                DirectoryInfo deletableDirInfo = new DirectoryInfo(targetDir);
+                if (deletableDirInfo.Exists)
+                    deletableDirInfo.Delete(true);
             }
         }
 
@@ -253,7 +255,6 @@ public class FolderViewModel : INotifyPropertyChanged
 
         private void TransferFolders(ref bool returnStatus, IProgress<long> sizeFromHell, object _lock, CancellationToken ct)
         {
-            //Status = TaskStatus.Running;
             switch (Ass.Mode)
             {
                 case TaskMode.STORE:
@@ -275,7 +276,7 @@ public class FolderViewModel : INotifyPropertyChanged
                 return;
             DirSize = null;
             _isGettingSize = true;
-            Task.Factory.StartNew(() => DirectorySize.DirSizeIterative(DirInfo), CancellationToken.None, TaskCreationOptions.None, getSizeTS).ContinueWith(task => { if (task.Result >= 0) { DirSize = task.Result; } else { DirSize = -1; } _isGettingSize = false; });
+            Task.Factory.StartNew(() => DirectorySize.DireSizeFrameWork(DirInfo), CancellationToken.None, TaskCreationOptions.None, getSizeTS).ContinueWith(task => { if (task.Result >= 0) { DirSize = task.Result; } else { DirSize = -1; } _isGettingSize = false; });
         }
 
         #region Properties

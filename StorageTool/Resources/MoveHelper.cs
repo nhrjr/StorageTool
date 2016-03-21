@@ -34,14 +34,10 @@ namespace StorageTool.Resources
                 
                 
             }
-            catch (IOException ioexp)
+            catch (Exception exp)
             {
-                MessageBox.Show(ioexp.Message);
+                MessageBox.Show(exp.Message);
                 returnStatus = false;
-            }
-            catch (UnauthorizedAccessException unauth)
-            {
-                MessageBox.Show(unauth.Message);
             }
             return returnStatus;
         }
@@ -50,6 +46,7 @@ namespace StorageTool.Resources
         {
             string sourceDir = prof.Source.FullName;
             string targetDir = prof.Target.FullName;// + @"\" + prof.Source.Name;
+            Console.WriteLine("Moving " + sourceDir + " to " + targetDir + " started");
             bool returnStatus = false;
             try
             {
@@ -62,22 +59,21 @@ namespace StorageTool.Resources
                 {
                     DirectoryInfo deletableDirInfo = prof.Source;
                     deletableDirInfo.Delete(true);
+                    Console.WriteLine("Deleted " + sourceDir);
                     if (!AnalyzeFolders.ExistsAsDirectory(sourceDir))
                     {
                         JunctionPoint.Create(@sourceDir,@targetDir, false);
+                        Console.WriteLine("Created Link");
                     }
+                    
                 }
             }
 
-            catch (IOException ioexp)
+            catch (Exception exp)
             {
-                MessageBox.Show(ioexp.Message);
-                //MessageBox.Show("Unable to create NTFS-Junction with source: " + sourceDir + " at " + targetDir);
+                MessageBox.Show(exp.Message);
             }
-            catch (UnauthorizedAccessException unauth)
-            {
-                MessageBox.Show(unauth.Message);
-            }
+            Console.WriteLine("Moving " + sourceDir + " to " + targetDir + " finished with " + returnStatus);
             return returnStatus;
 
         }
@@ -86,6 +82,7 @@ namespace StorageTool.Resources
         {
             string sourceDir = prof.Source.FullName;
             string targetDir = prof.Target.FullName;// + @"\" + prof.Source.Name;
+            Console.WriteLine("Moving " + sourceDir + " to " + targetDir + " started");
             bool returnStatus = false;
             try
             {
@@ -126,40 +123,36 @@ namespace StorageTool.Resources
                     deletableDirInfo.Delete(true);
                 }
             }
-            catch (IOException ioexp)
+            catch (Exception exp)
             {
-                MessageBox.Show(ioexp.Message);
-                //MessageBox.Show("Unable to create NTFS-Junction with source: " + sourceDir + " at " + targetDir);
+                MessageBox.Show(exp.Message);
             }
-            catch (UnauthorizedAccessException unauth)
-            {
-                MessageBox.Show(unauth.Message);
-            }
+            Console.WriteLine("Moving " + sourceDir + " to " + targetDir + " finished with " + returnStatus);
             return returnStatus;
         }
 
-        private static async Task<bool> CopyFiles(IEnumerable<FileInfo> files , IProgress<long> sizeFromHell, object _lock, CancellationToken ct, string outputPath)
-        {
-            foreach (FileInfo file in files)
-            {
-                if (ct.IsCancellationRequested)
-                {
-                    return false;
-                }
-                lock (_lock)
-                sizeFromHell.Report(file.Length / 2);
-                //file.CopyTo(outputPath + @"\" + file.Name);
-                using (FileStream SourceStream = file.Open(FileMode.Open, FileAccess.Read))
-                {
-                    using (FileStream DestinationStream = File.Create(outputPath + @"\" + file.Name))
-                    {
-                        await SourceStream.CopyToAsync(DestinationStream);
-                    }
-                }
-                sizeFromHell.Report(file.Length / 2);
-            }
-            return true;
-        }
+        //private static async Task<bool> CopyFiles(IEnumerable<FileInfo> files , IProgress<long> sizeFromHell, object _lock, CancellationToken ct, string outputPath)
+        //{
+        //    foreach (FileInfo file in files)
+        //    {
+        //        if (ct.IsCancellationRequested)
+        //        {
+        //            return false;
+        //        }
+        //        lock (_lock)
+        //        sizeFromHell.Report(file.Length / 2);
+        //        //file.CopyTo(outputPath + @"\" + file.Name);
+        //        using (FileStream SourceStream = file.Open(FileMode.Open, FileAccess.Read))
+        //        {
+        //            using (FileStream DestinationStream = File.Create(outputPath + @"\" + file.Name))
+        //            {
+        //                await SourceStream.CopyToAsync(DestinationStream);
+        //            }
+        //        }
+        //        sizeFromHell.Report(file.Length / 2);
+        //    }
+        //    return true;
+        //}
 
         public static bool CopyFolders(Assignment item, IProgress<long> sizeFromHell, object _lock, CancellationToken ct)
         {
@@ -167,60 +160,57 @@ namespace StorageTool.Resources
             List<DirectoryInfo> allDirs = new List<DirectoryInfo>();
             allDirs.Add(item.Source);
             allDirs.AddRange(item.Source.GetDirectories("*", SearchOption.AllDirectories).ToList());
-            
+            bool success = false;
+
             //Creates all of the directories and subdirectories
             foreach (DirectoryInfo dirInfo in allDirs)
             {
                 if (ct.IsCancellationRequested)
                 {
-                    return false;
+                    return success;
                 }
                 string dirPath = dirInfo.FullName;
                 string outputPath = dirPath.Replace(item.Source.FullName, item.Target.FullName);
                 Directory.CreateDirectory(outputPath);
 
-                //CopyFiles(dirInfo.EnumerateFiles(),sizeFromHell,_lock,ct, outputPath);
                 foreach (FileInfo file in dirInfo.EnumerateFiles())
                 {
-                    if (ct.IsCancellationRequested)
+                    success = FileCopy(file.FullName, outputPath + @"\" + file.Name, sizeFromHell, _lock, ct);
+                    if (success == false) break;
+                }
+            }
+            return success;
+        }
+
+        static bool FileCopy(string source, string destination, IProgress<long> sizeFromHell, object _lock, CancellationToken ct)
+        {
+            int array_length = (int)Math.Pow(2, 19);
+            byte[] dataArray = new byte[array_length];
+            using (FileStream fsread = new FileStream(source, FileMode.Open, FileAccess.Read, FileShare.None, array_length))
+            {
+                using (BinaryReader bwread = new BinaryReader(fsread))
+                {
+                    using (FileStream fswrite = new FileStream(destination, FileMode.Create, FileAccess.Write, FileShare.None, array_length))
                     {
-                        return false;
-                    }
-                    lock (_lock)
-                    sizeFromHell.Report(file.Length / 2);
-                    //file.CopyTo(outputPath + @"\" + file.Name);
-                    using (FileStream SourceStream = file.Open(FileMode.Open, FileAccess.Read))
-                    {
-                        using (FileStream DestinationStream = File.Create(outputPath + @"\" + file.Name))
+                        using (BinaryWriter bwwrite = new BinaryWriter(fswrite))
                         {
-                            SourceStream.CopyTo(DestinationStream);
+                            int read = 0;
+                            for (;;)
+                            {                    
+                                if (ct.IsCancellationRequested) { return false; }                                  
+                                lock(_lock)
+                                read = bwread.Read(dataArray, 0, array_length);
+                                if (0 == read)
+                                    break;
+                                bwwrite.Write(dataArray, 0, read);
+                                sizeFromHell.Report(read);
+                            }
                         }
                     }
-                    sizeFromHell.Report(file.Length / 2);
                 }
-                //var result = Parallel.ForEach(dirInfo.EnumerateFiles(), (file, state) => {
-                //    if (ct.IsCancellationRequested)
-                //    {
-                //        state.Break();
-                //    }
-                //    lock (_lock)
-                //    sizeFromHell.Report(file.Length / 2);
-                //    //file.CopyTo(outputPath + @"\" + file.Name);
-                //    using (FileStream SourceStream = file.OpenRead())
-                //    {
-                //        using (FileStream DestinationStream = File.Create(outputPath + @"\" + file.Name))
-                //        {
-                //            SourceStream.CopyTo(DestinationStream);
-                //        }
-                //    }
-                //    sizeFromHell.Report(file.Length / 2);
-                //});
-                //if(result.IsCompleted == false)
-                //{
-                //    return false;
-                //}
             }
             return true;
         }
+
     }
 }

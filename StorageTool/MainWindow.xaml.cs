@@ -47,7 +47,7 @@ namespace StorageTool
 
         private void OnClosing(object sender, CancelEventArgs cancelEventArgs)
         {
-            int var = mainWindowViewModel.NumberOfOpenMoves();
+            int var = mainWindowViewModel.NumberOfRunningCopies();
             if (var > 0)
             {
                 if (MessageBox.Show(this, Constants.CloseApplicationErrorString, "Close StorageTool", MessageBoxButton.YesNo) != MessageBoxResult.Yes)

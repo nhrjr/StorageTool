@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{B4BC90C4-969D-4CD1-9DD1-0FEA984E08D7}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>StorageTool</RootNamespace>
     <AssemblyName>StorageTool</AssemblyName>
@@ -160,6 +160,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Settings\SettingsViewModel.cs" />
     <Compile Include="Updater\AppUpdater.cs" />
     <Compile Include="Views\FolderManagerView.xaml.cs">
       <DependentUpon>FolderManagerView.xaml</DependentUpon>
@@ -184,6 +185,9 @@
     <Compile Include="ProfileManager\ProfileManagerViewModel.cs" />
     <Compile Include="Resources\SortAdorner.cs" />
     <Compile Include="Resources\MoveHelper.cs" />
+    <Compile Include="Views\SettingsView.xaml.cs">
+      <DependentUpon>SettingsView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\UpdatesView.xaml.cs">
       <DependentUpon>UpdatesView.xaml</DependentUpon>
     </Compile>
@@ -214,6 +218,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\ProfileManageView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\SettingsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
