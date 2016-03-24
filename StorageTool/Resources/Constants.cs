@@ -15,5 +15,7 @@ namespace StorageTool.Resources
         public const string ProfileInputNameDefault = "Enter your profile name here.";
         public const string ProfileInputNameAlreadyExists = "This name exists already, or the chosen folder do not exist. Please retry";
         public const string CloseApplicationErrorString = "StorageTool is still copying,\n are you sure you wish to close?\n This will cancel all current move operations.";
+
+        public const string UpdateFeedURL = "http://umami.spdns.eu/StorageTool/AppUpdateFeed.xml";
     }
 }

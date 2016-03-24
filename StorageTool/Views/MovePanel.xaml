@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:StorageTool"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="500">
-    <ListView x:Name="Move_Queue" ItemsSource="{Binding Assigned}" Margin="0" Style="{DynamicResource ListViewStyle}" ItemContainerStyle="{DynamicResource ListViewItemStyle}">
+    <ListView x:Name="Move_Queue" ItemsSource="{Binding Assigned}" Margin="0" Style="{DynamicResource ListViewStyle}" ItemContainerStyle="{DynamicResource ListViewItemStyle}" Visibility="{Binding HasItems,RelativeSource={RelativeSource Self},Converter={StaticResource BoolToVis}}">
             <!--<ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />

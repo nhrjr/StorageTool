@@ -9,6 +9,7 @@ using System.IO;
 using System.ComponentModel;
 using Monitor.Core.Utilities;
 using System.Windows;
+using System.Runtime.CompilerServices;
 
 namespace StorageTool.Resources
 {
@@ -162,7 +163,6 @@ namespace StorageTool.Resources
             allDirs.AddRange(item.Source.GetDirectories("*", SearchOption.AllDirectories).ToList());
             bool success = false;
 
-            //Creates all of the directories and subdirectories
             foreach (DirectoryInfo dirInfo in allDirs)
             {
                 if (ct.IsCancellationRequested)
@@ -182,6 +182,7 @@ namespace StorageTool.Resources
             return success;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static bool FileCopy(string source, string destination, IProgress<long> sizeFromHell, object _lock, CancellationToken ct)
         {
             int array_length = (int)Math.Pow(2, 19);
@@ -195,7 +196,7 @@ namespace StorageTool.Resources
                         using (BinaryWriter bwwrite = new BinaryWriter(fswrite))
                         {
                             int read = 0;
-                            for (;;)
+                            while(true)
                             {                    
                                 if (ct.IsCancellationRequested) { return false; }                                  
                                 lock(_lock)

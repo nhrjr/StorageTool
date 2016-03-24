@@ -28,6 +28,7 @@ namespace StorageTool
     {
         private bool _showUnlinkedFolders = false;
         private bool _showDuplicateFolders = false;
+        private bool _debugView;
 
         private ListSortDirection _lastDirection = ListSortDirection.Ascending;        
 
@@ -159,6 +160,17 @@ namespace StorageTool
             {
                 _showUnlinkedFolders = value;
                 OnPropertyChanged(nameof(ShowUnlinkedFolders));
+            }
+        }
+
+        public bool DebugView
+        {
+            get { return _debugView; }
+            set
+            {
+                _debugView = value;
+                OnPropertyChanged(nameof(DebugView));
+                Console.WriteLine("set FolderManagerViewModel.DebugView to " + _debugView);
             }
         }
 

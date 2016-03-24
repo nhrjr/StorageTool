@@ -7,7 +7,11 @@
              mc:Ignorable="d" 
              Height="100" Width="550" Background="White">
     <Grid Margin="0">
-        <Button x:Name="button" Content="{Binding ClickCounter}" Command="{Binding BreakCommand}" HorizontalAlignment="Left" Margin="53,40,0,0" VerticalAlignment="Top" Width="75"/>
+        <TextBlock x:Name="versionBox" HorizontalAlignment="Left" Height="16" Margin="60,10,0,0" TextWrapping="Wrap" Text="{Binding Version}" VerticalAlignment="Top" Width="63"/>
+        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Version: " VerticalAlignment="Top"/>
+        <CheckBox x:Name="DebugTab" Content="Show Debug Tab" HorizontalAlignment="Left" Margin="10,31,0,0" VerticalAlignment="Top" IsChecked="{Binding DebugView}"/>
+
+        <!--<Button x:Name="button" Content="{Binding ClickCounter}" Command="{Binding BreakCommand}" HorizontalAlignment="Left" Margin="53,40,0,0" VerticalAlignment="Top" Width="75"/>-->
 
 
     </Grid>

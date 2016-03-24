@@ -160,6 +160,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Resources\DiskSizes.cs" />
     <Compile Include="Settings\SettingsViewModel.cs" />
     <Compile Include="Updater\AppUpdater.cs" />
     <Compile Include="Views\FolderManagerView.xaml.cs">
@@ -179,7 +180,7 @@
     <Compile Include="Resources\Constants.cs" />
     <Compile Include="Resources\HeaderNames.cs" />
     <Compile Include="Resources\QueueItem.cs" />
-    <Compile Include="Resources\AppCommands.cs" />
+    <Compile Include="Resources\RelayCommand.cs" />
     <Compile Include="Resources\Config.cs" />
     <Compile Include="Resources\FolderWatcher.cs" />
     <Compile Include="ProfileManager\ProfileManagerViewModel.cs" />

@@ -121,13 +121,13 @@
                                                   TextBlock.FontWeight="Medium"
                                                   Margin="5,2"          
                                     />
-                                <!--<Border.ContextMenu>
+                                <Border.ContextMenu>
                                     <ContextMenu>
-                                        <MenuItem Header="Open Source Folder" Command="{Binding PlacementTarget.Tag.OpenExplorerCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" CommandParameter="Source"/>
-                                        <MenuItem Header="Open Storage Folder" Command="{Binding PlacementTarget.Tag.OpenExplorerCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" CommandParameter="Storage"/>
+                                        <MenuItem Header="Open Source Folder" Command="{Binding PlacementTarget.Tag.OpenSourceCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}"/>
+                                        <MenuItem Header="Open Storage Folder" Command="{Binding PlacementTarget.Tag.OpenStorageCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}" CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}"/>
                                         <MenuItem Header="Refresh Folders" Command="{Binding PlacementTarget.Tag.RefreshFoldersCommand, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ContextMenu}}}"/>
                                     </ContextMenu>
-                                </Border.ContextMenu>-->
+                                </Border.ContextMenu>
                             </Border>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsSelected" Value="True">

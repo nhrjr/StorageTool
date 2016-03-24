@@ -101,33 +101,7 @@ public class FolderViewModel : INotifyPropertyChanged
             }
         }
 
-        public void TogglePause(bool? setPauseAll = null)
-        {
-            if(setPauseAll == null)
-            {
-                if (Paused == false)
-                {
-                    System.Threading.Monitor.Enter(_lock);
-                    Paused = true;
-                }
-                else
-                {
-                    Paused = false;
-                    System.Threading.Monitor.Exit(_lock);
-                }
-            }
-            if(setPauseAll == true)
-            {
-                System.Threading.Monitor.Enter(_lock);
-                Paused = true;
-            }
-            if(setPauseAll == false)
-            {
-                Paused = false;
-                System.Threading.Monitor.Exit(_lock);
-            }
-            
-        }
+
 
         public ICommand StoreCommand
         {
@@ -251,6 +225,34 @@ public class FolderViewModel : INotifyPropertyChanged
                 Canceled = true;
                 _cts.Cancel();
             }          
+        }
+
+        public void TogglePause(bool? setPauseAll = null)
+        {
+            if (setPauseAll == null)
+            {
+                if (Paused == false)
+                {
+                    System.Threading.Monitor.Enter(_lock);
+                    Paused = true;
+                }
+                else
+                {
+                    Paused = false;
+                    System.Threading.Monitor.Exit(_lock);
+                }
+            }
+            if (setPauseAll == true)
+            {
+                System.Threading.Monitor.Enter(_lock);
+                Paused = true;
+            }
+            if (setPauseAll == false)
+            {
+                Paused = false;
+                System.Threading.Monitor.Exit(_lock);
+            }
+
         }
 
         private void TransferFolders(ref bool returnStatus, IProgress<long> sizeFromHell, object _lock, CancellationToken ct)

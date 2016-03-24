@@ -12,8 +12,7 @@
     </UserControl.Resources>
 
     <TabControl x:Name="tabControl" BorderThickness="0" Padding="0" Margin="0" ItemContainerStyle="{DynamicResource FolderManagerViewTabItem}">
-
-
+        
         <TabItem Header="{Binding HeaderNames.Source}">
             <ListView x:Name="sourceList" ItemsSource="{Binding Source}"  Style="{DynamicResource ListViewStyle}" ItemContainerStyle="{DynamicResource ListViewItemStyle}" >
                 <ListView.View>
@@ -108,7 +107,7 @@
         </TabItem>
 
         <!--DEBUGVIEW-->
-        <TabItem Header="{Binding HeaderNames.All}">
+        <TabItem Header="{Binding HeaderNames.All}" Visibility="{Binding DebugView, Converter={StaticResource BoolToVis}}">
             <ListView x:Name="allList" ItemsSource="{Binding FolderManager.Folders}"  Style="{DynamicResource ListViewStyle}" ItemContainerStyle="{DynamicResource ListViewItemStyle}">
                 <ListView.View>
                     <GridView ColumnHeaderContainerStyle="{DynamicResource GridViewColumnHeaderStyle}">

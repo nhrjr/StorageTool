@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.ComponentModel;
+using System.Diagnostics;
 
 using StorageTool.Resources;
 
@@ -12,13 +13,35 @@ namespace StorageTool
 {
     public class SettingsViewModel : INotifyPropertyChanged
     {
-        private int _clickCounter = 0;
-        public string ClickCounter
+        #region Fields
+        private bool _debugView;
+        #endregion
+
+        #region Properties
+        public string Version
         {
-            get { return _clickCounter.ToString(); }
-            set { }
+            get { System.Reflection.Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
+                FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
+                return fvi.FileVersion;
+            }
         }
 
+        public bool DebugView
+        {
+            get
+            {
+                return _debugView;
+            }
+            set
+            {
+                _debugView = value;
+                OnPropertyChanged(nameof(DebugView));
+                Console.WriteLine("set SettingsViewModel.DebugView to " + _debugView);
+            }
+        }
+        #endregion
+
+        #region Commands
         RelayCommand _breakCommand;
         public ICommand BreakCommand
         {
@@ -30,14 +53,14 @@ namespace StorageTool
                     {
                         //System.Diagnostics.Process.Start(Application.ResourceAssembly.Location);
                         //System.Windows.Application.Current.Shutdown();
-                        _clickCounter++;
-                        OnPropertyChanged(nameof(ClickCounter));
 
                     }, param => true);
                 }
                 return _breakCommand;
             }
         }
+        #endregion
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         public void OnPropertyChanged(string propName)

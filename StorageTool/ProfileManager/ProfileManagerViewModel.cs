@@ -21,7 +21,11 @@ namespace StorageTool
         private string _storageInput = null;
         private string _profileName = null;
 
-        private ProfileManager _profileManager;        
+        private string _sourceDiskSize = null;
+        private string _storageDiskSize = null;
+
+        private ProfileManager _profileManager;
+        private DiskSizes _diskSizes;        
 
         public ProfileManagerViewModel(ProfileManager profileManager)
         {
@@ -39,6 +43,9 @@ namespace StorageTool
                     SourceInput = _profileManager.ActiveProfile.GameFolder.FullName;
                     StorageInput = _profileManager.ActiveProfile.StorageFolder.FullName;
                     ProfileName = _profileManager.ActiveProfile.ProfileName;
+                    DiskSizes _diskSizes = DiskSizes.Instance;
+                    SourceDiskSize = "Free " + _diskSizes.GetFreeSpace(_profileManager.ActiveProfile.GameFolder) + " of " + _diskSizes.GetDiskSize(_profileManager.ActiveProfile.GameFolder);
+                    StorageDiskSize = "Free " + _diskSizes.GetFreeSpace(_profileManager.ActiveProfile.StorageFolder) + " of " + _diskSizes.GetDiskSize(_profileManager.ActiveProfile.StorageFolder);
                 }
                 else
                 {
@@ -178,6 +185,34 @@ namespace StorageTool
         public string Error
         {
             get { return "Error"; }
+        }
+
+
+
+        public string SourceDiskSize
+        {
+            get
+            {
+                return _sourceDiskSize;
+            }
+            set
+            {
+                _sourceDiskSize = value;
+                OnPropertyChanged(nameof(SourceDiskSize));
+            }
+        }
+
+        public string StorageDiskSize
+        {
+            get
+            {
+                return _storageDiskSize;
+            }
+            set
+            {
+                _storageDiskSize = value;
+                OnPropertyChanged(nameof(StorageDiskSize));
+            }
         }
 
         public string this[string inputbox]

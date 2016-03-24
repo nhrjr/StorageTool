@@ -134,7 +134,7 @@ namespace StorageTool
         {
             // Normally this would be a web based source.
             // But for the demo app, we prepare an in-memory source.
-            var source = new NAppUpdate.Framework.Sources.SimpleWebSource("http://umami.spdns.eu/AppUpdateFeed.xml");
+            var source = new NAppUpdate.Framework.Sources.SimpleWebSource(Constants.UpdateFeedURL);
 
             //var source = new NAppUpdate.Framework.Sources.MemorySource(File.ReadAllText("C:\\Users\\nhrjr\\Documents\\Visual Studio 2015\\Projects\\StorageTool\\StorageTool\\UpdateFeed\\AppUpdateFeed.xml"));
             //source.AddTempFile(new Uri("https://github.com/nhrjr/StorageTool/releases/download/v0.3.1-alpha/StorageTool.exe"), "C:\\Users\\nhrjr\\Documents\\Visual Studio 2015\\Projects\\StorageTool\\StorageTool\\UpdateFeed\\StorageTool.exe");

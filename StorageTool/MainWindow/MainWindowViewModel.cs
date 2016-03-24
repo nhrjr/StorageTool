@@ -37,6 +37,7 @@ namespace StorageTool
         {
             _profileManager.ChangedProfilesEvent += UpdateDisplaySettings;
             _appUpdater.UserRequestsInstallEvent += NumberOfRunningCopies;
+            _settingsViewModel.PropertyChanged += SettingsHaveChanged;
 
             _profileManagerViewModel = new ProfileManagerViewModel(_profileManager);
 
@@ -83,6 +84,21 @@ namespace StorageTool
 
         }
 
+        private void SettingsHaveChanged(object o, PropertyChangedEventArgs e)
+        {
+            string param = e.PropertyName;
+            if(param == "DebugView")
+            {
+                Console.WriteLine("MainWindowViewModel DebugView SettingsHaveChanged");
+                SettingsViewModel s = o as SettingsViewModel;
+                foreach(FolderManagerViewModel f in _folderManagerViewModels)
+                {
+                    f.DebugView = s.DebugView;
+                }
+            }
+
+        }
+
         public int NumberOfRunningCopies()
         {
             int var = 0;
@@ -94,27 +110,49 @@ namespace StorageTool
         }
 
         #region Commands
-        RelayCommand _openExplorerCommand;
-        public ICommand OpenExplorerCommand
+        RelayCommand _openSourceCommand;
+        public ICommand OpenSourceCommand
         {
             get
             {
-                if (_openExplorerCommand == null)
+                if (_openSourceCommand == null)
                 {
-                    _openExplorerCommand = new RelayCommand(param =>
+                    _openSourceCommand = new RelayCommand(param =>
                     {
-                        string comm = param as string;
-                        if (comm != null)
+                        //Type t = param.GetType();
+                        TabItem comm = param as TabItem;
+                        FolderManagerViewModel f = comm.Header as FolderManagerViewModel;
+                        
+                        if (f != null)
                         {
-                            if (comm == "Source")
-                                comm = _profileManager.ActiveProfile.GameFolder.FullName;
-                            if (comm == "Storage")
-                                comm = _profileManager.ActiveProfile.StorageFolder.FullName;
-                            Process.Start(comm);
+                            Process.Start(f.FolderManager.Profile.GameFolder.FullName);
                         }
                     }, param => true);
                 }
-                return _openExplorerCommand;
+                return _openSourceCommand;
+            }
+        }
+
+        RelayCommand _openStorageCommand;
+        public ICommand OpenStorageCommand
+        {
+            get
+            {
+                if (_openStorageCommand == null)
+                {
+                    _openStorageCommand = new RelayCommand(param =>
+                    {
+                        //Type t = param.GetType();
+                        TabItem comm = param as TabItem;
+                        FolderManagerViewModel f = comm.Header as FolderManagerViewModel;
+                        
+                        if (f != null)
+                        {
+                            Process.Start(f.FolderManager.Profile.StorageFolder.FullName);
+                        }
+                    }, param => true);
+                }
+                return _openStorageCommand;
             }
         }
 
