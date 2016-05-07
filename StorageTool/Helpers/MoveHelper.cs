@@ -10,6 +10,7 @@ using System.ComponentModel;
 using Monitor.Core.Utilities;
 using System.Windows;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace StorageTool.Resources
 {
@@ -182,36 +183,77 @@ namespace StorageTool.Resources
             return success;
         }
 
+        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        //static bool FileCopy(string source, string destination, IProgress<long> sizeFromHell, object _lock, CancellationToken ct)
+        //{
+        //    int array_length = (int)Math.Pow(2, 19);
+        //    byte[] dataArray = new byte[array_length];
+        //    using (FileStream fsread = new FileStream(source, FileMode.Open, FileAccess.Read, FileShare.None, array_length))
+        //    {
+        //        using (BinaryReader bwread = new BinaryReader(fsread))
+        //        {
+        //            using (FileStream fswrite = new FileStream(destination, FileMode.Create, FileAccess.Write, FileShare.None, array_length))
+        //            {
+        //                using (BinaryWriter bwwrite = new BinaryWriter(fswrite))
+        //                {
+        //                    int read = 0;
+        //                    while (true)
+        //                    {
+        //                        if (ct.IsCancellationRequested) { return false; }
+        //                        lock (_lock)
+        //                            read = bwread.Read(dataArray, 0, array_length);
+        //                        if (0 == read)
+        //                            break;
+        //                        bwwrite.Write(dataArray, 0, read);
+        //                        sizeFromHell.Report(read);
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
+        //    return true;
+        //}
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         static bool FileCopy(string source, string destination, IProgress<long> sizeFromHell, object _lock, CancellationToken ct)
         {
             int array_length = (int)Math.Pow(2, 19);
-            byte[] dataArray = new byte[array_length];
+            byte[] buffer1 = new byte[array_length];
+            byte[] buffer2 = new byte[array_length];
+            bool swap = false;
+            Task writer = null;
             using (FileStream fsread = new FileStream(source, FileMode.Open, FileAccess.Read, FileShare.None, array_length))
             {
-                using (BinaryReader bwread = new BinaryReader(fsread))
-                {
+                //using (BinaryReader bwread = new BinaryReader(fsread))
+                //{
                     using (FileStream fswrite = new FileStream(destination, FileMode.Create, FileAccess.Write, FileShare.None, array_length))
                     {
-                        using (BinaryWriter bwwrite = new BinaryWriter(fswrite))
-                        {
+                        //using (BinaryWriter bwwrite = new BinaryWriter(fswrite))
+                        //{
                             int read = 0;
-                            while(true)
-                            {                    
-                                if (ct.IsCancellationRequested) { return false; }                                  
-                                lock(_lock)
-                                read = bwread.Read(dataArray, 0, array_length);
+                            while (true)
+                            {
+                                if (ct.IsCancellationRequested) { return false; }
+                                lock (_lock)
+
+                                read = fsread.Read(swap ? buffer1 : buffer2, 0, array_length);
                                 if (0 == read)
                                     break;
-                                bwwrite.Write(dataArray, 0, read);
+
+                                writer?.Wait();
+                                writer = fswrite.WriteAsync(swap ? buffer1 : buffer2, 0, read);
+                                swap = !swap;
+
+
                                 sizeFromHell.Report(read);
                             }
-                        }
+                    writer?.Wait();
+                        //}
                     }
-                }
+                //}
             }
             return true;
         }
-
-    }
+    }    
 }
+

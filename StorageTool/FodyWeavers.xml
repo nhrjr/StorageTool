@@ -3,7 +3,6 @@
   <Costura CreateTemporaryAssemblies='true'>
     <IncludeAssemblies>
       ParallelExtensionsExtras
-      NAppUpdate.Framework
     </IncludeAssemblies>
   </Costura>
 </Weavers>
