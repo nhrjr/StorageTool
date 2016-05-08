@@ -22,28 +22,29 @@ namespace StorageTool
 
         public ChangedProfilesEventHandler ChangedProfilesEvent;
 
-        private void LoadConfig()
-        {
-            if (Properties.Settings.Default.Config == null)
-            {
-                StorageTool.Properties.Settings.Default.Config = new Config();
-            }
-            else
-            {
-                //StorageTool.Properties.Settings.Default.Upgrade();
-                Profiles = convertProfileBaseToProfile(Properties.Settings.Default.Config.Profiles);
-            }
-        }
+        //private void LoadConfig()
+        //{
+        //    if (Properties.Settings.Default.Config == null)
+        //    {
+        //        StorageTool.Properties.Settings.Default.Config = new Config();
+        //    }
+        //    else
+        //    {
+        //        //StorageTool.Properties.Settings.Default.Upgrade();
+        //        Profiles = convertProfileBaseToProfile(Properties.Settings.Default.Config.Profiles);
+        //    }
+        //}
 
-        private void SaveConfig()
+        private void SaveProfilesToConfig()
         {
             Properties.Settings.Default.Config.Profiles = GetProfileBase();
-            Properties.Settings.Default.Save();
+            //Properties.Settings.Default.Save();
         }
 
         public ProfileManager()
         {
-            LoadConfig();
+            Profiles = convertProfileBaseToProfile(Properties.Settings.Default.Config.Profiles);
+            //LoadConfig();
         }
 
         public ProfileManager(List<ProfileBase> input)
@@ -106,7 +107,7 @@ namespace StorageTool
                     {
                         ChangedProfilesEvent();
                     }
-                    SaveConfig();
+                    SaveProfilesToConfig();
 
                     return true;
                 }                  
@@ -121,7 +122,7 @@ namespace StorageTool
             {
                 ChangedProfilesEvent();
             }
-            SaveConfig();
+            SaveProfilesToConfig();
         }
 
         public ObservableCollection<Profile> Profiles

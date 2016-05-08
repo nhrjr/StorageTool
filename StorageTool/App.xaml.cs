@@ -19,10 +19,16 @@ namespace StorageTool
         {
             EventManager.RegisterClassHandler(typeof(TextBox), UIElement.PreviewMouseLeftButtonDownEvent, new MouseButtonEventHandler(SelectivelyHandleMouseButton), true);
             EventManager.RegisterClassHandler(typeof(TextBox), UIElement.GotKeyboardFocusEvent, new RoutedEventHandler(SelectAllText), true);
+
+            if (StorageTool.Properties.Settings.Default.Config == null)
+            {
+                StorageTool.Properties.Settings.Default.Config = new Config();
+            }
         }
 
         private void Application_Exit(object sender, ExitEventArgs e)
         {
+            StorageTool.Properties.Settings.Default.Save();
         }
 
         private static void SelectivelyHandleMouseButton(object sender, MouseButtonEventArgs e)

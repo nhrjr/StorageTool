@@ -11,10 +11,35 @@ using StorageTool.Resources;
 
 namespace StorageTool
 {
-    public class SettingsViewModel : INotifyPropertyChanged
+    public sealed class SettingsViewModel : INotifyPropertyChanged
     {
+        #region Singletion
+        private static readonly SettingsViewModel instance = new SettingsViewModel();
+
+        static SettingsViewModel()
+        {
+        }
+
+        private SettingsViewModel()
+        {
+            _debugView = StorageTool.Properties.Settings.Default.Config.DebugView;
+            _calculateSizes = StorageTool.Properties.Settings.Default.Config.CalculateSizes;
+            _checkForUpdates = StorageTool.Properties.Settings.Default.Config.CheckForUpdates;
+        }
+
+        public static SettingsViewModel Instance
+        {
+            get
+            {
+                return instance;
+            }
+        }
+        #endregion
+
         #region Fields
         private bool _debugView;
+        private bool _calculateSizes;
+        private bool _checkForUpdates;
         #endregion
 
         #region Properties
@@ -36,30 +61,59 @@ namespace StorageTool
             {
                 _debugView = value;
                 OnPropertyChanged(nameof(DebugView));
-                Console.WriteLine("set SettingsViewModel.DebugView to " + _debugView);
+               StorageTool.Properties.Settings.Default.Config.DebugView = _debugView;
+                
             }
         }
-        #endregion
 
-        #region Commands
-        RelayCommand _breakCommand;
-        public ICommand BreakCommand
+        public bool CheckForUpdates
         {
             get
             {
-                if (_breakCommand == null)
-                {
-                    _breakCommand = new RelayCommand(param =>
-                    {
-                        //System.Diagnostics.Process.Start(Application.ResourceAssembly.Location);
-                        //System.Windows.Application.Current.Shutdown();
+                return _checkForUpdates;
+            }
+            set
+            {
+                _checkForUpdates = value;
+                OnPropertyChanged(nameof(CheckForUpdates));
+                StorageTool.Properties.Settings.Default.Config.CheckForUpdates = _checkForUpdates;
+            }
+        }
 
-                    }, param => true);
-                }
-                return _breakCommand;
+        public bool CalculateSizes
+        {
+            get
+            {
+                return _calculateSizes;
+            }
+            set
+            {
+                _calculateSizes = value;
+                OnPropertyChanged(nameof(CalculateSizes));
+                StorageTool.Properties.Settings.Default.Config.CalculateSizes = _calculateSizes;
             }
         }
         #endregion
+
+        //#region Commands
+        //RelayCommand _breakCommand;
+        //public ICommand BreakCommand
+        //{
+        //    get
+        //    {
+        //        if (_breakCommand == null)
+        //        {
+        //            _breakCommand = new RelayCommand(param =>
+        //            {
+        //                //System.Diagnostics.Process.Start(Application.ResourceAssembly.Location);
+        //                //System.Windows.Application.Current.Shutdown();
+        //
+        //            }, param => true);
+        //        }
+        //        return _breakCommand;
+        //    }
+        //}
+        //#endregion
 
         public event PropertyChangedEventHandler PropertyChanged;
 

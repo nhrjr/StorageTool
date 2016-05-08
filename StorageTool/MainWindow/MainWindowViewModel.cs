@@ -28,7 +28,7 @@ namespace StorageTool
         public CompositeCollection _assigned = new CompositeCollection();
 
         private AppUpdater _appUpdater = new AppUpdater();
-        private SettingsViewModel _settingsViewModel = new SettingsViewModel();
+        private SettingsViewModel _settingsViewModel = SettingsViewModel.Instance;
         private ProfileManager _profileManager = new ProfileManager();        
         private ProfileManagerViewModel _profileManagerViewModel;
         
@@ -57,7 +57,12 @@ namespace StorageTool
             {
                 Task.Run(() =>  f.FolderManager.RefreshFolders());
             }
-            _appUpdater.CheckForUpdates();
+            SettingsViewModel s = SettingsViewModel.Instance;
+            if(s.CheckForUpdates == true)
+            {
+                _appUpdater.CheckForUpdates();
+            }
+            
         }
 
         private void UpdateDisplaySettings()
@@ -89,14 +94,28 @@ namespace StorageTool
             string param = e.PropertyName;
             if(param == "DebugView")
             {
-                Console.WriteLine("MainWindowViewModel DebugView SettingsHaveChanged");
                 SettingsViewModel s = o as SettingsViewModel;
                 foreach(FolderManagerViewModel f in _folderManagerViewModels)
                 {
                     f.DebugView = s.DebugView;
                 }
             }
-
+            if(param == "CalculateSizes")
+            {
+                SettingsViewModel s = o as SettingsViewModel;
+                foreach (FolderManagerViewModel f in _folderManagerViewModels)
+                {
+                    foreach(FolderViewModel folder in f.FolderManager.Folders)
+                    {
+                        folder.ToggleGetSize();
+                    }
+                }
+            }
+            if(param == "CheckForUpdates")
+            {
+                SettingsViewModel s = o as SettingsViewModel;
+                _appUpdater.CheckForUpdates();
+            }
         }
 
         public int NumberOfRunningCopies()

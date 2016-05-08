@@ -127,22 +127,34 @@ namespace StorageTool
 
         public AppUpdater()
         {
+            Task.Run(() => deleteOldExe());                
+        }
+
+        private void deleteOldExe()
+        {
             string[] args = Environment.GetCommandLineArgs();
-            if(args.Count() > 1)
+            if (args.Count() > 1)
             {
+                int count = 0;
                 if (args[1] == "update")
                 {
                     try
                     {
-                        File.Delete("StorageTool.exe.original");
+                         File.Delete("StorageTool.exe.original");
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
-                        MessageBox.Show("Cannot delete StorageTool.exe.new. Exception was thrown: " + ex.Message);
+                        if(++count >= 10)
+                        {
+                            MessageBox.Show("Cannot delete StorageTool.exe.original after 10 tries.\n Exception was thrown: " + ex.Message + "\n Please try manually.");
+                        }
+                        else
+                        {
+                            return;
+                        }
                     }
                 }
             }
-                
         }
 
         private bool isUpdateAvailable(string currentVersion, string updateVersion)
@@ -183,6 +195,8 @@ namespace StorageTool
 
         public void CheckForUpdates()
         {
+            SettingsViewModel s = SettingsViewModel.Instance;
+            if (s.CheckForUpdates == false) return;
 
             Uri serviceUri = new Uri("https://api.github.com/repos/nhrjr/StorageTool/releases/latest");
             WebClient updateStrings = new WebClient();

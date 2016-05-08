@@ -57,14 +57,15 @@ public class FolderViewModel : INotifyPropertyChanged
         private TaskStatus _status;
         private Mapping _mapping;
         private Task _task;
-        private CancellationTokenSource _cts;
+        private CancellationTokenSource _actionTokenSource;
+        private CancellationTokenSource _sizeTokenSource;
         private Assignment _ass = new Assignment();
         private long _processedBits;
         private int _progress;
 
         private static OrderedTaskScheduler moveTS = new OrderedTaskScheduler();
-        private static LimitedConcurrencyLevelTaskScheduler getSizeTS = new LimitedConcurrencyLevelTaskScheduler(Environment.ProcessorCount - 1);
-        //private static OrderedTaskScheduler getSizeTS = new OrderedTaskScheduler();
+        //private static LimitedConcurrencyLevelTaskScheduler getSizeTS = new LimitedConcurrencyLevelTaskScheduler(Environment.ProcessorCount - 1);
+        private static OrderedTaskScheduler getSizeTS = new OrderedTaskScheduler();
 
         #region Commands
         RelayCommand _pauseCommand;
@@ -168,11 +169,11 @@ public class FolderViewModel : INotifyPropertyChanged
             });
 
             this.Status = TaskStatus.Running;
-            _cts = new CancellationTokenSource();
-            CancellationToken _ct = _cts.Token;
+            _actionTokenSource = new CancellationTokenSource();
+            CancellationToken _ct = _actionTokenSource.Token;
             bool returnStatus = false;
             
-            _task = Task.Factory.StartNew(() => TransferFolders(ref returnStatus,sizeFromHell, _lock, _ct), _cts.Token,TaskCreationOptions.None,moveTS);
+            _task = Task.Factory.StartNew(() => TransferFolders(ref returnStatus,sizeFromHell, _lock, _ct), _actionTokenSource.Token,TaskCreationOptions.None,moveTS);
             try
             {
                 await _task.ContinueWith((task) => UpdateYourself(returnStatus));
@@ -180,7 +181,7 @@ public class FolderViewModel : INotifyPropertyChanged
             //catch (AggregateException ex) { }
             finally
             {
-                _cts.Dispose();
+                _actionTokenSource.Dispose();
                 Canceled = false;
                 this.Status = TaskStatus.Inactive;
             }
@@ -223,7 +224,7 @@ public class FolderViewModel : INotifyPropertyChanged
             if (Status == TaskStatus.Running)
             {
                 Canceled = true;
-                _cts.Cancel();
+                _actionTokenSource.Cancel();
             }          
         }
 
@@ -274,11 +275,50 @@ public class FolderViewModel : INotifyPropertyChanged
 
         public void GetSize()
         {
-            if (_isGettingSize == true && _status == TaskStatus.Inactive)
+            SettingsViewModel s = SettingsViewModel.Instance;
+            if (s.CalculateSizes == false)
+            {
+                DirSize = -1;
                 return;
+            }
+            if (_isGettingSize == true)
+            {
+                return;
+            }
+                
+            _sizeTokenSource = new CancellationTokenSource();
+            CancellationToken ct = _sizeTokenSource.Token;
             DirSize = null;
             _isGettingSize = true;
-            Task.Factory.StartNew(() => DirectorySize.DireSizeFrameWork(DirInfo), CancellationToken.None, TaskCreationOptions.None, getSizeTS).ContinueWith(task => { if (task.Result >= 0) { DirSize = task.Result; } else { DirSize = -1; } _isGettingSize = false; });
+            Task.Factory.StartNew(() => DirectorySize.DirSize(DirInfo.FullName,ct), ct, TaskCreationOptions.None, getSizeTS).ContinueWith(task => {
+                if (task.Result >= 0 && ct.IsCancellationRequested == false)
+                {
+                    DirSize = task.Result;
+                }
+                else
+                {
+                    DirSize = -1;
+                }
+                _isGettingSize = false;
+            });
+        }
+
+        public void ToggleGetSize()
+        {
+            if (DirSize < 0)
+            {
+                GetSize();
+                return;
+            }
+            else if (_sizeTokenSource.IsCancellationRequested == false)
+            {
+                _sizeTokenSource.Cancel();
+                if(DirSize == null)
+                {
+                    DirSize = -1;
+                    _isGettingSize = false;
+                }
+            }
         }
 
         #region Properties

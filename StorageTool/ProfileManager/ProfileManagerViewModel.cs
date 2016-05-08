@@ -25,7 +25,7 @@ namespace StorageTool
         private string _storageDiskSize = null;
 
         private ProfileManager _profileManager;
-        private DiskSizes _diskSizes;        
+        //private DiskSizes _diskSizes;        
 
         public ProfileManagerViewModel(ProfileManager profileManager)
         {
@@ -44,8 +44,8 @@ namespace StorageTool
                     StorageInput = _profileManager.ActiveProfile.StorageFolder.FullName;
                     ProfileName = _profileManager.ActiveProfile.ProfileName;
                     DiskSizes _diskSizes = DiskSizes.Instance;
-                    SourceDiskSize = "Free " + _diskSizes.GetFreeSpace(_profileManager.ActiveProfile.GameFolder) + " of " + _diskSizes.GetDiskSize(_profileManager.ActiveProfile.GameFolder);
-                    StorageDiskSize = "Free " + _diskSizes.GetFreeSpace(_profileManager.ActiveProfile.StorageFolder) + " of " + _diskSizes.GetDiskSize(_profileManager.ActiveProfile.StorageFolder);
+                    SourceDiskSize = "Free Disk Space " + _diskSizes.GetFreeSpace(_profileManager.ActiveProfile.GameFolder) + " / " + _diskSizes.GetDiskSize(_profileManager.ActiveProfile.GameFolder);
+                    StorageDiskSize = "Free Disk Space " + _diskSizes.GetFreeSpace(_profileManager.ActiveProfile.StorageFolder) + " / " + _diskSizes.GetDiskSize(_profileManager.ActiveProfile.StorageFolder);
                 }
                 else
                 {
@@ -182,10 +182,7 @@ namespace StorageTool
             }
         }
 
-        public string Error
-        {
-            get { return "Error"; }
-        }
+
 
 
 
@@ -215,6 +212,11 @@ namespace StorageTool
             }
         }
 
+        public string Error
+        {
+            get { return "Error"; }
+        }
+
         public string this[string inputbox]
         {
             get
@@ -226,15 +228,16 @@ namespace StorageTool
         private string Validate(string propertyName)
         {
             string validationMessage = string.Empty;
-            try
-            {
+            //try
+            //{
                 switch (propertyName)
                 {
                     case "SourceInput":
                         if (_sourceInput != null)
                         {
-                            var sourceValidate = new DirectoryInfo(@_sourceInput);
-                            if (!sourceValidate.Exists)
+                            if (!Directory.Exists(@_sourceInput))
+                            //var sourceValidate = new DirectoryInfo(@_sourceInput);
+                            //if (!sourceValidate.Exists)
                                 validationMessage = "Directory does not exist.";
                         }
 
@@ -242,19 +245,20 @@ namespace StorageTool
                     case "StorageInput":
                         if (_storageInput != null)
                         {
-                            var storageValidate = new DirectoryInfo(@_storageInput);
-                            if (!storageValidate.Exists)
+                            if (!Directory.Exists(_storageInput))
+                            //var storageValidate = new DirectoryInfo(@_storageInput);
+                            //if (!storageValidate.Exists)
                                 validationMessage = "Directory does not exist.";
                         }
 
                         break;
                 }
-            }
-            catch(ArgumentException e)
-            {
-                MessageBox.Show(e.Message);
-                validationMessage = "Illegal character in path.";
-            }
+            //}
+            //catch(ArgumentException e)
+            //{
+            //    //MessageBox.Show(e.Message);
+            //    validationMessage = "Illegal character in path.";
+            //}
             return validationMessage;
 
         }

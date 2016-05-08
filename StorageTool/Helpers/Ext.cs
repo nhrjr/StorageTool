@@ -37,7 +37,7 @@ namespace StorageTool
         public static string ToPrettySize(this long? value, int decimalPlaces = 0)
         {
             if (value == null) return "Refreshing";
-            if (value < 0) return "Not Available";
+            if (value < 0) return "";
             var asTb = Math.Round((double)value / OneTb, decimalPlaces);
             var asGb = Math.Round((double)value / OneGb, decimalPlaces);
             var asMb = Math.Round((double)value / OneMb, decimalPlaces);
