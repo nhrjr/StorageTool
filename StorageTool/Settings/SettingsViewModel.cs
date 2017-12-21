@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Windows.Navigation;
 
 using StorageTool.Resources;
 
@@ -94,6 +95,8 @@ namespace StorageTool
             }
         }
         #endregion
+
+
 
         //#region Commands
         //RelayCommand _breakCommand;

@@ -13,6 +13,8 @@
         <CheckBox x:Name="CalculateSizes" Content="Calculate Folder Sizes" HorizontalAlignment="Left" Margin="10,31,0,0" VerticalAlignment="Top" IsChecked="{Binding CalculateSizes}"/>
         <CheckBox x:Name="CheckForUpdates" Content="Check for Updates" HorizontalAlignment="Left" Margin="10,51,0,0" VerticalAlignment="Top" IsChecked="{Binding CheckForUpdates}"/>
 
+        <TextBlock Margin="340,10,10,74"><Hyperlink NavigateUri="https://github.com/nhrjr/StorageTool" RequestNavigate="Hyperlink_RequestNavigate">https://github.com/nhrjr/StorageTool</Hyperlink></TextBlock>
+
         <!--<Button x:Name="button" Content="{Binding ClickCounter}" Command="{Binding BreakCommand}" HorizontalAlignment="Left" Margin="53,40,0,0" VerticalAlignment="Top" Width="75"/>-->
 
 

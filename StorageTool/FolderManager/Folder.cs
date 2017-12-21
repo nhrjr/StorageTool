@@ -73,6 +73,37 @@ public class FolderViewModel : INotifyPropertyChanged
         RelayCommand _storeCommand;
         RelayCommand _restoreCommand;
         RelayCommand _linkCommand;
+        RelayCommand _toggleGetSizeCommand;
+        RelayCommand _getSizeCommand;
+
+        public ICommand GetSizeCommand
+        {
+            get
+            {
+                if (_getSizeCommand == null)
+                {
+                    Console.WriteLine("GetSizeCommand Triggered.");
+                    _getSizeCommand = new RelayCommand(param => {
+                        GetSize(true);
+                    }, param => true);
+                }
+                return _getSizeCommand;
+            }
+        }
+
+        public ICommand ToggleGetSizeCommand
+        {
+            get
+            {
+                if (_toggleGetSizeCommand == null)
+                {
+                    _toggleGetSizeCommand = new RelayCommand(param => {
+                        ToggleGetSize();
+                    }, param => true);
+                }
+                return _toggleGetSizeCommand;
+            }
+        }
 
         public ICommand CancelCommand
         {
@@ -273,10 +304,10 @@ public class FolderViewModel : INotifyPropertyChanged
             }
         }
 
-        public void GetSize()
+        public void GetSize(bool doitanyway = false)
         {
             SettingsViewModel s = SettingsViewModel.Instance;
-            if (s.CalculateSizes == false)
+            if (s.CalculateSizes == false && doitanyway == false)
             {
                 DirSize = -1;
                 return;

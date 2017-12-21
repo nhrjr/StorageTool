@@ -107,18 +107,18 @@ namespace StorageTool
             Folders.Remove(folder);
         }
 
-        public void RefreshSizes(string path)
-        {
-            //if (_isRefreshingSizes == true)
-            //{
-            //    return;
-            //}
-            foreach (FolderViewModel f in Folders)
-            {
-                if(f.Status == TaskStatus.Inactive && path == f.DirInfo.FullName)
-                    f.GetSize();
-            }
-        }
+        //public void RefreshSizes(string path)
+        //{
+        //    //if (_isRefreshingSizes == true)
+        //    //{
+        //    //    return;
+        //    //}
+        //    foreach (FolderViewModel f in Folders)
+        //    {
+        //        if(f.Status == TaskStatus.Inactive && path == f.DirInfo.FullName)
+        //            f.GetSize();
+        //    }
+        //}
 
         public void RefreshFolders()
         {
